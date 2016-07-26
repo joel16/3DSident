@@ -158,7 +158,7 @@ int main()
 	cfguInit();
 	fsInit();
 	sdmcInit();
-	 ptmuInit();
+	ptmuInit();
 	
     char *str_ver = malloc(100), *str_sysver = malloc(100);
     u32 os_ver = osGetKernelVersion(), firm_ver = osGetKernelVersion();
@@ -194,7 +194,7 @@ int main()
 	printf("* Language: %s\n", getLang());
 	printf("* MAC Address: %s\n", getMacAddress());
 	
-	printf("* Batter Status: %s\n", batteryStatus());
+	printf("* Battery Status: %s\n", batteryStatus());
 	
 	if (sdDetect)
 		printf("* SD Detected: Yes\n");
