@@ -1,5 +1,14 @@
-# ctr_vercheck
+# 3DSident
 
-Small application for the Nintendo 3DS to check your current FIRM and OS version
+Originally created by wolfvak - It was initially intended to be a small application for the Nintendo 3DS to check your current FIRM and OS version.
 
-Can also be used to check for proper downgrades
+I decided to fork this project, and added additional info similar to PSPident, hence the name 3DSident.
+
+# Features:
+- Current FIRM and OS version detection.
+- Model detection.
+- Region detection.
+- Language detection.
+- MAC address detection.
+- SD detection.
+- Battery status.
