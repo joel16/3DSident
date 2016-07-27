@@ -36,7 +36,7 @@ INCLUDES	:=	include
 
 APP_TITLE	:= 3DSident
 APP_DESCRIPTION	:= Get more info about your 3DS, firmware, region etc. 
-APP_AUTHOR	:= Joel16 & wolfvak
+APP_AUTHOR	:= Joel16 & Wolfvak
 
 ICON := $(RESOURCES)/icon.png
 
