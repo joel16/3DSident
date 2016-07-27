@@ -29,9 +29,16 @@ include $(DEVKITARM)/3ds_rules
 #---------------------------------------------------------------------------------
 TARGET		:=	$(notdir $(CURDIR))
 BUILD		:=	build
+RESOURCES   :=	resources
 SOURCES		:=	source
 DATA		:=	data
 INCLUDES	:=	include
+
+APP_TITLE	:= 3DSident
+APP_DESCRIPTION	:= Get more info about your 3DS, firmware, region etc. 
+APP_AUTHOR	:= Joel16 & wolfvak
+
+ICON := $(RESOURCES)/icon.png
 
 #---------------------------------------------------------------------------------
 # options for code generation

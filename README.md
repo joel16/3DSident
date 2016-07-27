@@ -14,3 +14,4 @@ I decided to fork this project, and added additional info similar to PSPident, h
 - MAC address detection.
 - SD detection.
 - Battery status.
+- Automatically saves screenshot upon exit.
