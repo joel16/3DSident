@@ -3,9 +3,12 @@
 #include <string.h>
 #include <malloc.h>
 
+#include "screenshot.h"
+
 const char * getModel()
 {
-    const char *models[] = {
+    const char *models[] = 
+	{
         "O3DS",
         "O3DS XL",
         "N3DS",
@@ -25,7 +28,8 @@ const char * getModel()
 
 const char * getRegion()
 {
-    const char *regions[] = {
+    const char *regions[] = 
+	{
         "JPN",
         "USA",
         "EUR",
@@ -47,7 +51,8 @@ const char * getRegion()
 
 const char * getLang()
 {
-    const char *languages[] = {
+    const char *languages[] = 
+	{
         "Japanese",
         "English",
         "French",
@@ -157,8 +162,12 @@ int main(int argc, char *argv[])
     {
         gspWaitForVBlank();
         hidScanInput();
-        if (hidKeysDown()) break;
-        gfxFlushBuffers();
+        if (hidKeysDown())
+		{
+			captureScreenshot();
+			break;
+        }
+		gfxFlushBuffers();
         gfxSwapBuffers();
     }
 
