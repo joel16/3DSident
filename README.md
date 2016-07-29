@@ -1,6 +1,6 @@
 # 3DSident
 
-![3DSident Banner](http://i.imgur.com/2GUfMIA.png)
+![3DSident Banner](http://i.imgur.com/Q0rw8ff.png)
 
 Originally created by wolfvak - It was initially intended to be a small application for the Nintendo 3DS to check your current FIRM and OS version.
 
