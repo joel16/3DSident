@@ -113,8 +113,6 @@ int main(int argc, char *argv[])
     fsInit();
     sdmcInit();
     ptmuInit();
-	actInit();
-	ACTU_Initialize(0xB0002C8, 0, 0);
 
     consoleInit(GFX_TOP, NULL);
 
@@ -139,8 +137,10 @@ int main(int argc, char *argv[])
     if (ret)
         printf("* osGetSystemVersionData returned 0x%08liX\n\n", ret);
 
-    snprintf(str_sysver, 100, "* Current system version: %d.%d.%d-%d\n",
+    snprintf(str_sysver, 100, "* Current system version: %d.%d.%d-%d\n\n",
              cver->mainver, cver->minor, cver->build, nver->mainver);
+	if (!ret)
+        printf(str_sysver);
 
     printf("* Model: %s\n", getModel());
     printf("* Region: %s\n", getRegion());
@@ -152,12 +152,12 @@ int main(int argc, char *argv[])
 	int batt = (u32)batteryPercent * 20;
     printf("* Battery Status: %s\n", batteryStatus());
 	printf("* Battery Percentage: %d%%\n\n", batt);
-
-    if (!ret)
-        printf(str_sysver);
 	
+	actInit();
+	ACTU_Initialize(0xB0002C8, 0, 0);
 	u32 nnidNum = 0xFFFFFFFF;
 	ACTU_GetAccountDataBlock(0xFE, 4, 12, &nnidNum);
+	actExit();
 	
 	if (nnidNum != 0xFFFFFFFF)
 		printf("* NNID: %08X\n\n", (int) nnidNum); 
@@ -175,8 +175,8 @@ int main(int argc, char *argv[])
 	FSUSER_GetArchiveResource(&resource, SYSTEM_MEDIATYPE_CTR_NAND);
 	printf("* CTR Size: %.1f MB\n", (((u64) resource.totalClusters * (u64) resource.clusterSize) / 1024.0 / 1024.0));
 	printf("* CTR Free: %.1f MB\n", ((u64) resource.freeClusters * (u64) resource.clusterSize) / 1024.0 / 1024.0);
-	
-    printf("\n\nPress any key to exit\n");
+
+	printf("\n\nPress any key to exit\n");
 
     free(nver);
     free(cver);
