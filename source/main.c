@@ -119,9 +119,9 @@ int main(int argc, char *argv[])
     char *str_ver = malloc(255), *str_sysver = malloc(255);
     u32 os_ver = osGetKernelVersion(), firm_ver = osGetKernelVersion();
 
-    printf("3DSident 0.2\n\n");
+    printf("\x1b[32m3DSident 0.3\x1b[0m\n\n");
 
-    snprintf(str_ver, 255, "* Kernel version: %lu.%lu-%lu\n* FIRM version is %lu.%lu-%lu\n",
+    snprintf(str_ver, 255, "\x1b[33m*\x1b[0m Kernel version: %lu.%lu-%lu\n\x1b[33m*\x1b[0m FIRM version is %lu.%lu-%lu\n",
              GET_VERSION_MAJOR(os_ver), GET_VERSION_MINOR(os_ver), GET_VERSION_REVISION(os_ver),
              GET_VERSION_MAJOR(firm_ver), GET_VERSION_MINOR(firm_ver), GET_VERSION_REVISION(firm_ver));
 
@@ -135,23 +135,23 @@ int main(int argc, char *argv[])
 
     s32 ret = osGetSystemVersionData(nver, cver);
     if (ret)
-        printf("* osGetSystemVersionData returned 0x%08liX\n\n", ret);
+        printf("\x1b[33m*\x1b[0m osGetSystemVersionData returned 0x%08liX\n\n", ret);
 
-    snprintf(str_sysver, 100, "* Current system version: %d.%d.%d-%d\n\n",
+    snprintf(str_sysver, 100, "\x1b[33m*\x1b[0m Current system version: %d.%d.%d-%d\n\n",
              cver->mainver, cver->minor, cver->build, nver->mainver);
 	if (!ret)
         printf(str_sysver);
 
-    printf("* Model: %s\n", getModel());
-    printf("* Region: %s\n", getRegion());
-    printf("* Language: %s\n", getLang());
-    printf("* MAC Address: %s\n\n", getMacAddress());
+    printf("\x1b[31m*\x1b[0m Model: %s\n", getModel());
+    printf("\x1b[31m*\x1b[0m Region: %s\n", getRegion());
+    printf("\x1b[31m*\x1b[0m Language: %s\n", getLang());
+    printf("\x1b[31m*\x1b[0m MAC Address: %s\n\n", getMacAddress());
 
 	u8 batteryPercent;
 	PTMU_GetBatteryLevel(&batteryPercent);
 	int batt = (u32)batteryPercent * 20;
-    printf("* Battery Status: %s\n", batteryStatus());
-	printf("* Battery Percentage: %d%%\n\n", batt);
+    printf("\x1b[34m*\x1b[0m Battery Status: %s\n", batteryStatus());
+	printf("\x1b[34m*\x1b[0m Battery Percentage: %d%%\n\n", batt);
 	
 	actInit();
 	ACTU_Initialize(0xB0002C8, 0, 0);
@@ -160,23 +160,23 @@ int main(int argc, char *argv[])
 	actExit();
 	
 	if (nnidNum != 0xFFFFFFFF)
-		printf("* NNID: %08X\n\n", (int) nnidNum); 
+		printf("\x1b[34m*\x1b[0m NNID: %08X\n\n", (int) nnidNum); 
 	else
-		printf("* NNID: Error could not retreive NNID\n\n");
+		printf("\x1b[34m*\x1b[0m NNID: Error could not retreive NNID\n\n");
 	
-	printf("* SD Detected: %s\n", detectSD() ? "Yes" : "No");
+	printf("\x1b[32m*\x1b[0m SD Detected: %s\n", detectSD() ? "Yes" : "No");
 	
 	FS_ArchiveResource resource = {0};
 	FSUSER_GetArchiveResource(&resource, SYSTEM_MEDIATYPE_SD);
 	
-	printf("* SD Size: %.1f MB\n", (((u64) resource.totalClusters * (u64) resource.clusterSize) / 1024.0 / 1024.0));
-	printf("* SD Free: %.1f MB\n", ((u64) resource.freeClusters * (u64) resource.clusterSize) / 1024.0 / 1024.0);
+	printf("\x1b[32m*\x1b[0m SD Size: %.1f MB\n", (((u64) resource.totalClusters * (u64) resource.clusterSize) / 1024.0 / 1024.0));
+	printf("\x1b[32m*\x1b[0m SD Free: %.1f MB\n", ((u64) resource.freeClusters * (u64) resource.clusterSize) / 1024.0 / 1024.0);
 	
 	FSUSER_GetArchiveResource(&resource, SYSTEM_MEDIATYPE_CTR_NAND);
-	printf("* CTR Size: %.1f MB\n", (((u64) resource.totalClusters * (u64) resource.clusterSize) / 1024.0 / 1024.0));
-	printf("* CTR Free: %.1f MB\n", ((u64) resource.freeClusters * (u64) resource.clusterSize) / 1024.0 / 1024.0);
+	printf("\x1b[32m*\x1b[0m CTR Size: %.1f MB\n", (((u64) resource.totalClusters * (u64) resource.clusterSize) / 1024.0 / 1024.0));
+	printf("\x1b[32m*\x1b[0m CTR Free: %.1f MB\n", ((u64) resource.freeClusters * (u64) resource.clusterSize) / 1024.0 / 1024.0);
 
-	printf("\n\nPress any key to exit\n");
+	printf("\n\n\x1b[32m> Press any key to exit =)\x1b[0m\n");
 
     free(nver);
     free(cver);
