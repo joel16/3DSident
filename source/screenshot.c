@@ -272,8 +272,30 @@ int screenshot_png(const char *path, int level)
 	return 0;
 }
 
+int screenshotConfig(int data)
+{
+	FILE * config;
+	
+	data = 1;
+	
+	if (!(fileExists("/3ds/3DSident/screenshots/screenshot.bin")))
+	{
+		config = fopen("/3ds/3DSident/screenshots/screenshot.bin", "w");
+		fprintf(config, "%d", data);
+		fclose(config);
+	}
+	
+	config = fopen("/3ds/3DSident/screenshots/screenshot.bin", "r");
+	fscanf(config, "%d", &data);
+	fclose(config);
+	
+	return data;
+}
+
 void captureScreenshot()
 {
+	screenCapture = screenshotConfig(screenCapture);
+	
 	if (fileExists("/3ds/3DSident/screenshots/"))
 		deleteFile("/3ds/3DSident/screenshots/");
 	
@@ -283,5 +305,6 @@ void captureScreenshot()
 	if (!dirExists("/3ds/3DSident/screenshots"))
 		makeDir("/3ds/3DSident/screenshots");
 	
-	screenshot_png(screenshotPath, Z_NO_COMPRESSION);
+	if (screenCapture == 1)
+		screenshot_png(screenshotPath, Z_NO_COMPRESSION);
 }
