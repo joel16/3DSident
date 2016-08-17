@@ -147,7 +147,7 @@ int main(int argc, char *argv[])
     printf("\x1b[31m*\x1b[0m Language: %s\n", getLang());
     printf("\x1b[31m*\x1b[0m MAC Address: %s\n", getMacAddress());
 	
-	/*u8 buf[16];
+	u8 buf[16];
 	
 	FSUSER_GetSdmcCid(buf, 0x10);
 	printf("\x1b[31m*\x1b[0m SDMC CID: %02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X\n",
@@ -159,10 +159,7 @@ int main(int argc, char *argv[])
 	printf("\x1b[31m*\x1b[0m NAND CID: %02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X\n\n",
 		buf[0], buf[1], buf[2], buf[3], buf[4], buf[5],
 		buf[6], buf[7], buf[8], buf[9], buf[10], buf[11], 
-		buf[12], buf[13], buf[14], buf[15]);*/
-		
-		printf("\x1b[31m*\x1b[0m SDMC CID: 12345678910111213141516\n");
-		printf("\x1b[31m*\x1b[0m NAND CID: 12345678910111213141516\n\n");
+		buf[12], buf[13], buf[14], buf[15]);
 
 	u8 batteryPercent;
 	PTMU_GetBatteryLevel(&batteryPercent);
