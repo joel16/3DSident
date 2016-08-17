@@ -1,17 +1,24 @@
 # 3DSident
 
-![3DSident Banner](http://i.imgur.com/Q0rw8ff.png)
+![3DSident Banner](http://i.imgur.com/Gxvc03d.png)
+
+Please note, my console ID is obviously not shown in the screenshot above.
 
 Originally created by wolfvak - It was initially intended to be a small application for the Nintendo 3DS to check your current FIRM and OS version.
 
 I decided to fork this project, and added additional info similar to PSPident, hence the name 3DSident.
 
 # Features:
-- Current FIRM and OS version detection.
+- Current kernel, FIRM and system version detection.
 - Model detection.
 - Region detection.
 - Language detection.
 - MAC address detection.
-- SD detection.
+- SDMC CID detection.
+- NAND CID detection.
 - Battery status.
-- Automatically saves screenshot upon exit.
+- Battery percentage.
+- SD detection.
+- SD free storage and total storage capacity.
+- CTR free storage and total storage capacity.
+- Automatically saves screenshot upon exit. (Can be disabled by opening 3ds/3DSident/screenshots/screenshot.bin and replacing 1 with 0)
