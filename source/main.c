@@ -101,7 +101,7 @@ char * getMacAddress()
     static char macAddress[18];
 
     // sprintf automatically zero-terminates the string
-    sprintf(macAddress,"%02X:%02X:%02X:%02X:%02X:%02X",*macByte,*(macByte+1),*(macByte+2),*(macByte+3),*(macByte+4),*(macByte+5));
+    sprintf(macAddress, "%02X:%02X:%02X:%02X:%02X:%02X", *macByte, *(macByte + 1), *(macByte + 2), *(macByte + 3), *(macByte + 4), *(macByte + 5));
 
     return macAddress;
 }
@@ -145,7 +145,24 @@ int main(int argc, char *argv[])
     printf("\x1b[31m*\x1b[0m Model: %s\n", getModel());
     printf("\x1b[31m*\x1b[0m Region: %s\n", getRegion());
     printf("\x1b[31m*\x1b[0m Language: %s\n", getLang());
-    printf("\x1b[31m*\x1b[0m MAC Address: %s\n\n", getMacAddress());
+    printf("\x1b[31m*\x1b[0m MAC Address: %s\n", getMacAddress());
+	
+	/*u8 buf[16];
+	
+	FSUSER_GetSdmcCid(buf, 0x10);
+	printf("\x1b[31m*\x1b[0m SDMC CID: %02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X\n",
+		buf[0], buf[1], buf[2], buf[3], buf[4], buf[5],
+		buf[6], buf[7], buf[8], buf[9], buf[10], buf[11], 
+		buf[12], buf[13], buf[14], buf[15]);
+	
+	FSUSER_GetNandCid(buf, 0x10);
+	printf("\x1b[31m*\x1b[0m NAND CID: %02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X\n\n",
+		buf[0], buf[1], buf[2], buf[3], buf[4], buf[5],
+		buf[6], buf[7], buf[8], buf[9], buf[10], buf[11], 
+		buf[12], buf[13], buf[14], buf[15]);*/
+		
+		printf("\x1b[31m*\x1b[0m SDMC CID: 12345678910111213141516\n");
+		printf("\x1b[31m*\x1b[0m NAND CID: 12345678910111213141516\n\n");
 
 	u8 batteryPercent;
 	PTMU_GetBatteryLevel(&batteryPercent);
@@ -177,7 +194,7 @@ int main(int argc, char *argv[])
 	printf("\x1b[32m*\x1b[0m CTR Free: %.1f MB\n", ((u64) resource.freeClusters * (u64) resource.clusterSize) / 1024.0 / 1024.0);
 
 	printf("\n\n\x1b[32m> Press any key to exit =)\x1b[0m\n");
-
+	
     free(nver);
     free(cver);
     free(str_ver);
