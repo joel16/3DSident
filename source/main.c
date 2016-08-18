@@ -119,7 +119,7 @@ int main(int argc, char *argv[])
     char *str_ver = malloc(255), *str_sysver = malloc(255);
     u32 os_ver = osGetKernelVersion(), firm_ver = osGetKernelVersion();
 
-    printf("\x1b[32m3DSident 0.3\x1b[0m\n\n");
+    printf("\x1b[32m3DSident 0.3.1\x1b[0m\n\n");
 
     snprintf(str_ver, 255, "\x1b[33m*\x1b[0m Kernel version: %lu.%lu-%lu\n\x1b[33m*\x1b[0m FIRM version is %lu.%lu-%lu\n",
              GET_VERSION_MAJOR(os_ver), GET_VERSION_MINOR(os_ver), GET_VERSION_REVISION(os_ver),
@@ -176,7 +176,7 @@ int main(int argc, char *argv[])
 	if (nnidNum != 0xFFFFFFFF)
 		printf("\x1b[34m*\x1b[0m NNID: %08X\n\n", (int) nnidNum); 
 	else
-		printf("\x1b[34m*\x1b[0m NNID: Error could not retreive NNID\n\n");
+		printf("\x1b[34m*\x1b[0m NNID: Error could not retrieve NNID\n\n");
 	
 	printf("\x1b[32m*\x1b[0m SD Detected: %s\n", detectSD() ? "Yes" : "No");
 	

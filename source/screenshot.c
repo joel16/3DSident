@@ -294,16 +294,16 @@ int screenshotConfig(int data)
 
 void captureScreenshot()
 {
+	if (!(dirExists("/3ds/3DSident")))
+		makeDir("/3ds/3DSident");
+	
+	if (!(dirExists("/3ds/3DSident/screenshots")))
+		makeDir("/3ds/3DSident/screenshots");
+	
 	screenCapture = screenshotConfig(screenCapture);
 	
 	if (fileExists("/3ds/3DSident/screenshots/"))
 		deleteFile("/3ds/3DSident/screenshots/");
-	
-	if (!dirExists("/3ds/3DSident"))
-		makeDir("/3ds/3DSident");
-	
-	if (!dirExists("/3ds/3DSident/screenshots"))
-		makeDir("/3ds/3DSident/screenshots");
 	
 	if (screenCapture == 1)
 		screenshot_png(screenshotPath, Z_NO_COMPRESSION);
