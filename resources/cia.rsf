@@ -152,10 +152,12 @@ AccessControlInfo:
   # Maximum 34 services (32 if firmware is prior to 9.6.0)
   ServiceAccessControl:
    - APT:U
+   - ac:u
+   - act:u
+   - am:net
    - $hioFIO
    - $hostio0
    - $hostio1
-   - ac:u
    - boss:U
    - cam:u
    - cecd:u
@@ -194,8 +196,9 @@ SystemControlInfo:
   # Maximum 48 dependencies
   # <module name>:<module titleid>
   Dependency: 
-    ac: 0x0004013000002402L
-    am: 0x0004013000001502L
+    ac: 0x0004013000002402
+    act: 0x0004013000003802
+    am: 0x0004013000001502
     boss: 0x0004013000003402L
     camera: 0x0004013000001602L
     cecd: 0x0004013000002602L

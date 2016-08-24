@@ -6,6 +6,17 @@
 #include "actu.h"
 #include "screenshot.h"
 
+int vaPrint(char *format, ...)
+{
+    va_list args;
+    va_start(args, format);
+	int ret = vprintf(format, args);
+    va_end(args);
+	gfxFlushBuffers();
+	gfxSwapBuffers();
+	return ret;
+}
+
 const char * getModel()
 {
     const char *models[] = 
@@ -106,20 +117,30 @@ char * getMacAddress()
     return macAddress;
 }
 
-int main(int argc, char *argv[])
+u32 titleCount(FS_MediaType mediaType)
 {
+	u32 count = 0;
+	
+	AM_GetTitleCount(mediaType, &count);
+
+    return count;
+}
+
+int main(int argc, char *argv[])
+{      
     gfxInitDefault();
     cfguInit();
     fsInit();
     sdmcInit();
     ptmuInit();
+	amInit();
 
     consoleInit(GFX_TOP, NULL);
 
     char *str_ver = malloc(255), *str_sysver = malloc(255);
     u32 os_ver = osGetKernelVersion(), firm_ver = osGetKernelVersion();
 
-    printf("\x1b[32m3DSident 0.3.1\x1b[0m\n\n");
+    printf("\x1b[32m3DSident 0.4\x1b[0m\n\n");
 
     snprintf(str_ver, 255, "\x1b[33m*\x1b[0m Kernel version: %lu.%lu-%lu\n\x1b[33m*\x1b[0m FIRM version is %lu.%lu-%lu\n",
              GET_VERSION_MAJOR(os_ver), GET_VERSION_MINOR(os_ver), GET_VERSION_REVISION(os_ver),
@@ -167,16 +188,29 @@ int main(int argc, char *argv[])
     printf("\x1b[34m*\x1b[0m Battery Status: %s\n", batteryStatus());
 	printf("\x1b[34m*\x1b[0m Battery Percentage: %d%%\n\n", batt);
 	
-	actInit();
-	ACTU_Initialize(0xB0002C8, 0, 0);
 	u32 nnidNum = 0xFFFFFFFF;
-	ACTU_GetAccountDataBlock(0xFE, 4, 12, &nnidNum);
-	actExit();
 	
-	if (nnidNum != 0xFFFFFFFF)
-		printf("\x1b[34m*\x1b[0m NNID: %08X\n\n", (int) nnidNum); 
-	else
-		printf("\x1b[34m*\x1b[0m NNID: Error could not retrieve NNID\n\n");
+    ret = actInit();
+	/*if (ret) 
+		vaPrint("actInit failed! %08x\n", ret);*/
+    ret = ACTU_Initialize(0xB0002C8, 0, 0);
+	/*if (ret) 
+		vaPrint("ACTU_Initialize failed! %08x\n", ret);*/
+    ret = ACTU_GetAccountDataBlock(0xFE, 4, 12, &nnidNum);
+	/*if (ret) 
+		vaPrint("ACTU_GetAccountDataBlock failed! %08x\n", ret);*/
+    ret = actExit();
+	if (ret) 
+		vaPrint("actExit failed! %08x\n", ret);
+
+	if (nnidNum != 0xFFFFFFFF) 
+	{
+		vaPrint("\x1b[34m*\x1b[0m NNID Number: %08X\n\n", (int) nnidNum);
+	}
+	else 
+	{
+		vaPrint("\x1b[34m*\x1b[0m NNID Number: Error could not retrieve NNID\n\n");
+	}
 	
 	printf("\x1b[32m*\x1b[0m SD Detected: %s\n", detectSD() ? "Yes" : "No");
 	
@@ -189,6 +223,8 @@ int main(int argc, char *argv[])
 	FSUSER_GetArchiveResource(&resource, SYSTEM_MEDIATYPE_CTR_NAND);
 	printf("\x1b[32m*\x1b[0m CTR Size: %.1f MB\n", (((u64) resource.totalClusters * (u64) resource.clusterSize) / 1024.0 / 1024.0));
 	printf("\x1b[32m*\x1b[0m CTR Free: %.1f MB\n", ((u64) resource.freeClusters * (u64) resource.clusterSize) / 1024.0 / 1024.0);
+	u32 installedTitles = titleCount(MEDIATYPE_SD);
+	printf("\x1b[32m*\x1b[0m Installed titles: %i\n", (int)installedTitles);
 
 	printf("\n\n\x1b[32m> Press any key to exit =)\x1b[0m\n");
 	
@@ -210,6 +246,7 @@ int main(int argc, char *argv[])
         gfxSwapBuffers();
     }
 
+	amExit();
     ptmuExit();
     sdmcInit();
     fsExit();
