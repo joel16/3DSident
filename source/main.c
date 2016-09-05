@@ -126,6 +126,48 @@ u32 titleCount(FS_MediaType mediaType)
     return count;
 }
 
+void getScreenType()
+{
+	bool isNew3DS = 0;
+    APT_CheckNew3DS(&isNew3DS);
+	
+    if (isNew3DS)
+    {
+        u8 screens = 0;
+        GSPLCD_GetVendors(&screens);
+        printf("\x1b[31m*\x1b[0m Screen Info: ");
+        switch ((screens >> 4) & 0xF)
+        {
+            case 1:
+                printf("Upper: IPS ");
+                break;
+            case 0xC:
+                printf("Upper: TN ");
+                break;
+            default:
+                printf("Upper: Unknown ");
+                break;
+        }
+         switch (screens & 0xF)
+        {
+            case 1:
+                printf("| Lower: IPS\n");
+                break;
+            case 0xC:
+                printf("| Lower: TN\n");
+                break;
+            default:
+                printf("| Lower: Unknown\n");
+                break;
+        }
+    }
+	
+    else
+    {
+        printf("Upper screen: TN - Lower screen: TN\n");
+    }
+}
+
 int main(int argc, char *argv[])
 {      
     gfxInitDefault();
@@ -134,7 +176,11 @@ int main(int argc, char *argv[])
     sdmcInit();
     ptmuInit();
 	amInit();
-
+	psInit();
+	aptInit();
+    hidInit();
+    gspLcdInit();
+	
     consoleInit(GFX_TOP, NULL);
 
     char *str_ver = malloc(255), *str_sysver = malloc(255);
@@ -164,6 +210,7 @@ int main(int argc, char *argv[])
         printf(str_sysver);
 
     printf("\x1b[31m*\x1b[0m Model: %s\n", getModel());
+	getScreenType();
     printf("\x1b[31m*\x1b[0m Region: %s\n", getRegion());
     printf("\x1b[31m*\x1b[0m Language: %s\n", getLang());
     printf("\x1b[31m*\x1b[0m MAC Address: %s\n", getMacAddress());
@@ -181,6 +228,15 @@ int main(int argc, char *argv[])
 		buf[0], buf[1], buf[2], buf[3], buf[4], buf[5],
 		buf[6], buf[7], buf[8], buf[9], buf[10], buf[11], 
 		buf[12], buf[13], buf[14], buf[15]);
+		
+	/*u32 deviceId;
+	PS_GetDeviceId(&deviceId);
+	printf("\x1b[31m*\x1b[0m Device ID: %lu\n", deviceId);*/
+	
+	/*u8* secureInfo = (u8*) 0x20316000;
+    u8* serial = secureInfo + 0x102;
+	printf("\x1b[31m*\x1b[0m Serial: %.15s\n\n", (char*)serial);*/
+	
 
 	u8 batteryPercent;
 	PTMU_GetBatteryLevel(&batteryPercent);
@@ -200,8 +256,8 @@ int main(int argc, char *argv[])
 	/*if (ret) 
 		vaPrint("ACTU_GetAccountDataBlock failed! %08x\n", ret);*/
     ret = actExit();
-	if (ret) 
-		vaPrint("actExit failed! %08x\n", ret);
+	/*if (ret) 
+		vaPrint("actExit failed! %08x\n", ret);*/
 
 	if (nnidNum != 0xFFFFFFFF) 
 	{
@@ -212,7 +268,7 @@ int main(int argc, char *argv[])
 		vaPrint("\x1b[34m*\x1b[0m NNID Number: Error could not retrieve NNID\n\n");
 	}
 	
-	printf("\x1b[32m*\x1b[0m SD Detected: %s\n", detectSD() ? "Yes" : "No");
+	//printf("\x1b[32m*\x1b[0m SD Detected: %s\n", detectSD() ? "Yes" : "No"); Don't need this
 	
 	FS_ArchiveResource resource = {0};
 	FSUSER_GetArchiveResource(&resource, SYSTEM_MEDIATYPE_SD);
@@ -246,6 +302,10 @@ int main(int argc, char *argv[])
         gfxSwapBuffers();
     }
 
+	gspLcdExit();
+	hidExit();
+	aptExit();
+	psExit();
 	amExit();
     ptmuExit();
     sdmcExit();
