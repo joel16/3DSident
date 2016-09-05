@@ -308,7 +308,7 @@ int main(int argc, char *argv[])
 	psExit();
 	amExit();
     ptmuExit();
-    sdmcInit();
+    sdmcExit();
     fsExit();
     cfguExit();
     gfxExit();
