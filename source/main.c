@@ -131,11 +131,12 @@ void getScreenType()
 	bool isNew3DS = 0;
     APT_CheckNew3DS(&isNew3DS);
 	
+	printf("\x1b[31m*\x1b[0m Screen Info: ");
+	
     if (isNew3DS)
     {
         u8 screens = 0;
         GSPLCD_GetVendors(&screens);
-        printf("\x1b[31m*\x1b[0m Screen Info: ");
         switch ((screens >> 4) & 0xF)
         {
             case 1:
