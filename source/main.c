@@ -164,7 +164,7 @@ void getScreenType()
 	
     else
     {
-        printf("Upper screen: TN - Lower screen: TN\n");
+        printf("Upper: TN | Lower: TN\n");
     }
 }
 
@@ -308,7 +308,7 @@ int main(int argc, char *argv[])
 	psExit();
 	amExit();
     ptmuExit();
-    sdmcExit();
+    sdmcInit();
     fsExit();
     cfguExit();
     gfxExit();
