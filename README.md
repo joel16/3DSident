@@ -19,7 +19,7 @@ I decided to fork this project, and added additional info similar to PSPident, h
 - NAND CID detection.
 - NNID number detection.
 - Battery status.
-- Battery percentage.
+- Battery percentage (actual battery percentage).
 - SD detection.
 - SD free storage and total storage capacity.
 - CTR free storage and total storage capacity.
