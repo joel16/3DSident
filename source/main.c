@@ -240,11 +240,19 @@ int main(int argc, char *argv[])
     u8* serial = secureInfo + 0x102;
 	printf("\x1b[31m*\x1b[0m Serial: %.15s\n\n", (char*)serial);*/
 	
-    printf("\x1b[34m*\x1b[0m Battery Status: %s\n", batteryStatus());
+    printf("\x1b[34m*\x1b[0m Battery status: %s\n", batteryStatus());
 	
 	u8 batteryPercent; 
 	mcuGetBatteryLevel(&batteryPercent);
-	printf("\x1b[34m*\x1b[0m Battery Percentage: %d%%\n", batteryPercent);
+	printf("\x1b[34m*\x1b[0m Battery percentage: %d%%\n", batteryPercent);
+	
+	u8 batteryVolt; 
+	mcuGetBatteryVoltage(&batteryVolt);
+	printf("\x1b[34m*\x1b[0m Battery voltage: %d\n", batteryVolt);
+	
+	u8 volume; 
+	mcuGetVolume(&volume);
+	printf("\x1b[34m*\x1b[0m Volume slider state: %d\n", volume);
 	
 	u32 nnidNum = 0xFFFFFFFF;
 	
@@ -263,11 +271,11 @@ int main(int argc, char *argv[])
 
 	if (nnidNum != 0xFFFFFFFF) 
 	{
-		vaPrint("\x1b[34m*\x1b[0m NNID Number: %08X\n\n", (int) nnidNum);
+		vaPrint("\x1b[34m*\x1b[0m NNID number: %08X\n\n", (int) nnidNum);
 	}
 	else 
 	{
-		vaPrint("\x1b[34m*\x1b[0m NNID Number: Error could not retrieve NNID\n\n");
+		vaPrint("\x1b[34m*\x1b[0m NNID number: Error could not retrieve NNID\n\n");
 	}
 	
 	//printf("\x1b[32m*\x1b[0m SD Detected: %s\n", detectSD() ? "Yes" : "No"); Don't need this
