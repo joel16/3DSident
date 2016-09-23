@@ -4,6 +4,7 @@
 #include <malloc.h>
 
 #include "actu.h"
+#include "mcu.h"
 #include "screenshot.h"
 
 int vaPrint(char *format, ...)
@@ -176,6 +177,7 @@ int main(int argc, char *argv[])
     fsInit();
     sdmcInit();
     ptmuInit();
+	mcuInit();
 	amInit();
 	psInit();
 	aptInit();
@@ -187,7 +189,7 @@ int main(int argc, char *argv[])
     char *str_ver = malloc(255), *str_sysver = malloc(255);
     u32 os_ver = osGetKernelVersion(), firm_ver = osGetKernelVersion();
 
-    printf("\x1b[32m3DSident 0.4\x1b[0m\n\n");
+    printf("\x1b[32m3DSident 0.5\x1b[0m\n\n");
 
     snprintf(str_ver, 255, "\x1b[33m*\x1b[0m Kernel version: %lu.%lu-%lu\n\x1b[33m*\x1b[0m FIRM version is %lu.%lu-%lu\n",
              GET_VERSION_MAJOR(os_ver), GET_VERSION_MINOR(os_ver), GET_VERSION_REVISION(os_ver),

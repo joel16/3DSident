@@ -3,15 +3,18 @@
 
 static Handle actHandle;
 
-Result actInit(void) {
+Result actInit(void) 
+{
     return srvGetServiceHandle(&actHandle, "act:u");
 }
 
-Result actExit(void) {
+Result actExit(void) 
+{
     return svcCloseHandle(actHandle);
 }
 
-Result ACTU_Initialize(u32 sdkVersion, u32 unknown, Handle handle) {
+Result ACTU_Initialize(u32 sdkVersion, u32 unknown, Handle handle) 
+{
     Result ret = 0;
     u32 *cmdbuf = getThreadCommandBuffer();
 
@@ -28,7 +31,8 @@ Result ACTU_Initialize(u32 sdkVersion, u32 unknown, Handle handle) {
     return (Result)cmdbuf[1];
 }
 
-Result ACTU_GetAccountDataBlock(u32 unknown, u32 size, u32 blockId, void* output) {
+Result ACTU_GetAccountDataBlock(u32 unknown, u32 size, u32 blockId, void* output) 
+{
     Result ret = 0;
     u32 *cmdbuf = getThreadCommandBuffer();
 

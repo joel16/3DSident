@@ -170,6 +170,7 @@ AccessControlInfo:
    - gsp::Gpu
    - hid:USER
    - http:C
+   - mcu::HWC
    - mic:u
    - ndm:u
    - news:s
@@ -181,7 +182,6 @@ AccessControlInfo:
    - y2r:u
    - ldr:ro
    - ir:USER
-   - ir:u
    - csnd:SND
    - am:u
    - ns:s
