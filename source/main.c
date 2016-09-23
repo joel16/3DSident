@@ -240,12 +240,11 @@ int main(int argc, char *argv[])
     u8* serial = secureInfo + 0x102;
 	printf("\x1b[31m*\x1b[0m Serial: %.15s\n\n", (char*)serial);*/
 	
-
-	u8 batteryPercent;
-	PTMU_GetBatteryLevel(&batteryPercent);
-	int batt = (u32)batteryPercent * 20;
     printf("\x1b[34m*\x1b[0m Battery Status: %s\n", batteryStatus());
-	printf("\x1b[34m*\x1b[0m Battery Percentage: %d%%\n\n", batt);
+	
+	u8 batteryPercent; 
+	mcuGetBatteryLevel(&batteryPercent);
+	printf("\x1b[34m*\x1b[0m Battery Percentage: %d%%\n", batteryPercent);
 	
 	u32 nnidNum = 0xFFFFFFFF;
 	
@@ -310,6 +309,7 @@ int main(int argc, char *argv[])
 	aptExit();
 	psExit();
 	amExit();
+	mcuExit();
     ptmuExit();
     sdmcExit();
     fsExit();
