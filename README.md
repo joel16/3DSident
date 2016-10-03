@@ -20,8 +20,10 @@ I decided to fork this project, and added additional info similar to PSPident, h
 - NNID number detection.
 - Battery status.
 - Battery percentage (actual battery percentage).
+- Displays battery voltage (estimated) and unknown value format.
 - SD detection.
 - SD free storage and total storage capacity.
 - CTR free storage and total storage capacity.
 - Displays number of titles installed.
+- Displays volume slider state.
 - Automatically saves screenshot upon exit. (Can be disabled by opening 3ds/3DSident/screenshots/screenshot.bin and replacing 1 with 0)
