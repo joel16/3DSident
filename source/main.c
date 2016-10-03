@@ -189,7 +189,7 @@ int main(int argc, char *argv[])
     char *str_ver = malloc(255), *str_sysver = malloc(255);
     u32 os_ver = osGetKernelVersion(), firm_ver = osGetKernelVersion();
 
-    printf("\x1b[32m3DSident 0.5\x1b[0m\n\n");
+    printf("\x1b[32m3DSident 0.6\x1b[0m\n\n");
 
     snprintf(str_ver, 255, "\x1b[33m*\x1b[0m Kernel version: %lu.%lu-%lu\n\x1b[33m*\x1b[0m FIRM version is %lu.%lu-%lu\n",
              GET_VERSION_MAJOR(os_ver), GET_VERSION_MINOR(os_ver), GET_VERSION_REVISION(os_ver),
@@ -248,11 +248,13 @@ int main(int argc, char *argv[])
 	
 	u8 batteryVolt; 
 	mcuGetBatteryVoltage(&batteryVolt);
-	printf("\x1b[34m*\x1b[0m Battery voltage: %d\n", batteryVolt);
+	double estimatedVolt = (batteryVolt * 0.02248803827);
+	printf("\x1b[34m*\x1b[0m Battery voltage: %d (Estimated: %0.1lf V)\n", batteryVolt, estimatedVolt);
 	
 	u8 volume; 
 	mcuGetVolume(&volume);
-	printf("\x1b[34m*\x1b[0m Volume slider state: %d\n", volume);
+	double volPercent = (volume * 1.5873015873);
+	printf("\x1b[34m*\x1b[0m Volume slider state: %d  (%.0lf%%)\n", volume, volPercent);
 	
 	u32 nnidNum = 0xFFFFFFFF;
 	
