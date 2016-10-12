@@ -4,8 +4,12 @@
 #include <malloc.h>
 
 #include "actu.h"
+#include "cfgs.h"
+#include "frd.h"
 #include "mcu.h"
 #include "screenshot.h"
+
+#define SDK(a,b,c,d) ((a<<24)|(b<<16)|(c<<8)|d)
 
 int vaPrint(char *format, ...)
 {
@@ -170,10 +174,41 @@ void getScreenType()
     }
 }
 
+u64 principalIdToFriendCode(u64 pid)
+{
+    u64 fc = 0;
+	
+    frdPrincipalIdToFriendCode(&fc, pid);
+    
+	return fc;
+}
+
+FriendKey getMyFriendKey(void)
+{
+    FriendKey fk;
+    
+	frdGetMyFriendKey(&fk);
+    
+	return fk;
+}
+
+char * getSerialNum(void)
+{
+	static char str[32];
+    char serial[0x10];
+	
+    cfgsSecureInfoGetSerialNo(serial);
+    strcpy(str, serial);
+    
+	return str;
+}
+
 int main(int argc, char *argv[])
 {      
     gfxInitDefault();
     cfguInit();
+	cfgsInit();
+	//frdInit(SDK(11,4,0,200));
     fsInit();
     sdmcInit();
     ptmuInit();
@@ -189,7 +224,7 @@ int main(int argc, char *argv[])
     char *str_ver = malloc(255), *str_sysver = malloc(255);
     u32 os_ver = osGetKernelVersion(), firm_ver = osGetKernelVersion();
 
-    printf("\x1b[32m3DSident 0.6\x1b[0m\n\n");
+    printf("\x1b[32m3DSident 0.6.1\x1b[0m\n\n");
 
     snprintf(str_ver, 255, "\x1b[33m*\x1b[0m Kernel version: %lu.%lu-%lu\n\x1b[33m*\x1b[0m FIRM version is %lu.%lu-%lu\n",
              GET_VERSION_MAJOR(os_ver), GET_VERSION_MINOR(os_ver), GET_VERSION_REVISION(os_ver),
@@ -215,8 +250,35 @@ int main(int argc, char *argv[])
     printf("\x1b[31m*\x1b[0m Model: %s\n", getModel());
 	getScreenType();
     printf("\x1b[31m*\x1b[0m Region: %s\n", getRegion());
-    printf("\x1b[31m*\x1b[0m Language: %s\n", getLang());
-    printf("\x1b[31m*\x1b[0m MAC Address: %s\n", getMacAddress());
+	//printf("\x1b[31m*\x1b[0m Friend key: %llu\n", principalIdToFriendCode(getMyFriendKey().principalId));
+    
+	printf("\x1b[31m*\x1b[0m Language: %s\n", getLang());
+	
+	u32 nnidNum = 0xFFFFFFFF;
+    ret = actInit();
+	/*if (ret) 
+		vaPrint("actInit failed! %08x\n", ret);*/
+    ret = ACTU_Initialize(0xB0002C8, 0, 0);
+	/*if (ret) 
+		vaPrint("ACTU_Initialize failed! %08x\n", ret);*/
+    ret = ACTU_GetAccountDataBlock(0xFE, 4, 12, &nnidNum);
+	/*if (ret) 
+		vaPrint("ACTU_GetAccountDataBlock failed! %08x\n", ret);*/
+    ret = actExit();
+	/*if (ret) 
+		vaPrint("actExit failed! %08x\n", ret);*/
+
+	if (nnidNum != 0xFFFFFFFF) 
+	{
+		vaPrint("\x1b[31m*\x1b[0m NNID number: %08X\n", (int) nnidNum);
+	}
+	else 
+	{
+		vaPrint("\x1b[31m*\x1b[0m NNID number: Error could not retrieve NNID\n");
+	}
+    
+	printf("\x1b[31m*\x1b[0m MAC Address: %s\n", getMacAddress());
+	printf("\x1b[31m*\x1b[0m Serial number: %s\n", getSerialNum());
 	
 	u8 buf[16];
 	
@@ -236,49 +298,14 @@ int main(int argc, char *argv[])
 	PS_GetDeviceId(&deviceId);
 	printf("\x1b[31m*\x1b[0m Device ID: %lu\n", deviceId);*/
 	
-	/*u8* secureInfo = (u8*) 0x20316000;
-    u8* serial = secureInfo + 0x102;
-	printf("\x1b[31m*\x1b[0m Serial: %.15s\n\n", (char*)serial);*/
-	
-    printf("\x1b[34m*\x1b[0m Battery status: %s\n", batteryStatus());
-	
 	u8 batteryPercent; 
 	mcuGetBatteryLevel(&batteryPercent);
-	printf("\x1b[34m*\x1b[0m Battery percentage: %d%%\n", batteryPercent);
+	printf("\x1b[34m*\x1b[0m Battery percentage: %d%% (%s)\n", batteryPercent, batteryStatus());
 	
 	u8 batteryVolt; 
 	mcuGetBatteryVoltage(&batteryVolt);
-	double estimatedVolt = (batteryVolt * 0.02248803827);
-	printf("\x1b[34m*\x1b[0m Battery voltage: %d (Estimated: %0.1lf V)\n", batteryVolt, estimatedVolt);
-	
-	u8 volume; 
-	mcuGetVolume(&volume);
-	double volPercent = (volume * 1.5873015873);
-	printf("\x1b[34m*\x1b[0m Volume slider state: %d  (%.0lf%%)\n", volume, volPercent);
-	
-	u32 nnidNum = 0xFFFFFFFF;
-	
-    ret = actInit();
-	/*if (ret) 
-		vaPrint("actInit failed! %08x\n", ret);*/
-    ret = ACTU_Initialize(0xB0002C8, 0, 0);
-	/*if (ret) 
-		vaPrint("ACTU_Initialize failed! %08x\n", ret);*/
-    ret = ACTU_GetAccountDataBlock(0xFE, 4, 12, &nnidNum);
-	/*if (ret) 
-		vaPrint("ACTU_GetAccountDataBlock failed! %08x\n", ret);*/
-    ret = actExit();
-	/*if (ret) 
-		vaPrint("actExit failed! %08x\n", ret);*/
-
-	if (nnidNum != 0xFFFFFFFF) 
-	{
-		vaPrint("\x1b[34m*\x1b[0m NNID number: %08X\n\n", (int) nnidNum);
-	}
-	else 
-	{
-		vaPrint("\x1b[34m*\x1b[0m NNID number: Error could not retrieve NNID\n\n");
-	}
+	//double estimatedVolt = (batteryVolt * 0.02248803827);
+	printf("\x1b[34m*\x1b[0m Battery voltage: %d\n\n", batteryVolt);//,(Estimated: %0.1lf V) estimatedVolt);
 	
 	//printf("\x1b[32m*\x1b[0m SD Detected: %s\n", detectSD() ? "Yes" : "No"); Don't need this
 	
@@ -293,8 +320,13 @@ int main(int argc, char *argv[])
 	printf("\x1b[32m*\x1b[0m CTR Free: %.1f MB\n", ((u64) resource.freeClusters * (u64) resource.clusterSize) / 1024.0 / 1024.0);
 	u32 installedTitles = titleCount(MEDIATYPE_SD);
 	printf("\x1b[32m*\x1b[0m Installed titles: %i\n", (int)installedTitles);
+	
+	u8 volume; 
+	mcuGetVolume(&volume);
+	double volPercent = (volume * 1.5873015873);
+	printf("\x1b[32m*\x1b[0m Volume slider state: %d  (%.0lf%%)\n", volume, volPercent);
 
-	printf("\n\n\x1b[32m> Press any key to exit =)\x1b[0m\n");
+	printf("\n\x1b[32m> Press any key to exit =)\x1b[0m\n");
 	
     free(nver);
     free(cver);
@@ -323,6 +355,8 @@ int main(int argc, char *argv[])
     ptmuExit();
     sdmcExit();
     fsExit();
+    //frdExit();
+	cfgsExit();
     cfguExit();
     gfxExit();
     return 0;
