@@ -231,6 +231,7 @@ int main(int argc, char *argv[])
 	psInit();
 	aptInit();
     hidInit();
+	acInit();
     gspLcdInit();
 	
     consoleInit(GFX_TOP, NULL);
@@ -238,7 +239,7 @@ int main(int argc, char *argv[])
     char *str_ver = malloc(255), *str_sysver = malloc(255);
     u32 os_ver = osGetKernelVersion(), firm_ver = osGetKernelVersion();
 
-    printf("\x1b[32m3DSident 0.6.1\x1b[0m\n\n");
+    printf("\x1b[32m3DSident 0.7\x1b[0m\n\n");
 
     snprintf(str_ver, 255, "\x1b[33m*\x1b[0m Kernel version: %lu.%lu-%lu\n\x1b[33m*\x1b[0m FIRM version is %lu.%lu-%lu\n",
              GET_VERSION_MAJOR(os_ver), GET_VERSION_MINOR(os_ver), GET_VERSION_REVISION(os_ver),
@@ -261,9 +262,8 @@ int main(int argc, char *argv[])
 	if (!ret)
         printf(str_sysver);
 
-    printf("\x1b[31m*\x1b[0m Model: %s\n", getModel());
+    printf("\x1b[31m*\x1b[0m Model: %s %s\n", getModel(), getRegion());
 	getScreenType();
-    printf("\x1b[31m*\x1b[0m Region: %s\n", getRegion());
 	//printf("\x1b[31m*\x1b[0m Friend key: %llu\n", principalIdToFriendCode(getMyFriendKey().principalId));
 	printf("\x1b[31m*\x1b[0m Language: %s\n", getLang());
 	
@@ -326,18 +326,27 @@ int main(int argc, char *argv[])
 	FS_ArchiveResource resource = {0};
 	
 	FSUSER_GetArchiveResource(&resource, SYSTEM_MEDIATYPE_SD);
-	printf("\x1b[32m*\x1b[0m SD Size: Free (%.1f MB) / Total (%.1f MB)\n", (((u64) resource.freeClusters * (u64) resource.clusterSize) / 1024.0 / 1024.0), (((u64) resource.totalClusters * (u64) resource.clusterSize) / 1024.0 / 1024.0));
+	printf("\x1b[32m*\x1b[0m SD Size: %.1f MB / %.1f MB\n", (((u64) resource.freeClusters * (u64) resource.clusterSize) / 1024.0 / 1024.0), (((u64) resource.totalClusters * (u64) resource.clusterSize) / 1024.0 / 1024.0));
 	
 	FSUSER_GetArchiveResource(&resource, SYSTEM_MEDIATYPE_CTR_NAND);
-	printf("\x1b[32m*\x1b[0m CTR Size: Free (%.1f MB) / Total (%.1f MB)\n", (((u64) resource.freeClusters * (u64) resource.clusterSize) / 1024.0 / 1024.0), (((u64) resource.totalClusters * (u64) resource.clusterSize) / 1024.0 / 1024.0));
+	printf("\x1b[32m*\x1b[0m CTR Size: %.1f MB / %.1f MB\n", (((u64) resource.freeClusters * (u64) resource.clusterSize) / 1024.0 / 1024.0), (((u64) resource.totalClusters * (u64) resource.clusterSize) / 1024.0 / 1024.0));
 	
 	u32 installedTitles = titleCount(MEDIATYPE_SD);
 	printf("\x1b[32m*\x1b[0m Installed titles: %i\n", (int)installedTitles);
+	
+	/*u32 wifiStatus = 0;
+	ACU_GetWifiStatus(&wifiStatus);
+	int wifiStat = wifiStatus + osGetWifiStrength();*/
+	double wifiPercent = (osGetWifiStrength() * 33.3333333333);
+	printf("\x1b[32m*\x1b[0m WiFi signal strength: %d  (%.0lf%%)\n", osGetWifiStrength(), wifiPercent);
 	
 	u8 volume; 
 	mcuGetVolume(&volume);
 	double volPercent = (volume * 1.5873015873);
 	printf("\x1b[32m*\x1b[0m Volume slider state: %d  (%.0lf%%)\n", volume, volPercent);
+	
+	double _3dSliderPercent = (osGet3DSliderState() * 100.0);
+	printf("\x1b[32m*\x1b[0m 3D slider state: %.1lf  (%.0lf%%)\n", osGet3DSliderState(), _3dSliderPercent);
 
 	printf("\n\x1b[32m> Press any key to exit =)\x1b[0m\n");
 	
@@ -360,6 +369,7 @@ int main(int argc, char *argv[])
     }
 
 	gspLcdExit();
+	acExit();
 	hidExit();
 	aptExit();
 	psExit();
