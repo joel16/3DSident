@@ -203,6 +203,20 @@ char * getSerialNum(void)
 	return str;
 }
 
+u32 getDeviceId(void)
+{
+    u32 tmp = 0;
+    AM_GetDeviceId(&tmp);
+    return tmp;
+}
+
+u64 getSoapId(void)
+{
+    u32 tmp = 0;
+    AM_GetDeviceId(&tmp);
+    return (tmp | (((u64) 4) << 32));
+}
+
 int main(int argc, char *argv[])
 {      
     gfxInitDefault();
@@ -251,7 +265,6 @@ int main(int argc, char *argv[])
 	getScreenType();
     printf("\x1b[31m*\x1b[0m Region: %s\n", getRegion());
 	//printf("\x1b[31m*\x1b[0m Friend key: %llu\n", principalIdToFriendCode(getMyFriendKey().principalId));
-    
 	printf("\x1b[31m*\x1b[0m Language: %s\n", getLang());
 	
 	u32 nnidNum = 0xFFFFFFFF;
@@ -276,7 +289,8 @@ int main(int argc, char *argv[])
 	{
 		vaPrint("\x1b[31m*\x1b[0m NNID number: Error could not retrieve NNID\n");
 	}
-    
+    printf("\x1b[31m*\x1b[0m Device ID: (%lu)\n", getDeviceId());
+	printf("\x1b[31m*\x1b[0m ECS Device ID: (%llu)\n", getSoapId());
 	printf("\x1b[31m*\x1b[0m MAC Address: %s\n", getMacAddress());
 	printf("\x1b[31m*\x1b[0m Serial number: %s\n", getSerialNum());
 	
@@ -310,14 +324,13 @@ int main(int argc, char *argv[])
 	//printf("\x1b[32m*\x1b[0m SD Detected: %s\n", detectSD() ? "Yes" : "No"); Don't need this
 	
 	FS_ArchiveResource resource = {0};
-	FSUSER_GetArchiveResource(&resource, SYSTEM_MEDIATYPE_SD);
 	
-	printf("\x1b[32m*\x1b[0m SD Size: %.1f MB\n", (((u64) resource.totalClusters * (u64) resource.clusterSize) / 1024.0 / 1024.0));
-	printf("\x1b[32m*\x1b[0m SD Free: %.1f MB\n", ((u64) resource.freeClusters * (u64) resource.clusterSize) / 1024.0 / 1024.0);
+	FSUSER_GetArchiveResource(&resource, SYSTEM_MEDIATYPE_SD);
+	printf("\x1b[32m*\x1b[0m SD Size: Free (%.1f MB) / Total (%.1f MB)\n", (((u64) resource.freeClusters * (u64) resource.clusterSize) / 1024.0 / 1024.0), (((u64) resource.totalClusters * (u64) resource.clusterSize) / 1024.0 / 1024.0));
 	
 	FSUSER_GetArchiveResource(&resource, SYSTEM_MEDIATYPE_CTR_NAND);
-	printf("\x1b[32m*\x1b[0m CTR Size: %.1f MB\n", (((u64) resource.totalClusters * (u64) resource.clusterSize) / 1024.0 / 1024.0));
-	printf("\x1b[32m*\x1b[0m CTR Free: %.1f MB\n", ((u64) resource.freeClusters * (u64) resource.clusterSize) / 1024.0 / 1024.0);
+	printf("\x1b[32m*\x1b[0m CTR Size: Free (%.1f MB) / Total (%.1f MB)\n", (((u64) resource.freeClusters * (u64) resource.clusterSize) / 1024.0 / 1024.0), (((u64) resource.totalClusters * (u64) resource.clusterSize) / 1024.0 / 1024.0));
+	
 	u32 installedTitles = titleCount(MEDIATYPE_SD);
 	printf("\x1b[32m*\x1b[0m Installed titles: %i\n", (int)installedTitles);
 	

@@ -162,6 +162,7 @@ AccessControlInfo:
    - cam:u
    - cecd:u
    - cfg:u
+   - cfg:s
    - dlp:FKCL
    - dlp:SRVR
    - dsp::DSP
@@ -169,7 +170,6 @@ AccessControlInfo:
    - fs:USER
    - gsp::Gpu
    - hid:USER
-   - http:C
    - mcu::HWC
    - mic:u
    - ndm:u
