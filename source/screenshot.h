@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-//#include <png.h>
+#include <png.h>
 #include <zlib.h>
 #include <3ds.h>
 

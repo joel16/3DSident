@@ -9,15 +9,9 @@
 #include "cfgs.h"
 #include "frd.h"
 #include "mcu.h"
-/*#include "screenshot.h"*/
+#include "screenshot.h"
 
 #define SDK(a,b,c,d)	((a<<24)|(b<<16)|(c<<8)|d)
-#define RED				"\x1b[31m"
-#define GREEN			"\x1b[32m"
-#define YELLOW			"\x1b[33m"
-#define BLUE			"\x1b[34m"
-#define CYAN			"\x1b[36m"
-#define END				"\x1b[0m"
 
 int	vaPrint(char *format, ...)
 {
@@ -148,7 +142,7 @@ void getScreenType()
 
 	APT_CheckNew3DS(&isNew3DS);
 
-	printf("\x1b[31m*\x1b[0m Screen Info: ");
+	printf("\x1b[31;1m*\x1b[0m Screen Info: ");
 
 	if (isNew3DS)
 	{
@@ -156,25 +150,25 @@ void getScreenType()
 		switch ((screens >> 4) & 0xF)
 		{
 			case 1:
-				printf("Upper: IPS ");
+				printf("Upper: \x1b[31;1mIPS\x1b[0m ");
 				break;
 			case 0xC:
-				printf("Upper: TN ");
+				printf("Upper: \x1b[31;1mTN\x1b[0m ");
 				break;
 			default:
-				printf("Upper: Unknown ");
+				printf("Upper: \x1b[31;1mUnknown \x1b[0m");
 				break;
 		}
 		switch (screens & 0xF)
 		{
 			case 1:
-				printf("| Lower: IPS\n");
+				printf("| Lower: \x1b[31;1mIPS\x1b[0m\n");
 				break;
 			case 0xC:
-				printf("| Lower: TN\n");
+				printf("| Lower: \x1b[31;1mTN\x1b[0m\n");
 				break;
 			default:
-				printf("| Lower: Unknown\n");
+				printf("| Lower: \x1b[31;1mUnknown\x1b[0m\n");
 				break;
 		}
 	}
@@ -201,7 +195,7 @@ FriendKey getMyFriendKey(void)
 	return fk;
 }
 
-char * getSerialNum(void)
+char	*getSerialNum(void)
 {
 	static char	str[32];
 	char		serial[0x10];
@@ -245,28 +239,39 @@ int main(int argc, char *argv[])
 	gspLcdInit();
 	consoleInit(GFX_TOP, NULL);
 
-	char				*str_ver = (char *)malloc(sizeof(char) * 255), *str_sysver = (char *)malloc(sizeof(char) * 255);
-	double				wifiPercent;
-	double				volPercent;
-	double				_3dSliderPercent;
-	u32					os_ver = osGetKernelVersion(), firm_ver = osGetKernelVersion();
-	u32					installedTitles = titleCount(MEDIATYPE_SD);
-	u32					nnidNum = 0xFFFFFFFF;
+	//=========================Variable declaration============================
+	char				*str_ver = (char *)malloc(sizeof(char) * 255),
+						*str_sysver = (char *)malloc(sizeof(char) * 255);
+
+	double				wifiPercent,
+						volPercent,
+						_3dSliderPercent;
+
+	u32					os_ver = osGetKernelVersion(),
+						firm_ver = osGetKernelVersion(),
+						installedTitles = titleCount(MEDIATYPE_SD),
+						nnidNum = 0xFFFFFFFF;
+
+	u8					buf[16],
+						batteryPercent,
+						batteryVolt,
+						volume;
+
+	OS_VersionBin		*nver = (OS_VersionBin *)malloc(sizeof(OS_VersionBin)),
+						*cver = (OS_VersionBin *)malloc(sizeof(OS_VersionBin));
+
 	s32					ret;
-	u8					buf[16];
-	u8					batteryPercent;
-	u8					batteryVolt;
-	u8					volume;
+
 	FS_ArchiveResource	resource = {0};
-	OS_VersionBin		*nver = (OS_VersionBin *)malloc(sizeof(OS_VersionBin));
-	OS_VersionBin		*cver = (OS_VersionBin *)malloc(sizeof(OS_VersionBin));
+	//=========================================================================
 
 	while (aptMainLoop())
 	{
-		printf(GREEN"3DSident 0.7\n\n"END);
+		printf("\x1b[0;0H"); //Move the cursor to the top left corner of the screen
+		printf("                  \x1b[32;1m3DSident 0.7\x1b[0m\n\n");
 
-		//============================Yellow information===========================
-		snprintf(str_ver, 255, "\x1b[33m*\x1b[0m Kernel version:  %lu.%lu-%lu\n\x1b[33m*\x1b[0m FIRM version is: %lu.%lu-%lu\n",
+		//==========================Yellow information=========================
+		snprintf(str_ver, 255, "\x1b[33;1m*\x1b[0m Kernel version:  \x1b[33;1m%lu.%lu-%lu\n*\x1b[0m FIRM version is: \x1b[33;1m%lu.%lu-%lu\x1b[0m\n",
 				GET_VERSION_MAJOR(os_ver),
 				GET_VERSION_MINOR(os_ver),
 				GET_VERSION_REVISION(os_ver),
@@ -282,80 +287,96 @@ int main(int argc, char *argv[])
 		ret = osGetSystemVersionData(nver, cver);
 
 		if (ret)
-			printf("\x1b[33m*\x1b[0m osGetSystemVersionData returned 0x%08liX\n\n", ret);
+			printf("\x1b[33;1m*\x1b[0m osGetSystemVersionData returned 0x%08liX\n\n", ret);
 
-		snprintf(str_sysver, 100, "\x1b[33m*\x1b[0m Current system version: %d.%d.%d-%d\n\n", cver->mainver, cver->minor, cver->build, nver->mainver);
+		snprintf(str_sysver, 100, "\x1b[33;1m*\x1b[0m Current system version: \x1b[33;1m%d.%d.%d-%d\x1b[0m\n\n",
+				cver->mainver,
+				cver->minor,
+				cver->build,
+				nver->mainver
+				);
+
 		if (!ret)
 			printf(str_sysver);
-		//=========================================================================
-		//============================Yellow information===========================
+		//=====================================================================
 
-		printf("\x1b[31m*\x1b[0m Model: %s %s\n", getModel(), getRegion());
+		//============================Red information==========================
+		printf("\x1b[31;1m*\x1b[0m Model: \x1b[31;1m%s %s\n\x1b[0m", getModel(), getRegion());
 		getScreenType();
-		printf("\x1b[31m*\x1b[0m Language: %s\n", getLang());
+		printf("\x1b[31;1m*\x1b[0m Language: \x1b[31;1m%s\x1b[0m\n", getLang());
 
+		nnidNum = 0xFFFFFFFF;
 		ret = actInit();
 		ret = ACTU_Initialize(0xB0002C8, 0, 0);
 		ret = ACTU_GetAccountDataBlock(0xFE, 4, 12, &nnidNum);
 		ret = actExit();
 
-		if (nnidNum != 0xFFFFFFFF) 
-			vaPrint("\x1b[31m*\x1b[0m NNID number: %08X\n", (int) nnidNum);
+		if (nnidNum != 0xFFFFFFFF)
+			vaPrint("\x1b[31;1m*\x1b[0m NNID number: \x1b[31;1m%08X\x1b[0m\n", (int) nnidNum);
 		else
-			vaPrint("\x1b[31m*\x1b[0m NNID number: Error could not retrieve NNID\n");
-		printf("\x1b[31m*\x1b[0m Device ID: (%lu)\n", getDeviceId());
-		printf("\x1b[31m*\x1b[0m ECS Device ID: (%llu)\n", getSoapId());
-		printf("\x1b[31m*\x1b[0m MAC Address: %s\n", getMacAddress());
-		printf("\x1b[31m*\x1b[0m Serial number: %s\n", getSerialNum());
+			vaPrint("\x1b[31;1m*\x1b[0m NNID number: \x1b[31;1mError could not retrieve NNID\x1b[0m\n");
+
+		printf("\x1b[31;1m*\x1b[0m Device ID: (\x1b[31;1m%lu\x1b[0m)\n", getDeviceId());
+		printf("\x1b[31;1m*\x1b[0m ECS Device ID: (\x1b[31;1m%llu\x1b[0m)\n", getSoapId());
+		printf("\x1b[31;1m*\x1b[0m MAC Address: \x1b[31;1m%s\x1b[0m\n", getMacAddress());
+		printf("\x1b[31;1m*\x1b[0m Serial number: \x1b[31;1m%s\x1b[0m\n", getSerialNum());
 
 		FSUSER_GetSdmcCid(buf, 0x10);
-		printf("\x1b[31m*\x1b[0m SDMC CID: %02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X\n",
+		printf("\x1b[31;1m*\x1b[0m SDMC CID: \x1b[31;1m%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X\x1b[0m\n",
 				buf[0], buf[1], buf[2], buf[3], buf[4], buf[5],
-				buf[6], buf[7], buf[8], buf[9], buf[10], buf[11], 
+				buf[6], buf[7], buf[8], buf[9], buf[10], buf[11],
 				buf[12], buf[13], buf[14], buf[15]);
 
 		FSUSER_GetNandCid(buf, 0x10);
-		printf("\x1b[31m*\x1b[0m NAND CID: %02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X\n\n",
+		printf("\x1b[31;1m*\x1b[0m NAND CID: \x1b[31;1m%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X\x1b[0m\n\n",
 				buf[0], buf[1], buf[2], buf[3], buf[4], buf[5],
 				buf[6], buf[7], buf[8], buf[9], buf[10], buf[11], 
 				buf[12], buf[13], buf[14], buf[15]);
+		//=====================================================================
 
+		//============================Blue information=========================
 		mcuGetBatteryLevel(&batteryPercent);
-		printf("\x1b[34m*\x1b[0m Battery percentage: %d%% (%s)\n", batteryPercent, batteryStatus());
+		printf("\x1b[34;1m*\x1b[0m Battery percentage: \x1b[34;1m%3d%%\x1b[0m (\x1b[34;1m%s\x1b[0m)    \n\x1b[0m", batteryPercent, batteryStatus());
 
 		mcuGetBatteryVoltage(&batteryVolt);
-		printf("\x1b[34m*\x1b[0m Battery voltage: %d\n\n", batteryVolt);//,(Estimated: %0.1lf V) estimatedVolt);
+		printf("\x1b[34;1m*\x1b[0m Battery voltage:     \x1b[34;1m%d\x1b[0m\n\n", batteryVolt);//,(Estimated: %0.1lf V) estimatedVolt);
+		//=====================================================================
 
+		//============================Green information========================
 		FSUSER_GetArchiveResource(&resource, SYSTEM_MEDIATYPE_SD);
-		printf("\x1b[32m*\x1b[0m SD Size: %.1f MB / %.1f MB\n", (((u64) resource.freeClusters * (u64) resource.clusterSize) / 1024.0 / 1024.0), (((u64) resource.totalClusters * (u64) resource.clusterSize) / 1024.0 / 1024.0));
+		printf("\x1b[32;1m*\x1b[0m SD Size: \x1b[32;1m%.1f \x1b[0mMB / \x1b[32;1m%.1f\x1b[0m MB\n",
+				(((u64) resource.freeClusters * (u64) resource.clusterSize) / 1024.0 / 1024.0),
+				(((u64) resource.totalClusters * (u64) resource.clusterSize) / 1024.0 / 1024.0));
 
 		FSUSER_GetArchiveResource(&resource, SYSTEM_MEDIATYPE_CTR_NAND);
-		printf("\x1b[32m*\x1b[0m CTR Size: %.1f MB / %.1f MB\n", (((u64) resource.freeClusters * (u64) resource.clusterSize) / 1024.0 / 1024.0), (((u64) resource.totalClusters * (u64) resource.clusterSize) / 1024.0 / 1024.0));
+		printf("\x1b[32;1m*\x1b[0m CTR Size: \x1b[32;1m%.1f\x1b[0m MB / \x1b[32;1m%.1f\x1b[0m MB\n",
+				(((u64) resource.freeClusters * (u64) resource.clusterSize) / 1024.0 / 1024.0),
+				(((u64) resource.totalClusters * (u64) resource.clusterSize) / 1024.0 / 1024.0));
 
-		printf("\x1b[32m*\x1b[0m Installed titles: %i\n", (int)installedTitles);
+		printf("\x1b[32;1m*\x1b[0m Installed titles: \x1b[32;1m%i\x1b[0m\n", (int)installedTitles);
 
 		wifiPercent = (osGetWifiStrength() * 33.3333333333);
-		printf("\x1b[32m*\x1b[0m WiFi signal strength: %d  (%.0lf%%)\n", osGetWifiStrength(), wifiPercent);
+		printf("\x1b[32;1m*\x1b[0m WiFi signal strength: \x1b[32;1m%2d\x1b[0m   (\x1b[32;1m%.0lf%%\x1b[0m)  \n", osGetWifiStrength(), wifiPercent);
 
 		mcuGetVolume(&volume);
 		volPercent = (volume * 1.5873015873);
-		printf("\x1b[32m*\x1b[0m Volume slider state: %d  (%.0lf%%)\n", volume, volPercent);
+		printf("\x1b[32;1m*\x1b[0m Volume slider state: \x1b[32;1m%2d\x1b[0m   (\x1b[32;1m%.0lf%%\x1b[0m)  \n", volume, volPercent);
 
 		_3dSliderPercent = (osGet3DSliderState() * 100.0);
-		printf("\x1b[32m*\x1b[0m 3D slider state: %.1lf  (%.0lf%%)\n", osGet3DSliderState(), _3dSliderPercent);
+		printf("\x1b[32;1m*\x1b[0m 3D slider state: \x1b[32;1m%.1lf\x1b[0m (\x1b[32;1m%.0lf%%\x1b[0m)   \n", osGet3DSliderState(), _3dSliderPercent);
+		//=====================================================================
 
-		printf("\n\x1b[32m> Press any key to exit =)\x1b[0m\n");
+		printf("\n\x1b[32;1m>            Press any key to exit =)\x1b[0m\n");
 
-
-			gspWaitForVBlank();
-			hidScanInput();
-			if (hidKeysDown())
-			{
-				/*captureScreenshot();*/
-				break;
-			}
-			gfxFlushBuffers();
-			gfxSwapBuffers();
+		gspWaitForVBlank();
+		hidScanInput();
+		if (hidKeysDown())
+		{
+			captureScreenshot();
+			break;
+		}
+		gfxFlushBuffers();
+		gfxSwapBuffers();
 	}
 	free(nver);
 	free(cver);
