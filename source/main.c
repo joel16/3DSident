@@ -13,213 +13,210 @@
 
 #define SDK(a,b,c,d)	((a<<24)|(b<<16)|(c<<8)|d)
 
-int	vaPrint(char *format, ...)
+int vaPrint(char *format, ...)
 {
-	va_list	args;
-	int		ret = vprintf(format, args);
-
-	va_start(args, format);
-	va_end(args);
+    va_list args;
+    va_start(args, format);
+	int ret = vprintf(format, args);
+    va_end(args);
 	gfxFlushBuffers();
 	gfxSwapBuffers();
 	return ret;
 }
 
-const char	*getModel()
+const char * getModel()
 {
-	u8			model = 0;
-	const char	*models[] =
+    const char *models[] = 
 	{
-		"O3DS",
-		"O3DS XL",
-		"N3DS",
-		"2DS",
-		"N3DS XL",
-		"Unknown"
-	};
+        "O3DS",
+        "O3DS XL",
+        "N3DS",
+        "2DS",
+        "N3DS XL",
+        "Unknown"
+    };
 
-	CFGU_GetSystemModel(&model);
-	if (model < 5)
-		return models[model];
-	else
-		return models[5];
+    u8 model = 0;
+    CFGU_GetSystemModel(&model);
+
+    if (model < 5)
+        return models[model];
+    else
+        return models[5];
 }
 
-const char	*getRegion()
+const char * getRegion()
 {
-	u8			region = 0;
-	const char	*regions[] =
+    const char *regions[] = 
 	{
-		"JPN",
-		"USA",
-		"EUR",
-		"AUS",
-		"CHN",
-		"KOR",
-		"TWN",
-		"Unknown"
-	};
+        "JPN",
+        "USA",
+        "EUR",
+        "AUS",
+        "CHN",
+        "KOR",
+        "TWN",
+        "Unknown"
+    };
 
-	CFGU_SecureInfoGetRegion(&region);
+    u8 region = 0;
+    CFGU_SecureInfoGetRegion(&region);
 
-	if (region < 7)
-		return regions[region];
-	else
-		return regions[7];
+    if (region < 7)
+        return regions[region];
+    else
+        return regions[7];
 }
 
 const char * getLang()
 {
-	u8			language;
-	const char	*languages[] =
+    const char *languages[] = 
 	{
-		"Japanese",
-		"English",
-		"French",
-		"German",
-		"Italian",
-		"Spanish",
-		"Simplified Chinese",
-		"Korean",
-		"Dutch",
-		"Portugese",
-		"Russian",
-		"Traditional Chinese"
-	};
+        "Japanese",
+        "English",
+        "French",
+        "German",
+        "Italian",
+        "Spanish",
+        "Simplified Chinese",
+        "Korean",
+        "Dutch",
+        "Portugese",
+        "Russian",
+        "Traditional Chinese"
+    };
 
-	CFGU_GetSystemLanguage(&language);
+    u8 language;
+    CFGU_GetSystemLanguage(&language);
 
-	if (language < 11)
-		return languages[language];
-	else
-		return languages[11];
+    if (language < 11)
+        return languages[language];
+    else
+        return languages[11];
 }
 
-bool	detectSD()
+bool detectSD()
 {
-	bool	isSD;
-
-	FSUSER_IsSdmcDetected(&isSD);
-	return isSD;
+    bool isSD;
+    FSUSER_IsSdmcDetected(&isSD);
+    return isSD;
 }
 
 const char * batteryStatus()
 {
-	u8	batteryStateBool;
+    u8 batteryStateBool;
+    PTMU_GetBatteryChargeState(&batteryStateBool);
 
-	PTMU_GetBatteryChargeState(&batteryStateBool);
-
-	if (!batteryStateBool) 
-		return "Not charging";
-	else
-		return "Charging";
+    if (!batteryStateBool) 
+        return "Not charging";
+    else 
+        return "Charging";
 }
 
-char	*getMacAddress()
+char * getMacAddress()
 {
-	u8			*macByte = (u8*)0x1FF81060;
-	static char	macAddress[18];
+    u8* macByte = (u8*)0x1FF81060; 
+    static char macAddress[18];
 
-	// sprintf automatically zero-terminates the string
-	sprintf(macAddress, "%02X:%02X:%02X:%02X:%02X:%02X", *macByte, *(macByte + 1), *(macByte + 2), *(macByte + 3), *(macByte + 4), *(macByte + 5));
+    // sprintf automatically zero-terminates the string
+    sprintf(macAddress, "%02X:%02X:%02X:%02X:%02X:%02X", *macByte, *(macByte + 1), *(macByte + 2), *(macByte + 3), *(macByte + 4), *(macByte + 5));
 
-	return macAddress;
+    return macAddress;
 }
 
 u32 titleCount(FS_MediaType mediaType)
 {
-	u32	count = 0;
-
+	u32 count = 0;
+	
 	AM_GetTitleCount(mediaType, &count);
 
-	return count;
+    return count;
 }
 
 void getScreenType()
 {
-	bool	isNew3DS = 0;
-	u8		screens = 0;
-
-	APT_CheckNew3DS(&isNew3DS);
-
+	bool isNew3DS = 0;
+    APT_CheckNew3DS(&isNew3DS);
+	
 	printf("\x1b[31;1m*\x1b[0m Screen Info: ");
-
-	if (isNew3DS)
-	{
-		GSPLCD_GetVendors(&screens);
-		switch ((screens >> 4) & 0xF)
-		{
-			case 1:
+	
+    if (isNew3DS)
+    {
+        u8 screens = 0;
+        GSPLCD_GetVendors(&screens);
+        switch ((screens >> 4) & 0xF)
+        {
+            case 1:
 				printf("Upper: \x1b[31;1mIPS\x1b[0m ");
-				break;
-			case 0xC:
-				printf("Upper: \x1b[31;1mTN\x1b[0m ");
-				break;
-			default:
-				printf("Upper: \x1b[31;1mUnknown \x1b[0m");
-				break;
-		}
-		switch (screens & 0xF)
-		{
-			case 1:
-				printf("| Lower: \x1b[31;1mIPS\x1b[0m\n");
-				break;
-			case 0xC:
-				printf("| Lower: \x1b[31;1mTN\x1b[0m\n");
-				break;
-			default:
-				printf("| Lower: \x1b[31;1mUnknown\x1b[0m\n");
-				break;
-		}
-	}
-
-	else
-		printf("Upper: TN | Lower: TN\n");
+                break;
+            case 0xC:
+                printf("Upper: \x1b[31;1mTN\x1b[0m ");
+                break;
+            default:
+                printf("Upper: \x1b[31;1mUnknown \x1b[0m");
+                break;
+        }
+         switch (screens & 0xF)
+        {
+            case 1:
+                printf("| Lower: \x1b[31;1mIPS\x1b[0m\n");
+                break;
+            case 0xC:
+                printf("| Lower: \x1b[31;1mTN\x1b[0m\n");
+                break;
+            default:
+                printf("| Lower: \x1b[31;1mUnknown\x1b[0m\n");
+                break;
+        }
+    }
+	
+    else
+    {
+        printf("Upper: \x1b[31;1mTN\x1b[0m | Lower: \x1b[31;1mTN\n");
+    }
 }
 
 u64 principalIdToFriendCode(u64 pid)
 {
-	u64	fc = 0;
-
-	frdPrincipalIdToFriendCode(&fc, pid);
-
+    u64 fc = 0;
+	
+    frdPrincipalIdToFriendCode(&fc, pid);
+    
 	return fc;
 }
 
 FriendKey getMyFriendKey(void)
 {
-	FriendKey	fk;
-
+    FriendKey fk;
+    
 	frdGetMyFriendKey(&fk);
-
+    
 	return fk;
 }
 
-char	*getSerialNum(void)
+char * getSerialNum(void)
 {
-	static char	str[32];
-	char		serial[0x10];
-
-	cfgsSecureInfoGetSerialNo(serial);
-	strcpy(str, serial);
-
+	static char str[32];
+    char serial[0x10];
+	
+    cfgsSecureInfoGetSerialNo(serial);
+    strcpy(str, serial);
+    
 	return str;
 }
 
 u32 getDeviceId(void)
 {
-	u32	tmp = 0;
-
-	AM_GetDeviceId(&tmp);
-	return tmp;
+    u32 tmp = 0;
+    AM_GetDeviceId(&tmp);
+    return tmp;
 }
 
 u64 getSoapId(void)
 {
-	u32	tmp = 0;
-
-	AM_GetDeviceId(&tmp);
-	return (tmp | (((u64) 4) << 32));
+    u32 tmp = 0;
+    AM_GetDeviceId(&tmp);
+    return (tmp | (((u64) 4) << 32));
 }
 
 int main(int argc, char *argv[])
@@ -240,38 +237,22 @@ int main(int argc, char *argv[])
 	consoleInit(GFX_TOP, NULL);
 
 	//=========================Variable declaration============================
-	char				*str_ver = (char *)malloc(sizeof(char) * 255),
-						*str_sysver = (char *)malloc(sizeof(char) * 255);
-
-	double				wifiPercent,
-						volPercent,
-						_3dSliderPercent;
-
-	u32					os_ver = osGetKernelVersion(),
-						firm_ver = osGetKernelVersion(),
-						installedTitles = titleCount(MEDIATYPE_SD),
-						nnidNum = 0xFFFFFFFF;
-
-	u8					buf[16],
-						batteryPercent,
-						batteryVolt,
-						volume;
-
-	OS_VersionBin		*nver = (OS_VersionBin *)malloc(sizeof(OS_VersionBin)),
-						*cver = (OS_VersionBin *)malloc(sizeof(OS_VersionBin));
-
-	s32					ret;
-
+	char *str_ver = (char *)malloc(sizeof(char) * 255), *str_sysver = (char *)malloc(sizeof(char) * 255);
+	double wifiPercent, volPercent, _3dSliderPercent;
+	u32 os_ver = osGetKernelVersion(), firm_ver = osGetKernelVersion(), installedTitles = titleCount(MEDIATYPE_SD), nnidNum = 0xFFFFFFFF;
+	u8 buf[16], batteryPercent, batteryVolt, volume;
+	OS_VersionBin *nver = (OS_VersionBin *)malloc(sizeof(OS_VersionBin)), *cver = (OS_VersionBin *)malloc(sizeof(OS_VersionBin));
+	s32 ret;
 	FS_ArchiveResource	resource = {0};
 	//=========================================================================
 
 	while (aptMainLoop())
 	{
 		printf("\x1b[0;0H"); //Move the cursor to the top left corner of the screen
-		printf("                  \x1b[32;1m3DSident 0.7\x1b[0m\n\n");
+		printf("\x1b[32;1m3DSident 0.7\x1b[0m\n\n");
 
 		//==========================Yellow information=========================
-		snprintf(str_ver, 255, "\x1b[33;1m*\x1b[0m Kernel version:  \x1b[33;1m%lu.%lu-%lu\n*\x1b[0m FIRM version is: \x1b[33;1m%lu.%lu-%lu\x1b[0m\n",
+		snprintf(str_ver, 255, "\x1b[33;1m*\x1b[0m Kernel version: \x1b[33;1m%lu.%lu-%lu\n*\x1b[0m FIRM version is: \x1b[33;1m%lu.%lu-%lu\x1b[0m\n",
 				GET_VERSION_MAJOR(os_ver),
 				GET_VERSION_MINOR(os_ver),
 				GET_VERSION_REVISION(os_ver),
@@ -339,7 +320,7 @@ int main(int argc, char *argv[])
 		printf("\x1b[34;1m*\x1b[0m Battery percentage: \x1b[34;1m%3d%%\x1b[0m (\x1b[34;1m%s\x1b[0m)    \n\x1b[0m", batteryPercent, batteryStatus());
 
 		mcuGetBatteryVoltage(&batteryVolt);
-		printf("\x1b[34;1m*\x1b[0m Battery voltage:     \x1b[34;1m%d\x1b[0m\n\n", batteryVolt);//,(Estimated: %0.1lf V) estimatedVolt);
+		printf("\x1b[34;1m*\x1b[0m Battery voltage: \x1b[34;1m%d\x1b[0m\n\n", batteryVolt);//,(Estimated: %0.1lf V) estimatedVolt);
 		//=====================================================================
 
 		//============================Green information========================
@@ -356,17 +337,17 @@ int main(int argc, char *argv[])
 		printf("\x1b[32;1m*\x1b[0m Installed titles: \x1b[32;1m%i\x1b[0m\n", (int)installedTitles);
 
 		wifiPercent = (osGetWifiStrength() * 33.3333333333);
-		printf("\x1b[32;1m*\x1b[0m WiFi signal strength: \x1b[32;1m%2d\x1b[0m   (\x1b[32;1m%.0lf%%\x1b[0m)  \n", osGetWifiStrength(), wifiPercent);
+		printf("\x1b[32;1m*\x1b[0m WiFi signal strength: \x1b[32;1m%d\x1b[0m  (\x1b[32;1m%.0lf%%\x1b[0m)  \n", osGetWifiStrength(), wifiPercent);
 
 		mcuGetVolume(&volume);
 		volPercent = (volume * 1.5873015873);
-		printf("\x1b[32;1m*\x1b[0m Volume slider state: \x1b[32;1m%2d\x1b[0m   (\x1b[32;1m%.0lf%%\x1b[0m)  \n", volume, volPercent);
+		printf("\x1b[32;1m*\x1b[0m Volume slider state: \x1b[32;1m%d\x1b[0m  (\x1b[32;1m%.0lf%%\x1b[0m)  \n", volume, volPercent);
 
 		_3dSliderPercent = (osGet3DSliderState() * 100.0);
-		printf("\x1b[32;1m*\x1b[0m 3D slider state: \x1b[32;1m%.1lf\x1b[0m (\x1b[32;1m%.0lf%%\x1b[0m)   \n", osGet3DSliderState(), _3dSliderPercent);
+		printf("\x1b[32;1m*\x1b[0m 3D slider state: \x1b[32;1m%.1lf\x1b[0m  (\x1b[32;1m%.0lf%%\x1b[0m)   \n", osGet3DSliderState(), _3dSliderPercent);
 		//=====================================================================
 
-		printf("\n\x1b[32;1m>            Press any key to exit =)\x1b[0m\n");
+		printf("\n\x1b[32;1m> Press any key to exit =)\x1b[0m\n");
 
 		gspWaitForVBlank();
 		hidScanInput();
