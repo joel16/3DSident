@@ -11,7 +11,7 @@
 #include "mcu.h"
 #include "screenshot.h"
 
-#define SDK(a,b,c,d)	((a<<24)|(b<<16)|(c<<8)|d)
+#define SDK(a,b,c,d) ((a<<24)|(b<<16)|(c<<8)|d)
 
 int vaPrint(char *format, ...)
 {
@@ -118,7 +118,7 @@ char * getMacAddress()
     u8* macByte = (u8*)0x1FF81060; 
     static char macAddress[18];
 
-    // sprintf automatically zero-terminates the string
+    //sprintf automatically zero-terminates the string
     sprintf(macAddress, "%02X:%02X:%02X:%02X:%02X:%02X", *macByte, *(macByte + 1), *(macByte + 2), *(macByte + 3), *(macByte + 4), *(macByte + 5));
 
     return macAddress;
@@ -156,7 +156,7 @@ void getScreenType()
                 printf("Upper: \x1b[31;1mUnknown \x1b[0m");
                 break;
         }
-         switch (screens & 0xF)
+        switch (screens & 0xF)
         {
             case 1:
                 printf("| Lower: \x1b[31;1mIPS\x1b[0m\n");
@@ -178,7 +178,7 @@ void getScreenType()
 
 u64 principalIdToFriendCode(u64 pid)
 {
-    u64 fc = 0;
+	u64 fc = 0;
 	
     frdPrincipalIdToFriendCode(&fc, pid);
     
@@ -236,7 +236,10 @@ int main(int argc, char *argv[])
 	gspLcdInit();
 	consoleInit(GFX_TOP, NULL);
 
-	//=========================Variable declaration============================
+	//=====================================================================//
+	//------------------------Variable Declaration-------------------------//
+	//=====================================================================//
+	
 	char *str_ver = (char *)malloc(sizeof(char) * 255), *str_sysver = (char *)malloc(sizeof(char) * 255);
 	double wifiPercent, volPercent, _3dSliderPercent;
 	u32 os_ver = osGetKernelVersion(), firm_ver = osGetKernelVersion(), installedTitles = titleCount(MEDIATYPE_SD), nnidNum = 0xFFFFFFFF;
@@ -244,15 +247,17 @@ int main(int argc, char *argv[])
 	OS_VersionBin *nver = (OS_VersionBin *)malloc(sizeof(OS_VersionBin)), *cver = (OS_VersionBin *)malloc(sizeof(OS_VersionBin));
 	s32 ret;
 	FS_ArchiveResource	resource = {0};
-	//=========================================================================
 
 	while (aptMainLoop())
 	{
 		printf("\x1b[0;0H"); //Move the cursor to the top left corner of the screen
 		printf("\x1b[32;1m3DSident 0.7\x1b[0m\n\n");
 
-		//==========================Yellow information=========================
-		snprintf(str_ver, 255, "\x1b[33;1m*\x1b[0m Kernel version: \x1b[33;1m%lu.%lu-%lu\n*\x1b[0m FIRM version is: \x1b[33;1m%lu.%lu-%lu\x1b[0m\n",
+		//=====================================================================//
+		//------------------------------Firm Info------------------------------//
+		//=====================================================================//
+		
+		snprintf(str_ver, 255, "\x1b[33;1m*\x1b[0m Kernel version: \x1b[33;1m%lu.%lu-%lu\n*\x1b[0m FIRM version is: \x1b[33;1m%lu.%lu-%lu\x1b[0m \n",
 				GET_VERSION_MAJOR(os_ver),
 				GET_VERSION_MINOR(os_ver),
 				GET_VERSION_REVISION(os_ver),
@@ -279,12 +284,14 @@ int main(int argc, char *argv[])
 
 		if (!ret)
 			printf(str_sysver);
-		//=====================================================================
-
-		//============================Red information==========================
+		
+		//=====================================================================//
+		//-----------------------------System Info-----------------------------//
+		//=====================================================================//
+		
 		printf("\x1b[31;1m*\x1b[0m Model: \x1b[31;1m%s %s\n\x1b[0m", getModel(), getRegion());
 		getScreenType();
-		printf("\x1b[31;1m*\x1b[0m Language: \x1b[31;1m%s\x1b[0m\n", getLang());
+		printf("\x1b[31;1m*\x1b[0m Language: \x1b[31;1m%s\x1b[0m \n", getLang());
 
 		nnidNum = 0xFFFFFFFF;
 		ret = actInit();
@@ -293,76 +300,83 @@ int main(int argc, char *argv[])
 		ret = actExit();
 
 		if (nnidNum != 0xFFFFFFFF)
-			vaPrint("\x1b[31;1m*\x1b[0m NNID number: \x1b[31;1m%08X\x1b[0m\n", (int) nnidNum);
+			vaPrint("\x1b[31;1m*\x1b[0m NNID number: \x1b[31;1m%08X\x1b[0m \n", (int) nnidNum);
 		else
-			vaPrint("\x1b[31;1m*\x1b[0m NNID number: \x1b[31;1mError could not retrieve NNID\x1b[0m\n");
+			vaPrint("\x1b[31;1m*\x1b[0m NNID number: \x1b[31;1mError could not retrieve NNID\x1b[0m \n");
 
-		printf("\x1b[31;1m*\x1b[0m Device ID: (\x1b[31;1m%lu\x1b[0m)\n", getDeviceId());
-		printf("\x1b[31;1m*\x1b[0m ECS Device ID: (\x1b[31;1m%llu\x1b[0m)\n", getSoapId());
-		printf("\x1b[31;1m*\x1b[0m MAC Address: \x1b[31;1m%s\x1b[0m\n", getMacAddress());
-		printf("\x1b[31;1m*\x1b[0m Serial number: \x1b[31;1m%s\x1b[0m\n", getSerialNum());
+		printf("\x1b[31;1m*\x1b[0m Device ID: \x1b[31;1m%lu \n", getDeviceId());
+		printf("\x1b[31;1m*\x1b[0m ECS Device ID: \x1b[31;1m%llu \n", getSoapId());
+		printf("\x1b[31;1m*\x1b[0m MAC Address: \x1b[31;1m%s\x1b[0m \n", getMacAddress());
+		printf("\x1b[31;1m*\x1b[0m Serial number: \x1b[31;1m%s\x1b[0m \n", getSerialNum());
 
 		FSUSER_GetSdmcCid(buf, 0x10);
-		printf("\x1b[31;1m*\x1b[0m SDMC CID: \x1b[31;1m%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X\x1b[0m\n",
+		printf("\x1b[31;1m*\x1b[0m SDMC CID: \x1b[31;1m%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X\x1b[0m \n",
 				buf[0], buf[1], buf[2], buf[3], buf[4], buf[5],
 				buf[6], buf[7], buf[8], buf[9], buf[10], buf[11],
 				buf[12], buf[13], buf[14], buf[15]);
 
 		FSUSER_GetNandCid(buf, 0x10);
-		printf("\x1b[31;1m*\x1b[0m NAND CID: \x1b[31;1m%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X\x1b[0m\n\n",
+		printf("\x1b[31;1m*\x1b[0m NAND CID: \x1b[31;1m%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X\x1b[0m\n \n",
 				buf[0], buf[1], buf[2], buf[3], buf[4], buf[5],
 				buf[6], buf[7], buf[8], buf[9], buf[10], buf[11], 
 				buf[12], buf[13], buf[14], buf[15]);
-		//=====================================================================
-
-		//============================Blue information=========================
+				
+		//=====================================================================//
+		//----------------------------Battery Info-----------------------------//
+		//=====================================================================//
+		
 		mcuGetBatteryLevel(&batteryPercent);
-		printf("\x1b[34;1m*\x1b[0m Battery percentage: \x1b[34;1m%3d%%\x1b[0m (\x1b[34;1m%s\x1b[0m)    \n\x1b[0m", batteryPercent, batteryStatus());
+		printf("\x1b[34;1m*\x1b[0m Battery percentage: \x1b[34;1m%3d%%\x1b[0m (\x1b[34;1m%s\x1b[0m) \n\x1b[0m", batteryPercent, batteryStatus());
 
 		mcuGetBatteryVoltage(&batteryVolt);
-		printf("\x1b[34;1m*\x1b[0m Battery voltage: \x1b[34;1m%d\x1b[0m\n\n", batteryVolt);//,(Estimated: %0.1lf V) estimatedVolt);
-		//=====================================================================
-
-		//============================Green information========================
+		printf("\x1b[34;1m*\x1b[0m Battery voltage: \x1b[34;1m%d\x1b[0m\n \n", batteryVolt);//,(Estimated: %0.1lf V) estimatedVolt);
+		
+		//=====================================================================//
+		//------------------------------Misc Info------------------------------//
+		//=====================================================================//
+		
 		FSUSER_GetArchiveResource(&resource, SYSTEM_MEDIATYPE_SD);
-		printf("\x1b[32;1m*\x1b[0m SD Size: \x1b[32;1m%.1f \x1b[0mMB / \x1b[32;1m%.1f\x1b[0m MB\n",
+		printf("\x1b[32;1m*\x1b[0m SD Size: \x1b[32;1m%.1f \x1b[0mMB / \x1b[32;1m%.1f\x1b[0m MB \n",
 				(((u64) resource.freeClusters * (u64) resource.clusterSize) / 1024.0 / 1024.0),
 				(((u64) resource.totalClusters * (u64) resource.clusterSize) / 1024.0 / 1024.0));
 
 		FSUSER_GetArchiveResource(&resource, SYSTEM_MEDIATYPE_CTR_NAND);
-		printf("\x1b[32;1m*\x1b[0m CTR Size: \x1b[32;1m%.1f\x1b[0m MB / \x1b[32;1m%.1f\x1b[0m MB\n",
+		printf("\x1b[32;1m*\x1b[0m CTR Size: \x1b[32;1m%.1f\x1b[0m MB / \x1b[32;1m%.1f\x1b[0m MB \n",
 				(((u64) resource.freeClusters * (u64) resource.clusterSize) / 1024.0 / 1024.0),
 				(((u64) resource.totalClusters * (u64) resource.clusterSize) / 1024.0 / 1024.0));
 
 		printf("\x1b[32;1m*\x1b[0m Installed titles: \x1b[32;1m%i\x1b[0m\n", (int)installedTitles);
 
 		wifiPercent = (osGetWifiStrength() * 33.3333333333);
-		printf("\x1b[32;1m*\x1b[0m WiFi signal strength: \x1b[32;1m%d\x1b[0m  (\x1b[32;1m%.0lf%%\x1b[0m)  \n", osGetWifiStrength(), wifiPercent);
+		printf("\x1b[32;1m*\x1b[0m WiFi signal strength: \x1b[32;1m%d\x1b[0m  (\x1b[32;1m%.0lf%%\x1b[0m) \n", osGetWifiStrength(), wifiPercent);
 
 		mcuGetVolume(&volume);
 		volPercent = (volume * 1.5873015873);
-		printf("\x1b[32;1m*\x1b[0m Volume slider state: \x1b[32;1m%d\x1b[0m  (\x1b[32;1m%.0lf%%\x1b[0m)  \n", volume, volPercent);
+		printf("\x1b[32;1m*\x1b[0m Volume slider state: \x1b[32;1m%d\x1b[0m  (\x1b[32;1m%.0lf%%\x1b[0m) \n", volume, volPercent);
 
 		_3dSliderPercent = (osGet3DSliderState() * 100.0);
 		printf("\x1b[32;1m*\x1b[0m 3D slider state: \x1b[32;1m%.1lf\x1b[0m  (\x1b[32;1m%.0lf%%\x1b[0m)   \n", osGet3DSliderState(), _3dSliderPercent);
-		//=====================================================================
-
+		
 		printf("\n\x1b[32;1m> Press any key to exit =)\x1b[0m\n");
 
 		gspWaitForVBlank();
 		hidScanInput();
+		
 		if (hidKeysDown())
 		{
 			captureScreenshot();
 			break;
 		}
+		
 		gfxFlushBuffers();
 		gfxSwapBuffers();
 	}
+	
 	free(nver);
 	free(cver);
 	free(str_ver);
 	free(str_sysver);
+	
 	gspLcdExit();
 	acExit();
 	hidExit();
