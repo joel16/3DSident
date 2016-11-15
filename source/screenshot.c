@@ -294,6 +294,9 @@ int screenshotConfig(int data)
 
 void captureScreenshot()
 {
+	if (!(dirExists("/3ds/")))
+		makeDir("/3ds");
+	
 	if (!(dirExists("/3ds/3DSident")))
 		makeDir("/3ds/3DSident");
 	
