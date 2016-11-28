@@ -2,10 +2,15 @@
 
 Result frdInit(u32 sdkVer)
 {
-	srvGetServiceHandle(&frdHandle, "frd:u");
-	srvGetServiceHandle(&frdHandle, "frd:n");
-    srvGetServiceHandle(&frdHandle, "frd:a");
-	return frdSetClientSdkVersion(sdkVer);
+	Result ret;
+	
+	ret = srvGetServiceHandle(&frdHandle, "frd:u");
+	if(R_FAILED(ret)) ret = srvGetServiceHandle(&frdHandle, "frd:n");
+    if(R_FAILED(ret)) ret = srvGetServiceHandle(&frdHandle, "frd:a");
+	
+	frdSetClientSdkVersion(sdkVer);
+
+	return ret;
 }
 
 Result frdExit()

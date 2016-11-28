@@ -1,5 +1,8 @@
 #include <3ds.h>
+#include <stdlib.h>
+#include <string.h>
 
 Handle amHandle;
 
-Result AMNet_GetDeviceCert(u8 *buffer);
+char * base64encode(const char * input);
+Result amNetGetDeviceCert(u8 const * buffer);

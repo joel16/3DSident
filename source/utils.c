@@ -1,8 +1,8 @@
-#include "am.h"
-	
-char * base64encode(const char * input)
+#include "utils.h"
+
+char * base64Encode(u8 const * input)
 {
-    int      len      = strlen(input);
+    int      len      = strlen((const char *)input);
     int      leftover = len % 3;
     char    *ret      = malloc(((len/3) * 4) + ((leftover)?4:0) + 1);
     int      n        = 0;
@@ -53,19 +53,4 @@ char * base64encode(const char * input)
     }
     ret[outlen] = '\0';
     return ret;
-}
-
-Result amNetGetDeviceCert(u8 const * buffer)
-{
-	Result ret = 0;
-	u32 *cmdbuf = getThreadCommandBuffer();
-
-	cmdbuf[0] = IPC_MakeHeader(0x818,1,2); // 0x08180042
-	cmdbuf[1] = 0x180;
-	cmdbuf[2] = (0x180 << 4) | 0xC;
-	cmdbuf[3] = (u32)buffer;
-
-	if(R_FAILED(ret = svcSendSyncRequest(amHandle))) return ret;
-
-	return (Result)cmdbuf[1];
 }
