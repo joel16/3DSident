@@ -23,8 +23,6 @@ int vaPrint(char *format, ...)
     va_start(args, format);
 	int ret = vprintf(format, args);
     va_end(args);
-	gfxFlushBuffers();
-	gfxSwapBuffers();
 	return ret;
 }
 
@@ -299,7 +297,7 @@ int main(int argc, char *argv[])
 		GET_VERSION_MINOR(os_ver),
 		GET_VERSION_REVISION(os_ver)
 	    );
-		sftd_draw_text(font, 10, 20,  RGBA8(0,0 , 255,   255), 10,str_ver);
+		sftd_draw_text(font, 10, 20,  RGBA8(255 ,140 ,0 ,255), 10,str_ver);
 		
 		snprintf(str_verf,255, "FIRM version is: %lu.%lu-%lu",
 				GET_VERSION_MAJOR(firm_ver),
@@ -332,11 +330,11 @@ int main(int argc, char *argv[])
 		//=====================================================================//
 		sftd_draw_textf(font, 10, 50,  RGBA8(0, 255, 255,   255), 10,"Model: %s",getModel());
 		//printf("\x1b[31;1m*\x1b[0m Model: \x1b[31;1m%s %s\n\x1b[0m", getModel(), getRegion());
-		sftd_draw_textf(font, 10, 60,  RGBA8(0, 0 , 255,   255), 10,"Region: %s",getRegion());
+		sftd_draw_textf(font, 10, 60,  RGBA8(255 ,140 ,0 ,255), 10,"Region: %s",getRegion());
 		
 		sftd_draw_textf(font, 10, 70,  RGBA8(255, 0 , 0,   255), 10,"%s",getLang());
 		//printf("\x1b[31;1m*\x1b[0m Language: \x1b[31;1m%s\x1b[0m \n", getLang());
-		sftd_draw_textf(font, 10, 80,  RGBA8(255, 0 , 0,   255), 10,"NNID: %s",getNNID());
+		sftd_draw_textf(font, 10, 80,  RGBA8(255, 0 , 0,   255), 10,"NNID: %s",(char*)getNNID());
 		//printf("\x1b[31;1m*\x1b[0m NNID: \x1b[31;1m%s\x1b[0m ", (char*)getNNID());
         getScreenType(font);
 		ret = ACTU_Initialize(0xB0002C8, 0, 0);
@@ -344,7 +342,9 @@ int main(int argc, char *argv[])
    
 		//if (nnidNum != 0xFFFFFFFF)
 		//	vaPrint("(\x1b[31;1m%08X\x1b[0m) \n", (int) nnidNum);
-		//else
+	        // sftd_draw_textf(font, 40, 80,  RGBA8(0, 255, 0,   255), 10,"%08X",(int)nnidNum);
+	   // else
+			//sftd_draw_text(font, 20, 80,  RGBA8(0, 255, 0,   255), 10,"Error could not retrieve NNID");
 			//printf("\x1b[31;1mError could not retrieve NNID\x1b[0m\n");
         sftd_draw_textf(font, 10, 120,  RGBA8(120, 255 , 0,   255), 10,"Device ID: %lu",getDeviceId);
 		//printf("\x1b[31;1m*\x1b[0m Device ID: \x1b[31;1m%lu \n", getDeviceId());
@@ -377,12 +377,12 @@ int main(int argc, char *argv[])
 		//=====================================================================//
 		
 		mcuGetBatteryLevel(&batteryPercent);
-		sftd_draw_textf(font, 10, 190,  RGBA8(0, 0 , 255,   255), 10,"Battery Percentage: %3d%% Battery Status %s", batteryPercent,batteryStatus());
+		sftd_draw_textf(font, 10, 190,  RGBA8(255 ,140 ,0 ,255), 10,"Battery Percentage: %3d%% Battery Status %s", batteryPercent,batteryStatus());
 		//printf("\x1b[34;1m*\x1b[0m Battery percentage: \x1b[34;1m%3d%%\x1b[0m (\x1b[34;1m%s\x1b[0m) \n\x1b[0m", batteryPercent, batteryStatus());
 		
 
 		mcuGetBatteryVoltage(&batteryVolt);
-		sftd_draw_textf(font, 10, 200,  RGBA8(0, 0 , 255,   255), 10,"Battery Voltage %d",batteryVolt);
+		sftd_draw_textf(font, 10, 200,  RGBA8(255 ,140 ,0 ,255), 10,"Battery Voltage %d",batteryVolt);
 		//printf("\x1b[34;1m*\x1b[0m Battery voltage: \x1b[34;1m%d\x1b[0m\n \n", batteryVolt);//,(Estimated: %0.1lf V) estimatedVolt);
 		
 		//=====================================================================//
