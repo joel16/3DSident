@@ -10,17 +10,6 @@
 #include "system.h"
 #include "utils.h"
 
-int vaPrint(char *format, ...)
-{
-    va_list args;
-    va_start(args, format);
-	int ret = vprintf(format, args);
-    va_end(args);
-	gfxFlushBuffers();
-	gfxSwapBuffers();
-	return ret;
-}
-
 void kernelMenu()
 {
 	char *str_kernel = (char *)malloc(sizeof(char) * 255), *str_ver = (char *)malloc(sizeof(char) * 255), *str_sysver = (char *)malloc(sizeof(char) * 255);
@@ -121,10 +110,12 @@ void miscMenu()
 	
 	sftd_draw_textf(font, 165, 100, RGBA8(0, 0, 0, 255), 12, "Miscelleanous");
 	
+	FSUSER_GetArchiveResource(&resource, SYSTEM_MEDIATYPE_SD);
 	sftd_draw_textf(font, 20, 116, RGBA8(77, 76, 74, 255), 12, "SD Size: %.1f MB / %.1f MB",
 				(((u64) resource.freeClusters * (u64) resource.clusterSize) / 1024.0 / 1024.0),
 				(((u64) resource.totalClusters * (u64) resource.clusterSize) / 1024.0 / 1024.0));
-				
+	
+	FSUSER_GetArchiveResource(&resource, SYSTEM_MEDIATYPE_CTR_NAND);
 	sftd_draw_textf(font, 20, 132, RGBA8(77, 76, 74, 255), 12, "CTR Size: %.1f MB / %.1f MB",
 				(((u64) resource.freeClusters * (u64) resource.clusterSize) / 1024.0 / 1024.0),
 				(((u64) resource.totalClusters * (u64) resource.clusterSize) / 1024.0 / 1024.0));
@@ -175,7 +166,7 @@ int main(int argc, char *argv[])
     while (aptMainLoop())
     {
 		selector_image_x = selector_x + (selector_xDistance * MenuSelection); //Determines where the selection image is drawn for each selection
-        selector_image_y = selector_y + (selector_yDistance * MenuSelection); //Determines where the selection image is drawn for each selection
+		selector_image_y = selector_y + (selector_yDistance * MenuSelection); //Determines where the selection image is drawn for each selection
 		
 		hidScanInput();
 		u32 kDown = hidKeysDown();
@@ -197,17 +188,17 @@ int main(int argc, char *argv[])
 		
 		if (kDown & KEY_DOWN) 
 			MenuSelection++; //Moves the selector down
-        if (kDown & KEY_UP) 
+		if (kDown & KEY_UP) 
 			MenuSelection--; //Moves the selector up
         
-        if (MenuSelection > numMenuItems) 
+		if (MenuSelection > numMenuItems) 
 			MenuSelection = 1; //Sets the selection to the first
-        if (MenuSelection < 1) 
+		if (MenuSelection < 1) 
 			MenuSelection = numMenuItems; //Sets the selection back to last
 		
 		sf2d_end_frame();
 		
-        sf2d_start_frame(GFX_TOP, GFX_LEFT);
+		sf2d_start_frame(GFX_TOP, GFX_LEFT);
         		
 		sf2d_draw_texture(topScreen, 0, 0);
 		
@@ -229,7 +220,7 @@ int main(int argc, char *argv[])
 		
 		// Flush and swap framebuffers
 		sf2d_swapbuffers();
-    }
+	}
 	
 	gspLcdExit();
 	acExit();
@@ -238,11 +229,11 @@ int main(int argc, char *argv[])
 	psExit();
 	amExit();
 	mcuExit();
-    ptmuExit();
-    sdmcExit();
-    fsExit();
-    //frdExit();
+	ptmuExit();
+	sdmcExit();
+	fsExit();
+	//frdExit();
 	cfgsExit();
-    cfguExit();
-    return 0;
+	cfguExit();
+	return 0;	
 }
