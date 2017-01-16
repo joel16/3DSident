@@ -256,9 +256,9 @@ int main(int argc, char *argv[])
 	httpcInit(0x9000);
     frdInit(SDK(11,4,0,200));
 	
-	consoleInit(GFX_BOTTOM, NULL);
+	/*consoleInit(GFX_BOTTOM, NULL);
 		
-	printf("\x1b[31;1m*\x1b[0m Device cert: \x1b[31;1m%s\x1b[0m \n\n", getDeviceCert());
+	printf("\x1b[31;1m*\x1b[0m Device cert: \x1b[31;1m%s\x1b[0m \n\n", getDeviceCert());*/
 	
 	consoleInit(GFX_TOP, NULL);
 
