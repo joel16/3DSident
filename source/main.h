@@ -24,5 +24,7 @@
 
 #define SDK(a,b,c,d) ((a<<24)|(b<<16)|(c<<8)|d)
 
+char kernerlVersion[100], systemVersion[100], firmVersion[100], sdmcCID[36], nandCID[36];
+
 sftd_font *font;
 sf2d_texture *topScreen, *bottomScreen;
