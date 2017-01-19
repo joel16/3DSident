@@ -1,4 +1,4 @@
-# 3DSident
+# 3DSident [![Github latest downloads](https://img.shields.io/github/downloads/joel16/3DSident/total.svg)](https://github.com/joel16/3DSident/releases/latest)
 
 ![3DSident Banner](http://i.imgur.com/HPWNgmz.png)
 
