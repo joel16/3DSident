@@ -133,6 +133,21 @@ void termServices()
 	cfguExit();
 }
 
+int	touchButton(touchPosition *touch, int MenuSelection)
+{
+	if (touch->px >= 15 && touch->px <= 300 && touch->py >= 37 && touch->py <= 56)
+		return (1);
+	else if (touch->px >= 15 && touch->px <= 300 && touch->py >= 56 && touch->py <= 73)
+		return (2);
+	else if (touch->px >= 15 && touch->px <= 300 && touch->py >= 73 && touch->py <= 92)
+		return (3);
+	else if (touch->px >= 15 && touch->px <= 300 && touch->py >= 92 && touch->py <= 110)
+		return (4);
+	else if (touch->px >= 15 && touch->px <= 300 && touch->py >= 110 && touch->py <= 127)
+		return (5);
+	return (MenuSelection);
+}
+
 int main(int argc, char *argv[])
 {      
 	initServices();
@@ -152,6 +167,7 @@ int main(int argc, char *argv[])
 	int numMenuItems = 5; //Amount of items in the menu
 	int selector_image_x = 0; //Determines the starting x position of the selection
 	int selector_image_y = 0; //Determines the starting y position of the selection
+	touchPosition touch;
 	
 	osSetSpeedupEnable(true);
 	
@@ -167,9 +183,11 @@ int main(int argc, char *argv[])
 		selector_image_y = selector_y + (selector_yDistance * MenuSelection); //Determines where the selection image is drawn for each selection
 		
 		hidScanInput();
+		hidTouchRead(&touch);
 		u32 kDown = hidKeysDown();
 		u32 kHeld = hidKeysHeld();
 		
+		MenuSelection = touchButton(&touch, MenuSelection);
 		sf2d_start_frame(GFX_BOTTOM, GFX_LEFT);
 		
 		sf2d_draw_texture(bottomScreen, 0, 0);
@@ -235,6 +253,11 @@ int main(int argc, char *argv[])
 		else if (MenuSelection == 4)
 			miscMenu();
 		else if ((MenuSelection == 5) && (kDown & KEY_A))
+		{
+			termServices();
+			break;
+		}
+		else if ((MenuSelection == 5) && (kDown & KEY_TOUCH))
 		{
 			termServices();
 			break;
