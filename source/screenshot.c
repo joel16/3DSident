@@ -1,22 +1,6 @@
 #include "fs.h"
 #include "screenshot.h"
 
-static const struct
-{
-	GSPGPU_FramebufferFormats format;
-	u32                    bytes_per_pixel;
-	const char             *str;
-}formats[] =
-{
-	{ GSP_RGBA8_OES,   4, "rgba8",  },
-	{ GSP_BGR8_OES,    3, "bgr8",   },
-	{ GSP_RGB565_OES,  2, "rgb565", },
-	{ GSP_RGB5_A1_OES, 2, "rgb5a1", },
-	{ GSP_RGBA4_OES,   2, "rgba4",  },
-};
-
-static const size_t num_formats = sizeof(formats)/sizeof(formats[0]);
-
 static inline void update_gfx(void)
 {
 	gfxFlushBuffers();
