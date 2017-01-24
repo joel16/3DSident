@@ -113,22 +113,30 @@ void initServices()
 	gspLcdInit();
 	httpcInit(0x9000);
 	frdInit(SDK(11,4,0,200));
-	psInit();
+	sf2d_init();
+	sftd_init();
+	romfsInit();
 }
 
 void termServices()
 {
+	romfsExit();
+	sftd_fini();
+	sf2d_fini();
+	frdExit();
+	httpcExit();
 	gspLcdExit();
-	acExit();
+	actExit();
+	actuExit();
 	hidExit();
 	aptExit();
 	psExit();
+	acExit();
 	amExit();
 	mcuExit();
 	ptmuExit();
 	sdmcExit();
 	fsExit();
-	//frdExit();
 	cfgsExit();
 	cfguExit();
 }
@@ -136,8 +144,6 @@ void termServices()
 int main(int argc, char *argv[])
 {      
 	initServices();
-	sf2d_init();
-	sftd_init();
 	
 	sf2d_set_clear_color(RGBA8(0, 0, 0, 255));
 	sf2d_set_vblank_wait(0);
