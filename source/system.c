@@ -130,7 +130,9 @@ char * getScreenType()
 		strcat(screenType, dScreenType);
     }
     else
-        sprintf(screenType, "Upper: TN | Lower: TN");
+	{
+		sprintf(screenType, "Upper: TN | Lower: TN");
+	}    
 	
 	return screenType;
 }
