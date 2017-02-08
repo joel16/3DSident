@@ -1,7 +1,11 @@
 BasicInfo:
   Title                   : $(APP_TITLE)
   ProductCode             : $(APP_PRODUCT_CODE)
-  Logo                    : Nintendo # Nintendo / Licensed / Distributed / iQue / iQueForSystem
+  Logo                    : Homebrew
+ 
+RomFs:
+  # Specifies the root path of the read only file system to include in the ROM.
+  RootPath                : $(APP_ROMFS_DIR)
 
 TitleInfo:
   Category                : Application
@@ -162,6 +166,7 @@ AccessControlInfo:
    - cam:u
    - cecd:u
    - cfg:u
+   - cfg:s
    - dlp:FKCL
    - dlp:SRVR
    - dsp::DSP
@@ -169,7 +174,6 @@ AccessControlInfo:
    - fs:USER
    - gsp::Gpu
    - hid:USER
-   - http:C
    - mcu::HWC
    - mic:u
    - ndm:u
