@@ -276,22 +276,38 @@ int screenshotConfig(int data)
 	return data;
 }
 
-void captureScreenshot()
+int lastNumber = -1;
+
+void genScreenshotFileName(int lastNumber, char *fileName, const char *ext)
 {
-	if (!(dirExists("/3ds/")))
-		makeDir("/3ds");
+
+	time_t unixTime = time(NULL);
+	struct tm* timeStruct = gmtime((const time_t *)&unixTime);
+	int num = lastNumber;
+	int day = timeStruct->tm_mday;
+	int month = timeStruct->tm_mon + 1;
+	int year = timeStruct->tm_year;
+
+	sprintf(fileName, "/screenshots/screenshot-%i-%d-%d-%d-%s", num, day, month, year, ext);
+}
+
+void captureScreenshot()
+{	
+	sprintf(fileName, "%s", "screenshot"); 
+
+	if(lastNumber == -1)
+	{
+		lastNumber = 0;
+	}
+
+	genScreenshotFileName(lastNumber, fileName, ".png"); 
 	
-	if (!(dirExists("/3ds/3DSident")))
-		makeDir("/3ds/3DSident");
+	while (fileExists(fileName))
+	{
+		lastNumber++;
+		genScreenshotFileName(lastNumber, fileName, ".png");
+	}
 	
-	if (!(dirExists("/3ds/3DSident/screenshots")))
-		makeDir("/3ds/3DSident/screenshots");
-	
-	screenCapture = screenshotConfig(screenCapture);
-	
-	if (fileExists("/3ds/3DSident/screenshots/"))
-		deleteFile("/3ds/3DSident/screenshots/");
-	
-	if (screenCapture == 1)
-		screenshot_png(screenshotPath, Z_NO_COMPRESSION);
+	screenshot_png(fileName, Z_NO_COMPRESSION);
+	lastNumber++;
 }

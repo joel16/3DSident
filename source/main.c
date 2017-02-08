@@ -113,9 +113,9 @@ void initServices()
 	gspLcdInit();
 	httpcInit(0x9000);
 	frdInit(SDK(11,4,0,200));
+	romfsInit();
 	sf2d_init();
 	sftd_init();
-	romfsInit();
 }
 
 void termServices()
@@ -141,21 +141,6 @@ void termServices()
 	cfguExit();
 }
 
-int	touchButton(touchPosition *touch, int MenuSelection)
-{
-	if (touch->px >= 15 && touch->px <= 300 && touch->py >= 37 && touch->py <= 56)
-		return (1);
-	else if (touch->px >= 15 && touch->px <= 300 && touch->py >= 56 && touch->py <= 73)
-		return (2);
-	else if (touch->px >= 15 && touch->px <= 300 && touch->py >= 73 && touch->py <= 92)
-		return (3);
-	else if (touch->px >= 15 && touch->px <= 300 && touch->py >= 92 && touch->py <= 110)
-		return (4);
-	else if (touch->px >= 15 && touch->px <= 300 && touch->py >= 110 && touch->py <= 127)
-		return (5);
-	return (MenuSelection);
-}
-
 int main(int argc, char *argv[])
 {      
 	initServices();
@@ -163,8 +148,8 @@ int main(int argc, char *argv[])
 	sf2d_set_clear_color(RGBA8(0, 0, 0, 255));
 	sf2d_set_vblank_wait(0);
 	
-	load_PNG(topScreen, "/3ds/3DSident/res/topScreen.png");
-	load_PNG(bottomScreen, "/3ds/3DSident/res/bottomScreen.png");
+	topScreen = sfil_load_PNG_file("romfs:/res/topScreen.png", SF2D_PLACE_RAM); //setBilinearFilter(1, topScreen);
+	bottomScreen = sfil_load_PNG_file("romfs:/res/bottomScreen.png", SF2D_PLACE_RAM); //setBilinearFilter(1, bottomScreen);
 	font = sftd_load_font_mem(Ubuntu_ttf, Ubuntu_ttf_size);
 	
 	int MenuSelection = 1; // Pretty obvious
@@ -173,7 +158,6 @@ int main(int argc, char *argv[])
 	int numMenuItems = 5; //Amount of items in the menu
 	int selector_image_x = 0; //Determines the starting x position of the selection
 	int selector_image_y = 0; //Determines the starting y position of the selection
-	touchPosition touch;
 	
 	osSetSpeedupEnable(true);
 	
@@ -189,11 +173,9 @@ int main(int argc, char *argv[])
 		selector_image_y = selector_y + (selector_yDistance * MenuSelection); //Determines where the selection image is drawn for each selection
 		
 		hidScanInput();
-		hidTouchRead(&touch);
 		u32 kDown = hidKeysDown();
 		u32 kHeld = hidKeysHeld();
 		
-		MenuSelection = touchButton(&touch, MenuSelection);
 		sf2d_start_frame(GFX_BOTTOM, GFX_LEFT);
 		
 		sf2d_draw_texture(bottomScreen, 0, 0);
@@ -248,7 +230,7 @@ int main(int argc, char *argv[])
         		
 		sf2d_draw_texture(topScreen, 0, 0);
 		
-		sftd_draw_textf(font, 5, 1, RGBA8(250, 237, 227, 255), 12, "3DSident v0.7.1");
+		sftd_draw_textf(font, 5, 1, RGBA8(250, 237, 227, 255), 12, "3DSident v0.7.2");
 		
 		if (MenuSelection == 1)
 			kernelMenu();
@@ -259,11 +241,6 @@ int main(int argc, char *argv[])
 		else if (MenuSelection == 4)
 			miscMenu();
 		else if ((MenuSelection == 5) && (kDown & KEY_A))
-		{
-			termServices();
-			break;
-		}
-		else if ((MenuSelection == 5) && (kDown & KEY_TOUCH))
 		{
 			termServices();
 			break;

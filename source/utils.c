@@ -1,5 +1,16 @@
 #include "utils.h"
 
+int bilinearFilterEnabled;
+
+void setBilinearFilter(int enabled, sf2d_texture *texture)
+{
+	bilinearFilterEnabled = enabled;
+	if (enabled == 1)
+	{
+		sf2d_texture_set_params(texture, GPU_TEXTURE_MAG_FILTER(GPU_LINEAR) | GPU_TEXTURE_MIN_FILTER(GPU_NEAREST));
+	}
+}
+
 char * base64Encode(u8 const * input)
 {
     int      len      = strlen((const char *)input);
