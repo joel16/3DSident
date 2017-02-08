@@ -52,7 +52,7 @@ void systemMenu()
 
 void batteryMenu()
 {
-	u8 batteryPercent, batteryVolt;
+	u8 batteryPercent, batteryVolt, mcuFwMajor, mcuFwMinor;
 	
 	sftd_draw_textf(font, 165, 100, RGBA8(0, 0, 0, 255), 12, "Battery Menu");
 	
@@ -62,6 +62,12 @@ void batteryMenu()
 	sftd_draw_textf(font, 20, 116, RGBA8(77, 76, 74, 255), 12, "Battery percentage: %3d%%", batteryPercent);
 	sftd_draw_textf(font, 20, 132, RGBA8(77, 76, 74, 255), 12, "Battery status: %s", batteryStatus());
 	sftd_draw_textf(font, 20, 148, RGBA8(77, 76, 74, 255), 12, "Battery voltage: %d", batteryVolt);
+	
+	GetMcuFwVerHigh(&mcuFwMajor);
+	GetMcuFwVerLow(&mcuFwMinor);
+	
+	//if (CFG_UNITINFO == 0)
+	sftd_draw_textf(font, 20, 164, RGBA8(77, 76, 74, 255), 12, "MCU firmware: %u.%u", (mcuFwMajor - 16), mcuFwMinor);
 }
 
 void miscMenu()
