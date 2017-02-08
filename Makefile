@@ -33,14 +33,16 @@ RESOURCES   :=	resources
 SOURCES		:=	source
 DATA		:=	data
 INCLUDES	:=	include
+ROMFS		:=	romfs
 
 APP_TITLE	:= 3DSident
 APP_DESCRIPTION	:= Get more info about your 3DS, firmware, region etc. 
 APP_AUTHOR	:= Joel16
 
-ICON := $(RESOURCES)/icon.png
-BANNER := $(RESOURCES)/banner.png
-JINGLE := $(RESOURCES)/banner.wav
+ICON 		:= $(RESOURCES)/icon.png
+BANNER 		:= $(RESOURCES)/banner.png
+JINGLE 		:= $(RESOURCES)/banner.wav
+CIA_ROMFS	:= $(RESOURCES)/romfs.bin
 
 # CIA
 APP_PRODUCT_CODE := 3DSGI
@@ -54,7 +56,7 @@ APP_SYSTEM_MODE_EXT := Legacy
 
 ARCH	:=	-march=armv6k -mtune=mpcore -mfloat-abi=hard
 
-CFLAGS	:=	-g -Wall -O2 -mword-relocations -Werror -DVERSION=$(VERSION)\
+CFLAGS	:=	-g -Wall -O2 -mword-relocations -Werror \
 			-fomit-frame-pointer -ffast-math \
 			$(ARCH)
 
@@ -144,6 +146,12 @@ ifeq ($(strip $(NO_SMDH)),)
 	export _3DSXFLAGS += --smdh=$(CURDIR)/$(TARGET).smdh
 endif
 
+ifneq ($(ROMFS),)
+	export _3DSXFLAGS += --romfs=$(CURDIR)/$(ROMFS)
+endif
+
+.PHONY: $(BUILD) clean all
+
 #---------------------------------------------------------------------------------
 # 3DS CIA
 #---------------------------------------------------------------------------------
@@ -183,7 +191,7 @@ banner:
 	
 cia: clean all
 	@arm-none-eabi-strip $(TARGET).elf
-	@makerom -f cia -o $(TARGET).cia -elf $(TARGET).elf -rsf $(RESOURCE)/cia.rsf -icon $(RESOURCES)/icon.png -banner $(RESOURCES)/banner.png -exefslogo -target t
+	@makerom -f cia -target t -exefslogo -o $(TARGET).cia -rsf $(RESOURCE)/cia.rsf -icon $(RESOURCES)/icon.png -banner $(RESOURCES)/banner.png -logo "$(RESOURCES)/twlv2-padded.lz11" -DAPP_ROMFS="$(ROMFS)" -major 0 -minor 7
 	
 #---------------------------------------------------------------------------------
 
