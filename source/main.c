@@ -2,6 +2,7 @@
 #include "am.h"
 #include "cfgs.h"
 #include "frd.h"
+#include "gsplcd.h"
 #include "kernel.h"
 #include "main.h"
 #include "mcu.h"
@@ -101,8 +102,26 @@ void miscMenu()
 	sftd_draw_textf(font, 20, 196, RGBA8(77, 76, 74, 255), 12, "3D slider state: %.1lf (%.0lf%%)", osGet3DSliderState(), _3dSliderPercent);
 }
 
+void hardwareMenu()
+{
+	bool hpInserted = false, csInserted = false;
+	
+	sftd_draw_textf(font, 165, 100, RGBA8(0, 0, 0, 255), 12, "Hardware");
+	
+	DSP_GetHeadphoneStatus(&hpInserted);
+	sftd_draw_textf(font, 20, 116, RGBA8(77, 76, 74, 255), 12, "Headphone status: %s", hpInserted? "inserted" : "not inserted");
+	
+	FSUSER_CardSlotIsInserted(&csInserted);
+	sftd_draw_textf(font, 20, 132, RGBA8(77, 76, 74, 255), 12, "Card slot status: %s", csInserted? "inserted" : "not inserted");
+	
+	/*u32 brightness  = 0;
+	GSPLCD_GetBrightness(brightness);
+	sftd_draw_textf(font, 20, 148, RGBA8(77, 76, 74, 255), 12, "Brightness: %zu", brightness);*/
+}
+
 void initServices()
 {
+	dspInit();
 	cfguInit();
 	cfgsInit();
 	fsInit();
@@ -145,6 +164,7 @@ void termServices()
 	fsExit();
 	cfgsExit();
 	cfguExit();
+	dspExit();
 }
 
 int	touchButton(touchPosition *touch, int MenuSelection)
@@ -159,6 +179,8 @@ int	touchButton(touchPosition *touch, int MenuSelection)
 		return (4);
 	else if (touch->px >= 15 && touch->px <= 300 && touch->py >= 110 && touch->py <= 127)
 		return (5);
+	else if (touch->px >= 15 && touch->px <= 300 && touch->py >= 127 && touch->py <= 144)
+		return (6);
 	return (MenuSelection);
 }
 
@@ -176,7 +198,7 @@ int main(int argc, char *argv[])
 	int MenuSelection = 1; // Pretty obvious
 	int selector_x = 16; //The x position of the first selection
 	int selector_y = 17; //The y position of the first selection
-	int numMenuItems = 5; //Amount of items in the menu
+	int numMenuItems = 6; //Amount of items in the menu
 	int selector_image_x = 0; //Determines the starting x position of the selection
 	int selector_image_y = 0; //Determines the starting y position of the selection
 	touchPosition touch;
@@ -226,9 +248,14 @@ int main(int argc, char *argv[])
 			sftd_draw_textf(font, 22, 91, RGBA8(78, 74, 67, 255), 12, "Miscelleanous");
 		
 		if (MenuSelection == 5)
-			sftd_draw_textf(font, 22, 109, RGBA8(250, 237, 227, 255), 12, "Exit");
+			sftd_draw_textf(font, 22, 109, RGBA8(250, 237, 227, 255), 12, "Hardware");
 		else
-			sftd_draw_textf(font, 22, 109, RGBA8(78, 74, 67, 255), 12, "Exit");
+			sftd_draw_textf(font, 22, 109, RGBA8(78, 74, 67, 255), 12, "Hardware");
+		
+		if (MenuSelection == 6)
+			sftd_draw_textf(font, 22, 127, RGBA8(250, 237, 227, 255), 12, "Exit");
+		else
+			sftd_draw_textf(font, 22, 127, RGBA8(78, 74, 67, 255), 12, "Exit");
 		
 		//Added delay to prevent text from appearing 'glitchy' as you scroll past each section.
 		if (kDown & KEY_DOWN) 
@@ -264,7 +291,9 @@ int main(int argc, char *argv[])
 			batteryMenu();
 		else if (MenuSelection == 4)
 			miscMenu();
-		else if ((MenuSelection == 5) && ((kDown & KEY_A) || (kDown & KEY_TOUCH)))
+		else if (MenuSelection == 5)
+			hardwareMenu();
+		else if ((MenuSelection == 6) && ((kDown & KEY_A) || (kDown & KEY_TOUCH)))
 		{
 			termServices();
 			break;
