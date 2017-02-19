@@ -256,26 +256,6 @@ int screenshot_png(const char *path, int level)
 	return 0;
 }
 
-int screenshotConfig(int data)
-{
-	FILE * config;
-	
-	data = 1;
-	
-	if (!(fileExists("/3ds/3DSident/screenshots/screenshot.bin")))
-	{
-		config = fopen("/3ds/3DSident/screenshots/screenshot.bin", "w");
-		fprintf(config, "%d", data);
-		fclose(config);
-	}
-	
-	config = fopen("/3ds/3DSident/screenshots/screenshot.bin", "r");
-	fscanf(config, "%d", &data);
-	fclose(config);
-	
-	return data;
-}
-
 int lastNumber = -1;
 
 void genScreenshotFileName(int lastNumber, char *fileName, const char *ext)
@@ -287,8 +267,11 @@ void genScreenshotFileName(int lastNumber, char *fileName, const char *ext)
 	int day = timeStruct->tm_mday;
 	int month = timeStruct->tm_mon + 1;
 	int year = timeStruct->tm_year;
+	
+	if (!(dirExists("/screenshots/")))
+		makeDir("/screenshots");
 
-	sprintf(fileName, "/screenshots/screenshot-%i-%d-%d-%d-%s", num, day, month, year, ext);
+	sprintf(fileName, "/screenshots/screenshot-%d-%d-%d-%i-%s", day, month, year, num, ext);
 }
 
 void captureScreenshot()
