@@ -1,22 +1,6 @@
 #include "fs.h"
 #include "screenshot.h"
 
-static const struct
-{
-	GSPGPU_FramebufferFormats format;
-	u32                    bytes_per_pixel;
-	const char             *str;
-}formats[] =
-{
-	{ GSP_RGBA8_OES,   4, "rgba8",  },
-	{ GSP_BGR8_OES,    3, "bgr8",   },
-	{ GSP_RGB565_OES,  2, "rgb565", },
-	{ GSP_RGB5_A1_OES, 2, "rgb5a1", },
-	{ GSP_RGBA4_OES,   2, "rgba4",  },
-};
-
-static const size_t num_formats = sizeof(formats)/sizeof(formats[0]);
-
 static inline void update_gfx(void)
 {
 	gfxFlushBuffers();
@@ -272,42 +256,41 @@ int screenshot_png(const char *path, int level)
 	return 0;
 }
 
-int screenshotConfig(int data)
+int lastNumber = -1;
+
+void genScreenshotFileName(int lastNumber, char *fileName, const char *ext)
 {
-	FILE * config;
+
+	time_t unixTime = time(NULL);
+	struct tm* timeStruct = gmtime((const time_t *)&unixTime);
+	int num = lastNumber;
+	int day = timeStruct->tm_mday;
+	int month = timeStruct->tm_mon + 1;
+	int year = timeStruct->tm_year;
 	
-	data = 1;
-	
-	if (!(fileExists("/3ds/3DSident/screenshots/screenshot.bin")))
-	{
-		config = fopen("/3ds/3DSident/screenshots/screenshot.bin", "w");
-		fprintf(config, "%d", data);
-		fclose(config);
-	}
-	
-	config = fopen("/3ds/3DSident/screenshots/screenshot.bin", "r");
-	fscanf(config, "%d", &data);
-	fclose(config);
-	
-	return data;
+	if (!(dirExists("/screenshots/")))
+		makeDir("/screenshots");
+
+	sprintf(fileName, "/screenshots/screenshot-%d-%d-%d-%i-%s", day, month, year, num, ext);
 }
 
 void captureScreenshot()
-{
-	if (!(dirExists("/3ds/")))
-		makeDir("/3ds");
+{	
+	sprintf(fileName, "%s", "screenshot"); 
+
+	if(lastNumber == -1)
+	{
+		lastNumber = 0;
+	}
+
+	genScreenshotFileName(lastNumber, fileName, ".png"); 
 	
-	if (!(dirExists("/3ds/3DSident")))
-		makeDir("/3ds/3DSident");
+	while (fileExists(fileName))
+	{
+		lastNumber++;
+		genScreenshotFileName(lastNumber, fileName, ".png");
+	}
 	
-	if (!(dirExists("/3ds/3DSident/screenshots")))
-		makeDir("/3ds/3DSident/screenshots");
-	
-	screenCapture = screenshotConfig(screenCapture);
-	
-	if (fileExists("/3ds/3DSident/screenshots/"))
-		deleteFile("/3ds/3DSident/screenshots/");
-	
-	if (screenCapture == 1)
-		screenshot_png(screenshotPath, Z_NO_COMPRESSION);
+	screenshot_png(fileName, Z_NO_COMPRESSION);
+	lastNumber++;
 }

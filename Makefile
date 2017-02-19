@@ -41,6 +41,11 @@ APP_AUTHOR	:= Joel16
 ICON := $(RESOURCES)/icon.png
 BANNER := $(RESOURCES)/banner.png
 JINGLE := $(RESOURCES)/banner.wav
+LOGO := $(RESOURCES)/logo.bcma.lz
+
+VERSION_MAJOR := 0
+VERSION_MINOR := 7
+VERSION_MICRO := 2
 
 # CIA
 APP_PRODUCT_CODE := 3DS-I
@@ -140,6 +145,12 @@ else
 	export APP_ICON := $(TOPDIR)/$(ICON)
 endif
 
+ifneq ("$(wildcard $(LOGO))","")
+	COMMON_MAKEROM_FLAGS += -logo "$(LOGO)"
+else ifneq ($(LOGO),plain)
+    COMMON_MAKEROM_FLAGS += -logo "$(RESOURCES)/logo.bcma.lz"
+endif
+
 ifeq ($(strip $(NO_SMDH)),)
 	export _3DSXFLAGS += --smdh=$(CURDIR)/$(TARGET).smdh
 endif
@@ -183,7 +194,7 @@ banner:
 	
 cia: clean all
 	@arm-none-eabi-strip $(TARGET).elf
-	@makerom -f cia -o $(TARGET).cia -elf $(TARGET).elf -rsf $(RESOURCE)/cia.rsf -icon $(RESOURCES)/icon.png -banner $(RESOURCES)/banner.png -exefslogo -target t
+	@makerom -f cia -o $(TARGET).cia -elf $(TARGET).elf -rsf $(RESOURCE)/cia.rsf -icon $(RESOURCES)/icon.png -banner $(RESOURCES)/banner.png -major $(VERSION_MAJOR) -minor $(VERSION_MINOR) -micro $(VERSION_MICRO) -exefslogo -target t
 	
 #---------------------------------------------------------------------------------
 

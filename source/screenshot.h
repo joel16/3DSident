@@ -8,7 +8,8 @@
 #include <3ds.h>
 
 #define NUM_LEVELS (Z_BEST_COMPRESSION - Z_NO_COMPRESSION + 1)
-#define screenshotPath "/3ds/3DSident/screenshots/3DSident.png"
+
+char fileName[256];
 
 int level, screenCapture;
 unsigned int format_choice;
