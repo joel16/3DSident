@@ -385,7 +385,15 @@ int main(int argc, char *argv[])
 	printf("\x1b[34;1m*\x1b[0m Battery percentage: \x1b[34;1m%3d%%\x1b[0m (\x1b[34;1m%s\x1b[0m) \n\x1b[0m", batteryPercent, batteryStatus());
 
 	mcuGetBatteryVoltage(&batteryVolt);
-	printf("\x1b[34;1m*\x1b[0m Battery voltage: \x1b[34;1m%d\x1b[0m\n \n", batteryVolt);//,(Estimated: %0.1lf V) estimatedVolt);
+	printf("\x1b[34;1m*\x1b[0m Battery voltage: \x1b[34;1m%d\x1b[0m\n", batteryVolt);//,(Estimated: %0.1lf V) estimatedVolt);
+	
+	u8 mcuFwMajor, mcuFwMinor;
+	
+	GetMcuFwVerHigh(&mcuFwMajor);
+	GetMcuFwVerLow(&mcuFwMinor);
+	
+	//if (CFG_UNITINFO == 0)
+	printf("\x1b[34;1m*\x1b[0m MCU firmware: \x1b[34;1m%u.%u\x1b[0m\n\n", (mcuFwMajor - 16), mcuFwMinor);
 		
 	//=====================================================================//
 	//------------------------------Misc Info------------------------------//
@@ -427,7 +435,7 @@ int main(int argc, char *argv[])
 
 		printf("\x1b[19;0H"); //Move the cursor to the top left corner of the screen
 		mcuGetBatteryVoltage(&batteryVolt);
-		printf("\x1b[34;1m*\x1b[0m Battery voltage: \x1b[34;1m%d\x1b[0m\n \n", batteryVolt);//,(Estimated: %0.1lf V) estimatedVolt);
+		printf("\x1b[34;1m*\x1b[0m Battery voltage: \x1b[34;1m%d\x1b[0m\n", batteryVolt);//,(Estimated: %0.1lf V) estimatedVolt);
 		//=====================================================================//
 		//------------------------------Misc Info------------------------------//
 		//=====================================================================//
