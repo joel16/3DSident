@@ -17,3 +17,5 @@ char kernerlVersion[100], systemVersion[100], firmVersion[100], sdmcCID[36], nan
 
 sftd_font *font;
 sf2d_texture *topScreen, *bottomScreen;
+
+udsConnectionStatus status;

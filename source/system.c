@@ -203,3 +203,14 @@ char * getNNID(void)
 	
     return tmp;
 }
+
+char * isDebugModeEnabled()
+{
+	u8 debugMode = 0;
+	CFG_GetConfig(4, 0x130000, &debugMode);
+	
+	if (debugMode == 0x10)
+		return "enabled";
+	else
+		return "disabled";
+}

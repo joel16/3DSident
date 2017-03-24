@@ -7,7 +7,7 @@ const char * batteryStatus()
     PTMU_GetBatteryChargeState(&batteryStateBool);
 
     if (!batteryStateBool) 
-        return "Not charging";
+        return "not charging";
     else 
-        return "Charging";
+        return "charging";
 }

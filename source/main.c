@@ -74,15 +74,9 @@ void batteryMenu()
 void miscMenu()
 {
 	FS_ArchiveResource	resource = {0};
-	u8 volume;
 	u32 installedTitles = titleCount(MEDIATYPE_SD);
 	
 	double wifiPercent = (osGetWifiStrength() * 33.3333333333);
-	
-	mcuGetVolume(&volume);
-	double volPercent = (volume * 1.5873015873);
-		
-	double _3dSliderPercent = (osGet3DSliderState() * 100.0);
 	
 	sftd_draw_textf(font, 165, 100, RGBA8(0, 0, 0, 255), 12, "Miscelleanous");
 	
@@ -98,13 +92,14 @@ void miscMenu()
 				
 	sftd_draw_textf(font, 20, 148, RGBA8(77, 76, 74, 255), 12, "Installed titles: %i", (int)installedTitles);
 	sftd_draw_textf(font, 20, 164, RGBA8(77, 76, 74, 255), 12, "WiFi signal strength: %d (%.0lf%%)", osGetWifiStrength(), wifiPercent);
-	sftd_draw_textf(font, 20, 180, RGBA8(77, 76, 74, 255), 12, "Volume slider state: %d (%.0lf%%)", volume, volPercent);
-	sftd_draw_textf(font, 20, 196, RGBA8(77, 76, 74, 255), 12, "3D slider state: %.1lf (%.0lf%%)", osGet3DSliderState(), _3dSliderPercent);
+	
+	sftd_draw_textf(font, 20, 180, RGBA8(77, 76, 74, 255), 12, "Debug mode: %s", isDebugModeEnabled());
 }
 
 void hardwareMenu()
 {
 	bool hpInserted = false, csInserted = false;
+	u8 volume;
 	
 	sftd_draw_textf(font, 165, 100, RGBA8(0, 0, 0, 255), 12, "Hardware");
 	
@@ -113,6 +108,15 @@ void hardwareMenu()
 	
 	FSUSER_CardSlotIsInserted(&csInserted);
 	sftd_draw_textf(font, 20, 132, RGBA8(77, 76, 74, 255), 12, "Card slot status: %s", csInserted? "inserted" : "not inserted");
+	
+	sftd_draw_textf(font, 20, 148, RGBA8(77, 76, 74, 255), 12, "SDMC status: %s", detectSD()? "detected" : "not detected");
+	
+	mcuGetVolume(&volume);
+	double volPercent = (volume * 1.5873015873);
+	sftd_draw_textf(font, 20, 164, RGBA8(77, 76, 74, 255), 12, "Volume slider state: %d (%.0lf%%)", volume, volPercent);
+	
+	double _3dSliderPercent = (osGet3DSliderState() * 100.0);
+	sftd_draw_textf(font, 20, 180, RGBA8(77, 76, 74, 255), 12, "3D slider state: %.1lf (%.0lf%%)", osGet3DSliderState(), _3dSliderPercent);
 	
 	/*u32 brightness  = 0;
 	GSPLCD_GetBrightness(brightness);

@@ -13,3 +13,4 @@ u32 getDeviceId(void);
 u64 getSoapId(void);
 char * getDeviceCert(void);
 char * getNNID(void);
+char * isDebugModeEnabled();

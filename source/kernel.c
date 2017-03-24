@@ -13,7 +13,7 @@ char * getNNIDNum()
 		sprintf(nnidNumStr, "%08X", (int) nnidNum);
 	
 	else 
-		sprintf(nnidNumStr, "Could not retreive NNID num.");
+		sprintf(nnidNumStr, "could not retreive NNID num.");
 	
 	return nnidNumStr;
 }	
