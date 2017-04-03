@@ -218,17 +218,18 @@ char * isDebugModeEnabled()
 
 char * getBrightness(u32 screen)
 {
-	GSPLCD_GetBrightness(&screen);
+	u32 brightness = 0;
+	GSPLCD_GetBrightness(screen, &brightness);
 	
-	if (screen == 0x10)
+	if (brightness == 0x10)
 		return "1 (20%)";
-	else if (screen == 0x1c)
+	else if (brightness == 0x1c)
 		return "2 (40%)";
-	else if (screen == 0x30)
+	else if (brightness == 0x30)
 		return "3 (60%)";
-	else if (screen == 0x52)
+	else if (brightness == 0x52)
 		return "4 (80%)";
-	else if (screen == 0x8e)
+	else if (brightness == 0x8e)
 		return "5 (100%)";
 	else
 		return "n3DS only";
