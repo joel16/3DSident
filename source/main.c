@@ -237,6 +237,25 @@ char * getNNID(void)
     return tmp;
 }
 
+char * getBrightness(u32 screen)
+{
+	u32 brightness = 0;
+	GSPLCD_GetBrightness(screen, &brightness);
+	
+	if (brightness == 0x10)
+		return "1 (20%)";
+	else if (brightness == 0x1c)
+		return "2 (40%)";
+	else if (brightness == 0x30)
+		return "3 (60%)";
+	else if (brightness == 0x52)
+		return "4 (80%)";
+	else if (brightness == 0x8e)
+		return "5 (100%)";
+	else
+		return "n3DS only";
+}
+
 void initServices()
 {
 	gfxInitDefault();
@@ -283,9 +302,10 @@ int main(int argc, char *argv[])
 {
 	initServices();
 	
-	/*consoleInit(GFX_BOTTOM, NULL);
+	consoleInit(GFX_BOTTOM, NULL);
 		
-	printf("\x1b[31;1m*\x1b[0m Device cert: \x1b[31;1m%s\x1b[0m \n\n", getDeviceCert());*/
+	printf("\n\x1b[32;1m> Press any key to exit =)\x1b[0m");
+	//printf("\x1b[31;1m*\x1b[0m Device cert: \x1b[31;1m%s\x1b[0m \n\n", getDeviceCert());
 	
 	consoleInit(GFX_TOP, NULL);
 
@@ -302,7 +322,7 @@ int main(int argc, char *argv[])
 	FS_ArchiveResource	resource = {0};
 
 	printf("\x1b[0;0H"); //Move the cursor to the top left corner of the screen
-	printf("\x1b[32;1m3DSident 0.7.2\x1b[0m\n\n");
+	printf("\x1b[32;1m3DSident 0.7.3\x1b[0m\n\n");
 
 	
 	//u32 brightness  = 0;
@@ -420,8 +440,8 @@ int main(int argc, char *argv[])
 
 	_3dSliderPercent = (osGet3DSliderState() * 100.0);
 	printf("\x1b[32;1m*\x1b[0m 3D slider state: \x1b[32;1m%.1lf\x1b[0m  (\x1b[32;1m%.0lf%%\x1b[0m)   \n", osGet3DSliderState(), _3dSliderPercent);
-		
-	printf("\n\x1b[32;1m> Press any key to exit =)\x1b[0m");
+	
+	printf("\x1b[32;1m*\x1b[0m Brightness: \x1b[32;1m%s\x1b[0m \n", getBrightness(1));
 
 	while (aptMainLoop())
 	{
@@ -455,12 +475,13 @@ int main(int argc, char *argv[])
 		
 		gspWaitForVBlank();
 		hidScanInput();
+		u32 kHeld = hidKeysHeld();
 		
-		if (hidKeysDown())
-		{
+		if ((kHeld & KEY_L) && (kHeld & KEY_R))
 			captureScreenshot();
+		
+		else if (hidKeysDown())
 			break;
-		}
 		
 		gfxFlushBuffers();
 		gfxSwapBuffers();

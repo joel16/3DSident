@@ -169,9 +169,9 @@ AccessControlInfo:
    - frd:u
    - fs:USER
    - gsp::Gpu
+   - gsp::Lcd
    - hid:USER
    - mcu::HWC
-   - mic:u
    - ndm:u
    - news:s
    - nwm::UDS

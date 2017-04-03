@@ -2,4 +2,4 @@
 
 Handle gspLcdHandle;
 
-Result GSPLCD_GetBrightness(u32 screen);
+Result GSPLCD_GetBrightness(u32 screen, u32 *brightness);
