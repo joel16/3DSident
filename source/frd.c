@@ -47,7 +47,6 @@ u64 frdPrincipalIdToFriendCode(u64 *fc, u64 pid)
 	return (Result)cmdbuf[1];
 }
 
-
 Result frdGetMyFriendKey(FriendKey *key)
 {
 	Result ret=0;

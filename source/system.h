@@ -14,3 +14,4 @@ u64 getSoapId(void);
 char * getDeviceCert(void);
 char * getNNID(void);
 char * isDebugModeEnabled();
+char * getBrightness(u32 screen);

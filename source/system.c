@@ -2,6 +2,7 @@
 #include "am.h"
 #include "cfgs.h"
 #include "frd.h"
+#include "gsplcd.h"
 #include "system.h"
 #include "utils.h"
 
@@ -213,4 +214,22 @@ char * isDebugModeEnabled()
 		return "enabled";
 	else
 		return "disabled";
+}
+
+char * getBrightness(u32 screen)
+{
+	GSPLCD_GetBrightness(&screen);
+	
+	if (screen == 0x10)
+		return "1 (20%)";
+	else if (screen == 0x1c)
+		return "2 (40%)";
+	else if (screen == 0x30)
+		return "3 (60%)";
+	else if (screen == 0x52)
+		return "4 (80%)";
+	else if (screen == 0x8e)
+		return "5 (100%)";
+	else
+		return "n3DS only";
 }

@@ -9,6 +9,15 @@ typedef struct
    u64 localFriendCode;
 } FriendKey;
 
+typedef struct
+{
+   u8 region;
+   u8 country;
+   u8 area;
+   u8 language;
+   u8 platform;
+} FrdProfile;
+
 Result frdInit();
 Result frdExit();
 Result frdSetClientSdkVersion(u32 sdkVer);
