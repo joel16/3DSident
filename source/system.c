@@ -91,46 +91,52 @@ char * getMacAddress()
 char * getScreenType()
 {
 	bool isNew3DS = 0;
-    APT_CheckNew3DS(&isNew3DS);
+	APT_CheckNew3DS(&isNew3DS);
 	
 	static char uScreenType[20];
 	static char dScreenType[20];
 	
 	static char screenType[32];
 	
-    if (isNew3DS)
-    {
-        u8 screens = 0;
-        GSPLCD_GetVendors(&screens);
-        switch ((screens >> 4) & 0xF)
-        {
-            case 1:
+	if (isNew3DS)
+	{
+		u8 screens = 0;
+		
+		if(R_SUCCEEDED(gspLcdInit()))
+		{
+			GSPLCD_GetVendors(&screens);
+			gspLcdExit();
+		}	
+        
+		switch ((screens >> 4) & 0xF)
+		{
+			case 1:
 				sprintf(uScreenType, "Upper: IPS");
-                break;
-            case 0xC:
-                sprintf(uScreenType, "Upper: TN");
-                break;
-            default:
-                sprintf(uScreenType, "Upper: Unknown");
-                break;
-        }
-        switch (screens & 0xF)
-        {
-            case 1:
-                sprintf(dScreenType, " | Lower: IPS");
-                break;
-            case 0xC:
-                sprintf(dScreenType, " | Lower: TN");
-                break;
-            default:
-                sprintf(dScreenType, " | Lower: Unknown");
-                break;
-        }
+				break;
+			case 0xC:
+				sprintf(uScreenType, "Upper: TN");
+				break;
+			default:
+				sprintf(uScreenType, "Upper: Unknown");
+				break;
+		}
+		switch (screens & 0xF)
+		{
+			case 1:
+				sprintf(dScreenType, " | Lower: IPS");
+				break;
+			case 0xC:
+				sprintf(dScreenType, " | Lower: TN");
+				break;
+			default:
+				sprintf(dScreenType, " | Lower: Unknown");
+				break;
+		}
 		
 		strcpy(screenType, uScreenType);
 		strcat(screenType, dScreenType);
-    }
-    else
+	}
+	else
 	{
 		sprintf(screenType, "Upper: TN | Lower: TN");
 	}    
@@ -219,7 +225,12 @@ char * isDebugModeEnabled()
 char * getBrightness(u32 screen)
 {
 	u32 brightness = 0;
-	GSPLCD_GetBrightness(screen, &brightness);
+	
+	if(R_SUCCEEDED(gspLcdInit()))
+	{
+		GSPLCD_GetBrightness(screen, &brightness);
+		gspLcdExit();
+	}	
 	
 	if (brightness == 0x10)
 		return "1 (20%)";

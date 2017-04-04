@@ -136,7 +136,6 @@ void initServices()
 	hidInit();
 	actuInit();
 	actInit(SDK(11,2,0,200), 0x20000);
-	gspLcdInit();
 	httpcInit(0x9000);
 	frdInit(SDK(11,4,0,200));
 	romfsInit();
@@ -151,7 +150,6 @@ void termServices()
 	sf2d_fini();
 	frdExit();
 	httpcExit();
-	gspLcdExit();
 	actExit();
 	actuExit();
 	hidExit();
