@@ -139,44 +139,48 @@ u32 titleCount(FS_MediaType mediaType)
 void getScreenType()
 {
 	bool isNew3DS = 0;
-    APT_CheckNew3DS(&isNew3DS);
+	APT_CheckNew3DS(&isNew3DS);
 	
 	printf("\x1b[31;1m*\x1b[0m Screen Info: ");
 	
-    if (isNew3DS)
-    {
-        u8 screens = 0;
-        GSPLCD_GetVendors(&screens);
-        switch ((screens >> 4) & 0xF)
-        {
-            case 1:
+	if (isNew3DS)
+	{
+		u8 screens = 0;
+		if(R_SUCCEEDED(gspLcdInit()))
+		{
+			GSPLCD_GetVendors(&screens);
+			gspLcdExit();
+		}	
+		switch ((screens >> 4) & 0xF)
+		{
+			case 1:
 				printf("Upper: \x1b[31;1mIPS\x1b[0m ");
-                break;
-            case 0xC:
-                printf("Upper: \x1b[31;1mTN\x1b[0m ");
-                break;
-            default:
-                printf("Upper: \x1b[31;1mUnknown \x1b[0m");
-                break;
-        }
-        switch (screens & 0xF)
-        {
-            case 1:
-                printf("| Lower: \x1b[31;1mIPS\x1b[0m\n");
-                break;
-            case 0xC:
-                printf("| Lower: \x1b[31;1mTN\x1b[0m\n");
-                break;
-            default:
-                printf("| Lower: \x1b[31;1mUnknown\x1b[0m\n");
-                break;
-        }
-    }
+				break;
+			case 0xC:
+				printf("Upper: \x1b[31;1mTN\x1b[0m ");
+				break;
+			default:
+				printf("Upper: \x1b[31;1mUnknown \x1b[0m");
+				break;
+		}
+		switch (screens & 0xF)
+		{
+			case 1:
+				printf("| Lower: \x1b[31;1mIPS\x1b[0m\n");
+				break;
+			case 0xC:
+				printf("| Lower: \x1b[31;1mTN\x1b[0m\n");
+				break;
+			default:
+				printf("| Lower: \x1b[31;1mUnknown\x1b[0m\n");
+				break;
+		}
+	}
 	
-    else
-    {
-        printf("Upper: \x1b[31;1mTN\x1b[0m | Lower: \x1b[31;1mTN\n");
-    }
+	else
+	{
+		printf("Upper: \x1b[31;1mTN\x1b[0m | Lower: \x1b[31;1mTN\n");
+	}
 }
 
 u64 principalIdToFriendCode(u64 pid)
@@ -240,7 +244,12 @@ char * getNNID(void)
 char * getBrightness(u32 screen)
 {
 	u32 brightness = 0;
-	GSPLCD_GetBrightness(screen, &brightness);
+	
+	if(R_SUCCEEDED(gspLcdInit()))
+	{
+		GSPLCD_GetBrightness(screen, &brightness);
+		gspLcdExit();
+	}	
 	
 	if (brightness == 0x10)
 		return "1 (20%)";
@@ -272,7 +281,6 @@ void initServices()
 	hidInit();
 	actuInit();
 	actInit(SDK(11,2,0,200), 0x20000);
-	gspLcdInit();
 	httpcInit(0x9000);
 	frdInit(SDK(11,4,0,200));
 }
@@ -281,7 +289,6 @@ void termServices()
 {
 	frdExit();
 	httpcExit();
-	gspLcdExit();
 	actExit();
 	actuExit();
 	hidExit();
