@@ -42,6 +42,7 @@ APP_AUTHOR	:= Joel16
 ICON 		:= $(RESOURCES)/icon.png
 BANNER 		:= $(RESOURCES)/banner.png
 JINGLE 		:= $(RESOURCES)/banner.wav
+LOGO 		:= resources/logo.bcma.lz
 
 # CIA
 APP_PRODUCT_CODE 	:= 3DSGI
@@ -264,11 +265,11 @@ $(OUTPUT).cia	:	$(OUTPUT)-stripped.elf $(OUTPUT).bin icon.bin banner.bin
 #---------------------------------------------------------------------------------
 
 ifeq ($(UNAME), Linux)
-	@$(TOPDIR)/tools/linux/makerom -f cia -o $(OUTPUT).cia -DAPP_ENCRYPTED=false -DAPP_UNIQUE_ID=$(APP_UNIQUE_ID) -elf $(OUTPUT)-stripped.elf -rsf "$(TOPDIR)/resources/cia.rsf" -icon $(TOPDIR)/icon.bin -banner $(TOPDIR)/banner.bin  -exefslogo -target t -romfs "$(OUTPUT).bin"
+	@$(TOPDIR)/tools/linux/makerom -f cia -o $(OUTPUT).cia -DAPP_ENCRYPTED=false -DAPP_UNIQUE_ID=$(APP_UNIQUE_ID) -elf $(OUTPUT)-stripped.elf -rsf "$(TOPDIR)/resources/cia.rsf" -icon $(TOPDIR)/icon.bin -logo "$(TOPDIR)/resources/logo.bcma.lz" -banner $(TOPDIR)/banner.bin  -exefslogo -target t -romfs "$(OUTPUT).bin"
 else ifeq ($(UNAME), Darwin)
-	@$(TOPDIR)/tools/osx/makerom -f cia -o $(OUTPUT).cia -DAPP_ENCRYPTED=false -DAPP_UNIQUE_ID=$(APP_UNIQUE_ID) -elf $(OUTPUT)-stripped.elf -rsf "$(TOPDIR)/resources/cia.rsf" -icon $(TOPDIR)/icon.bin -banner $(TOPDIR)/banner.bin -exefslogo -target t -romfs "$(OUTPUT).bin"
+	@$(TOPDIR)/tools/osx/makerom -f cia -o $(OUTPUT).cia -DAPP_ENCRYPTED=false -DAPP_UNIQUE_ID=$(APP_UNIQUE_ID) -elf $(OUTPUT)-stripped.elf -rsf "$(TOPDIR)/resources/cia.rsf" -icon $(TOPDIR)/icon.bin -logo "$(TOPDIR)/resources/logo.bcma.lz" -banner $(TOPDIR)/banner.bin -exefslogo -target t -romfs "$(OUTPUT).bin"
 else
-	@$(TOPDIR)/tools/windows/makerom.exe -f cia -o $(OUTPUT).cia -DAPP_ENCRYPTED=false -DAPP_UNIQUE_ID=$(APP_UNIQUE_ID) -elf $(OUTPUT)-stripped.elf -rsf "$(TOPDIR)/resources/cia.rsf" -icon $(TOPDIR)/icon.bin -banner $(TOPDIR)/banner.bin  -exefslogo -target t -romfs "$(OUTPUT).bin"
+	@$(TOPDIR)/tools/windows/makerom.exe -f cia -o $(OUTPUT).cia -DAPP_ENCRYPTED=false -DAPP_UNIQUE_ID=$(APP_UNIQUE_ID) -elf $(OUTPUT)-stripped.elf -rsf "$(TOPDIR)/resources/cia.rsf" -icon $(TOPDIR)/icon.bin -logo "$(TOPDIR)/resources/logo.bcma.lz" -banner $(TOPDIR)/banner.bin  -exefslogo -target t -romfs "$(OUTPUT).bin"
 endif
 	@echo CIA packaged ...
 

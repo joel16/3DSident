@@ -75,24 +75,29 @@ void miscMenu()
 	FS_ArchiveResource	resource = {0};
 	u32 installedTitles = titleCount(MEDIATYPE_SD);
 	
+	char sdFreeSize[16], sdTotalSize[16];
+	char ctrFreeSize[16], ctrTotalSize[16];
+	
 	double wifiPercent = (osGetWifiStrength() * 33.3333333333);
 	
 	sftd_draw_textf(font, 165, 100, RGBA8(0, 0, 0, 255), 12, "Miscelleanous");
 	
 	FSUSER_GetArchiveResource(&resource, SYSTEM_MEDIATYPE_SD);
-	sftd_draw_textf(font, 20, 120, RGBA8(77, 76, 74, 255), 12, "SD Size: %.1f MB / %.1f MB",
-				(((u64) resource.freeClusters * (u64) resource.clusterSize) / 1024.0 / 1024.0),
-				(((u64) resource.totalClusters * (u64) resource.clusterSize) / 1024.0 / 1024.0));
+	getSizeString(sdFreeSize, (((u64) resource.freeClusters * (u64) resource.clusterSize)));
+	getSizeString(sdTotalSize, (((u64) resource.totalClusters * (u64) resource.clusterSize)));
+	sftd_draw_textf(font, 20, 120, RGBA8(77, 76, 74, 255), 12, "SD Size: %s / %s", sdFreeSize, sdTotalSize);
 	
 	FSUSER_GetArchiveResource(&resource, SYSTEM_MEDIATYPE_CTR_NAND);
-	sftd_draw_textf(font, 20, 136, RGBA8(77, 76, 74, 255), 12, "CTR Size: %.1f MB / %.1f MB",
-				(((u64) resource.freeClusters * (u64) resource.clusterSize) / 1024.0 / 1024.0),
-				(((u64) resource.totalClusters * (u64) resource.clusterSize) / 1024.0 / 1024.0));
+	getSizeString(ctrFreeSize, (((u64) resource.freeClusters * (u64) resource.clusterSize)));
+	getSizeString(ctrTotalSize, (((u64) resource.totalClusters * (u64) resource.clusterSize)));
+	sftd_draw_textf(font, 20, 136, RGBA8(77, 76, 74, 255), 12, "CTR Size: %s / %s", ctrFreeSize, ctrTotalSize);
 				
 	sftd_draw_textf(font, 20, 152, RGBA8(77, 76, 74, 255), 12, "Installed titles: %i", (int)installedTitles);
 	sftd_draw_textf(font, 20, 168, RGBA8(77, 76, 74, 255), 12, "WiFi signal strength: %d (%.0lf%%)", osGetWifiStrength(), wifiPercent);
 	
 	sftd_draw_textf(font, 20, 184, RGBA8(77, 76, 74, 255), 12, "Debug mode: %s", isDebugModeEnabled());
+	
+	sftd_draw_textf(font, 20, 200, RGBA8(77, 76, 74, 255), 12, "Local friend code seed: %010llX", getLocalFriendCodeSeed());
 }
 
 void hardwareMenu()
@@ -280,7 +285,7 @@ int main(int argc, char *argv[])
         		
 		sf2d_draw_texture(topScreen, 0, 0);
 		
-		sftd_draw_textf(font, 5, 1, RGBA8(250, 237, 227, 255), 12, "3DSident v0.7.3");
+		sftd_draw_textf(font, 5, 1, RGBA8(250, 237, 227, 255), 12, "3DSident v0.7.4");
 		
 		if (MenuSelection == 1)
 			kernelMenu();

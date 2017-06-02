@@ -182,7 +182,7 @@ char * getSerialNum(void)
 	return str;
 }
 
-u32 getDeviceId(void)
+u32 getDeviceId(void) // Same as PS_GetDeviceId
 {
     u32 tmp = 0;
     AM_GetDeviceId(&tmp);
