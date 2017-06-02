@@ -173,7 +173,7 @@ AccessControlInfo:
    - hid:USER
    - mcu::HWC
    - ndm:u
-   - news:s
+   - ps:ps
    - nwm::UDS
    - ptm:u
    - pxi:dev

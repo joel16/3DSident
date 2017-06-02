@@ -11,259 +11,13 @@
 #include "frd.h"
 #include "gsplcd.h"
 #include "mcu.h"
+#include "misc.h"
+#include "power.h"
 #include "screenshot.h"
+#include "system.h"
 #include "utils.h"
 
 #define SDK(a,b,c,d) ((a<<24)|(b<<16)|(c<<8)|d)
-
-int vaPrint(char *format, ...)
-{
-    va_list args;
-    va_start(args, format);
-	int ret = vprintf(format, args);
-    va_end(args);
-	gfxFlushBuffers();
-	gfxSwapBuffers();
-	return ret;
-}
-
-const char * getModel()
-{
-    const char *models[] = 
-	{
-        "O3DS",
-        "O3DS XL",
-        "N3DS",
-        "2DS",
-        "N3DS XL",
-        "Unknown"
-    };
-
-    u8 model = 0;
-    CFGU_GetSystemModel(&model);
-
-    if (model < 5)
-        return models[model];
-    else
-        return models[5];
-}
-
-const char * getRegion()
-{
-    const char *regions[] = 
-	{
-        "JPN",
-        "USA",
-        "EUR",
-        "AUS",
-        "CHN",
-        "KOR",
-        "TWN",
-        "Unknown"
-    };
-
-    u8 region = 0;
-    CFGU_SecureInfoGetRegion(&region);
-
-    if (region < 7)
-        return regions[region];
-    else
-        return regions[7];
-}
-
-const char * getLang()
-{
-    const char *languages[] = 
-	{
-        "Japanese",
-        "English",
-        "French",
-        "German",
-        "Italian",
-        "Spanish",
-        "Simplified Chinese",
-        "Korean",
-        "Dutch",
-        "Portugese",
-        "Russian",
-        "Traditional Chinese"
-    };
-
-    u8 language;
-    CFGU_GetSystemLanguage(&language);
-
-    if (language < 11)
-        return languages[language];
-    else
-        return languages[11];
-}
-
-bool detectSD()
-{
-    bool isSD;
-    FSUSER_IsSdmcDetected(&isSD);
-    return isSD;
-}
-
-const char * batteryStatus()
-{
-    u8 batteryStateBool;
-    PTMU_GetBatteryChargeState(&batteryStateBool);
-
-    if (!batteryStateBool) 
-        return "Not charging";
-    else 
-        return "Charging";
-}
-
-char * getMacAddress()
-{
-    u8* macByte = (u8*)0x1FF81060; 
-    static char macAddress[18];
-
-    //sprintf automatically zero-terminates the string
-    sprintf(macAddress, "%02X:%02X:%02X:%02X:%02X:%02X", *macByte, *(macByte + 1), *(macByte + 2), *(macByte + 3), *(macByte + 4), *(macByte + 5));
-
-    return macAddress;
-}
-
-u32 titleCount(FS_MediaType mediaType)
-{
-	u32 count = 0;
-	
-	AM_GetTitleCount(mediaType, &count);
-
-    return count;
-}
-
-void getScreenType()
-{
-	bool isNew3DS = 0;
-	APT_CheckNew3DS(&isNew3DS);
-	
-	printf("\x1b[31;1m*\x1b[0m Screen Info: ");
-	
-	if (isNew3DS)
-	{
-		u8 screens = 0;
-		if(R_SUCCEEDED(gspLcdInit()))
-		{
-			GSPLCD_GetVendors(&screens);
-			gspLcdExit();
-		}	
-		switch ((screens >> 4) & 0xF)
-		{
-			case 1:
-				printf("Upper: \x1b[31;1mIPS\x1b[0m ");
-				break;
-			case 0xC:
-				printf("Upper: \x1b[31;1mTN\x1b[0m ");
-				break;
-			default:
-				printf("Upper: \x1b[31;1mUnknown \x1b[0m");
-				break;
-		}
-		switch (screens & 0xF)
-		{
-			case 1:
-				printf("| Lower: \x1b[31;1mIPS\x1b[0m\n");
-				break;
-			case 0xC:
-				printf("| Lower: \x1b[31;1mTN\x1b[0m\n");
-				break;
-			default:
-				printf("| Lower: \x1b[31;1mUnknown\x1b[0m\n");
-				break;
-		}
-	}
-	
-	else
-	{
-		printf("Upper: \x1b[31;1mTN\x1b[0m | Lower: \x1b[31;1mTN\n");
-	}
-}
-
-u64 principalIdToFriendCode(u64 pid)
-{
-	u64 fc = 0;
-	
-    frdPrincipalIdToFriendCode(&fc, pid);
-    
-	return fc;
-}
-
-FriendKey getMyFriendKey(void)
-{
-    FriendKey fk;
-    
-	frdGetMyFriendKey(&fk);
-    
-	return fk;
-}
-
-char * getSerialNum(void)
-{
-	static char str[32];
-    char serial[0x10];
-	
-    cfgsSecureInfoGetSerialNo(serial);
-    strcpy(str, serial);
-    
-	return str;
-}
-
-u32 getDeviceId(void)
-{
-    u32 tmp = 0;
-    AM_GetDeviceId(&tmp);
-    return tmp;
-}
-
-u64 getSoapId(void)
-{
-    u32 tmp = 0;
-    AM_GetDeviceId(&tmp);
-    return (tmp | (((u64) 4) << 32));
-}
-
-char * getDeviceCert(void)
-{
-    u8 const cert[0x180];
-    amNetGetDeviceCert(cert);
-    return base64Encode(cert);
-}
-
-char * getNNID(void)
-{
-    static char tmp[0x11];
-    ACT_GetAccountInfo(tmp, 0x11, 0x8);
-	
-    return tmp;
-}
-
-char * getBrightness(u32 screen)
-{
-	u32 brightness = 0;
-	
-	if(R_SUCCEEDED(gspLcdInit()))
-	{
-		GSPLCD_GetBrightness(screen, &brightness);
-		gspLcdExit();
-	}	
-	
-	if (brightness == 0x10)
-		return "1 (20%)";
-	else if (brightness == 0x1c)
-		return "2 (40%)";
-	else if (brightness == 0x30)
-		return "3 (60%)";
-	else if (brightness == 0x52)
-		return "4 (80%)";
-	else if (brightness == 0x8e)
-		return "5 (100%)";
-	else
-		return "n3DS only";
-}
 
 void initServices()
 {
@@ -311,6 +65,7 @@ int main(int argc, char *argv[])
 	
 	consoleInit(GFX_BOTTOM, NULL);
 		
+	printf("\x1b[32;1m*\x1b[0m Local friend code seed: \x1b[32;1m%010llX\x1b[0m \n", getLocalFriendCodeSeed());	
 	printf("\n\x1b[32;1m> Press any key to exit =)\x1b[0m");
 	//printf("\x1b[31;1m*\x1b[0m Device cert: \x1b[31;1m%s\x1b[0m \n\n", getDeviceCert());
 	
@@ -329,9 +84,8 @@ int main(int argc, char *argv[])
 	FS_ArchiveResource	resource = {0};
 
 	printf("\x1b[0;0H"); //Move the cursor to the top left corner of the screen
-	printf("\x1b[32;1m3DSident 0.7.3\x1b[0m\n\n");
+	printf("\x1b[32;1m3DSident 0.7.4\x1b[0m\n\n");
 
-	
 	//u32 brightness  = 0;
 	//GSPLCD_GetBrightness(brightness);
 	
@@ -374,7 +128,7 @@ int main(int argc, char *argv[])
 	//=====================================================================//
 	
 	printf("\x1b[31;1m*\x1b[0m Model: \x1b[31;1m%s %s\n\x1b[0m", getModel(), getRegion());
-	getScreenType();
+	printf("\x1b[31;1m*\x1b[0m Screen type: \x1b[31;1m %s \n\x1b[0m", getScreenType());
 	printf("\x1b[31;1m*\x1b[0m Language: \x1b[31;1m%s\x1b[0m \n", getLang());
 	printf("\x1b[31;1m*\x1b[0m NNID: \x1b[31;1m%s\x1b[0m ", (char*)getNNID());
 
@@ -382,7 +136,7 @@ int main(int argc, char *argv[])
 	ret = ACTU_GetAccountDataBlock(0xFE, 4, 12, &nnidNum);
 
 	if (nnidNum != 0xFFFFFFFF)
-		vaPrint("(\x1b[31;1m%08X\x1b[0m) \n", (int) nnidNum);
+		printf("(\x1b[31;1m%d\x1b[0m) \n", (int) nnidNum);
 	else
 		printf("\x1b[31;1mError could not retrieve NNID\x1b[0m\n");
 
@@ -426,15 +180,18 @@ int main(int argc, char *argv[])
 	//------------------------------Misc Info------------------------------//
 	//=====================================================================//
 		
+	char sdFreeSize[16], sdTotalSize[16];
+	char ctrFreeSize[16], ctrTotalSize[16];	
+		
 	FSUSER_GetArchiveResource(&resource, SYSTEM_MEDIATYPE_SD);
-	printf("\x1b[32;1m*\x1b[0m SD Size: \x1b[32;1m%.1f \x1b[0mMB / \x1b[32;1m%.1f\x1b[0m MB \n",
-			(((u64) resource.freeClusters * (u64) resource.clusterSize) / 1024.0 / 1024.0),
-			(((u64) resource.totalClusters * (u64) resource.clusterSize) / 1024.0 / 1024.0));
+	getSizeString(sdFreeSize, (((u64) resource.freeClusters * (u64) resource.clusterSize)));
+	getSizeString(sdTotalSize, (((u64) resource.totalClusters * (u64) resource.clusterSize)));
+	printf("\x1b[32;1m*\x1b[0m SD Size: \x1b[32;1m%s\x1b[0m / \x1b[32;1m%s\x1b[0m \n", sdFreeSize, sdTotalSize);
 
 	FSUSER_GetArchiveResource(&resource, SYSTEM_MEDIATYPE_CTR_NAND);
-	printf("\x1b[32;1m*\x1b[0m CTR Size: \x1b[32;1m%.1f\x1b[0m MB / \x1b[32;1m%.1f\x1b[0m MB \n",
-			(((u64) resource.freeClusters * (u64) resource.clusterSize) / 1024.0 / 1024.0),
-			(((u64) resource.totalClusters * (u64) resource.clusterSize) / 1024.0 / 1024.0));
+	getSizeString(ctrFreeSize, (((u64) resource.freeClusters * (u64) resource.clusterSize)));
+	getSizeString(ctrTotalSize, (((u64) resource.totalClusters * (u64) resource.clusterSize)));
+	printf("\x1b[32;1m*\x1b[0m CTR Size: \x1b[32;1m%s\x1b[0m / \x1b[32;1m%s\x1b[0m \n", ctrFreeSize, ctrTotalSize);
 
 	printf("\x1b[32;1m*\x1b[0m Installed titles: \x1b[32;1m%i\x1b[0m\n", (int)installedTitles);
 	
