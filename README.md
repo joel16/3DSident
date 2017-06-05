@@ -7,7 +7,7 @@ Originally created by wolfvak - It was initially intended to be a small applicat
 I decided to fork this project, and added additional info similar to PSPident, hence the name 3DSident.
 
 # Features:
-- Current kernel, FIRM and system version detection.
+- Current kernel, FIRM and system version detection. 
 - Model detection.
 - Displays screen type.
 - Region detection.
@@ -16,17 +16,21 @@ I decided to fork this project, and added additional info similar to PSPident, h
 - Device serial detection.
 - SDMC CID detection.
 - NAND CID detection.
-- NNID number detection.
+- NNID number, and account name detection.
 - Device ID.
 - Soap ID.
-- Battery status.
+- Battery charging status.
 - Battery percentage (actual battery percentage).
 - Displays battery voltage (estimated) and unknown value format.
+- Displays MCU firmware.
 - SD detection.
 - SD free storage and total storage capacity.
 - CTR free storage and total storage capacity.
 - Displays number of titles installed.
 - Displays volume slider state.
 - 3D slider state and percentage.
-- Wifi signal strength
-- Automatically saves screenshot upon exit. (Can be disabled by opening 3ds/3DSident/screenshots/screenshot.bin and replacing 1 with 0)
+- Wifi signal strength.
+- Brightness status.
+- Headphone status.
+- Card slot status.
+- Using L+R triggers a screenshot in the GUI version. (Automatic on original)
