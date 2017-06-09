@@ -1,7 +1,6 @@
 #include "actu.h"
 #include "am.h"
 #include "cfgs.h"
-#include "frd.h"
 #include "gsplcd.h"
 #include "system.h"
 #include "utils.h"
@@ -144,15 +143,6 @@ char * getScreenType()
 	return screenType;
 }
 
-u64 principalIdToFriendCode(u64 pid)
-{
-	u64 fc = 0;
-	
-    frdPrincipalIdToFriendCode(&fc, pid);
-    
-	return fc;
-}
-
 u64 getLocalFriendCodeSeed()
 {
 	u64 seed = 0;
@@ -160,15 +150,6 @@ u64 getLocalFriendCodeSeed()
     PS_GetLocalFriendCodeSeed(&seed);
     
 	return seed;
-}
-
-FriendKey getMyFriendKey(void)
-{
-    FriendKey fk;
-    
-	frdGetMyFriendKey(&fk);
-    
-	return fk;
 }
 
 char * getSerialNum(void)

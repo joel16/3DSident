@@ -1,7 +1,6 @@
 #include "actu.h"
 #include "am.h"
 #include "cfgs.h"
-#include "frd.h"
 #include "kernel.h"
 #include "main.h"
 #include "mcu.h"
@@ -44,7 +43,7 @@ void systemMenu()
 	sftd_draw_textf(font, 20, 120, RGBA8(77, 76, 74, 255), 12, "Model: %s %s", getModel(), getRegion());
 	sftd_draw_textf(font, 20, 136, RGBA8(77, 76, 74, 255), 12, "Language: %s", getLang());
 	sftd_draw_textf(font, 20, 152, RGBA8(77, 76, 74, 255), 12, "ECS Device ID: %llu", getSoapId());
-	sftd_draw_textf(font, 20, 168, RGBA8(77, 76, 74, 255), 12, "Friend Code: %llu", principalIdToFriendCode(getMyFriendKey().principalId));
+	sftd_draw_textf(font, 20, 168, RGBA8(77, 76, 74, 255), 12, "Local friend code seed: %010llX", getLocalFriendCodeSeed());
 	sftd_draw_textf(font, 20, 184, RGBA8(77, 76, 74, 255), 12, "MAC Address: %s", getMacAddress());
 	sftd_draw_textf(font, 20, 200, RGBA8(77, 76, 74, 255), 12, "Serial number: %s", getSerialNum());
 	sftd_draw_textf(font, 20, 216, RGBA8(77, 76, 74, 255), 12, "Screen type: %s", getScreenType());
@@ -96,8 +95,6 @@ void miscMenu()
 	sftd_draw_textf(font, 20, 168, RGBA8(77, 76, 74, 255), 12, "WiFi signal strength: %d (%.0lf%%)", osGetWifiStrength(), wifiPercent);
 	
 	sftd_draw_textf(font, 20, 184, RGBA8(77, 76, 74, 255), 12, "Debug mode: %s", isDebugModeEnabled());
-	
-	sftd_draw_textf(font, 20, 200, RGBA8(77, 76, 74, 255), 12, "Local friend code seed: %010llX", getLocalFriendCodeSeed());
 }
 
 void hardwareMenu()
@@ -115,7 +112,7 @@ void hardwareMenu()
 	
 	sftd_draw_textf(font, 20, 152, RGBA8(77, 76, 74, 255), 12, "SDMC status: %s", detectSD()? "detected" : "not detected");
 	
-	mcuGetVolume(&volume);
+	HIDUSER_GetSoundVolume(&volume);
 	double volPercent = (volume * 1.5873015873);
 	sftd_draw_textf(font, 20, 168, RGBA8(77, 76, 74, 255), 12, "Volume slider state: %d (%.0lf%%)", volume, volPercent);
 	
@@ -142,7 +139,6 @@ void initServices()
 	actuInit();
 	actInit(SDK(11,2,0,200), 0x20000);
 	httpcInit(0x9000);
-	frdInit(SDK(11,4,0,200));
 	romfsInit();
 	sf2d_init();
 	sftd_init();
@@ -153,7 +149,6 @@ void termServices()
 	romfsExit();
 	sftd_fini();
 	sf2d_fini();
-	frdExit();
 	httpcExit();
 	actExit();
 	actuExit();
@@ -285,7 +280,7 @@ int main(int argc, char *argv[])
         		
 		sf2d_draw_texture(topScreen, 0, 0);
 		
-		sftd_draw_textf(font, 5, 1, RGBA8(250, 237, 227, 255), 12, "3DSident v0.7.4");
+		sftd_draw_textf(font, 5, 1, RGBA8(250, 237, 227, 255), 12, "3DSident v0.7.5");
 		
 		if (MenuSelection == 1)
 			kernelMenu();

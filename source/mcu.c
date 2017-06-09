@@ -30,16 +30,6 @@ Result mcuGetBatteryVoltage(u8* out)
     return ipc[1];
 }
 
-Result mcuGetVolume(u8* out)
-{
-    u32* ipc = getThreadCommandBuffer();
-    ipc[0] = 0xB0000;
-    Result ret = svcSendSyncRequest(mcuhwcHandle);
-    if(ret < 0) return ret;
-	*out = ipc[2];
-    return ipc[1];
-}
-
 Result GetMcuFwVerHigh(u8* out) 
 {
 	u32* ipc = getThreadCommandBuffer();
