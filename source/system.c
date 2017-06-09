@@ -9,12 +9,12 @@ const char * getModel()
 {
     const char *models[] = 
 	{
-        "OLD 3DS",
-        "OLD 3DS XL",
-        "NEW 3DS",
-        "2DS",
-        "NEW 3DS XL",
-	"NEW 2DS XL",
+        "OLD 3DS - CTR",
+        "OLD 3DS XL - SPR",
+        "NEW 3DS - KTR",
+        "OLD 2DS - FTR",
+        "NEW 3DS XL - RED",
+	"NEW 2DS XL - JAN",
         "Unknown"
     };
 
