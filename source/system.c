@@ -9,21 +9,22 @@ const char * getModel()
 {
     const char *models[] = 
 	{
-        "O3DS",
-        "O3DS XL",
-        "N3DS",
+        "OLD 3DS",
+        "OLD 3DS XL",
+        "NEW 3DS",
         "2DS",
-        "N3DS XL",
+        "NEW 3DS XL",
+	"NEW 2DS XL",
         "Unknown"
     };
 
     u8 model = 0;
     CFGU_GetSystemModel(&model);
 
-    if (model < 5)
+    if (model < 6)
         return models[model];
     else
-        return models[5];
+        return models[6];
 }
 
 const char * getRegion()
