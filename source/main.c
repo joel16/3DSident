@@ -8,7 +8,6 @@
 #include "actu.h"
 #include "am.h"
 #include "cfgs.h"
-#include "frd.h"
 #include "gsplcd.h"
 #include "mcu.h"
 #include "misc.h"
@@ -36,12 +35,10 @@ void initServices()
 	actuInit();
 	actInit(SDK(11,2,0,200), 0x20000);
 	httpcInit(0x9000);
-	frdInit(SDK(11,4,0,200));
 }
 
 void termServices()
 {
-	frdExit();
 	httpcExit();
 	actExit();
 	actuExit();
@@ -64,8 +61,7 @@ int main(int argc, char *argv[])
 	initServices();
 	
 	consoleInit(GFX_BOTTOM, NULL);
-		
-	printf("\x1b[32;1m*\x1b[0m Local friend code seed: \x1b[32;1m%010llX\x1b[0m \n", getLocalFriendCodeSeed());	
+	
 	printf("\n\x1b[32;1m> Press any key to exit =)\x1b[0m");
 	//printf("\x1b[31;1m*\x1b[0m Device cert: \x1b[31;1m%s\x1b[0m \n\n", getDeviceCert());
 	
@@ -84,7 +80,7 @@ int main(int argc, char *argv[])
 	FS_ArchiveResource	resource = {0};
 
 	printf("\x1b[0;0H"); //Move the cursor to the top left corner of the screen
-	printf("\x1b[32;1m3DSident 0.7.4\x1b[0m\n\n");
+	printf("\x1b[32;1m3DSident 0.7.5\x1b[0m\n\n");
 
 	//u32 brightness  = 0;
 	//GSPLCD_GetBrightness(brightness);
@@ -142,7 +138,7 @@ int main(int argc, char *argv[])
 
 	printf("\x1b[31;1m*\x1b[0m Device ID: \x1b[31;1m%lu \n", getDeviceId());
 	printf("\x1b[31;1m*\x1b[0m ECS Device ID: \x1b[31;1m%llu \n", getSoapId());
-	printf("\x1b[31;1m*\x1b[0m Friend Code: \x1b[31;1m%llu \n", principalIdToFriendCode(getMyFriendKey().principalId));
+	printf("\x1b[31;1m*\x1b[0m Local friend code seed: \x1b[31;1m%010llX\x1b[0m \n", getLocalFriendCodeSeed());	
 	printf("\x1b[31;1m*\x1b[0m MAC Address: \x1b[31;1m%s\x1b[0m \n", getMacAddress());
 	printf("\x1b[31;1m*\x1b[0m Serial number: \x1b[31;1m%s\x1b[0m \n", getSerialNum());
 
@@ -198,7 +194,7 @@ int main(int argc, char *argv[])
 	wifiPercent = (osGetWifiStrength() * 33.3333333333);
 	printf("\x1b[32;1m*\x1b[0m WiFi signal strength: \x1b[32;1m%d\x1b[0m  (\x1b[32;1m%.0lf%%\x1b[0m) \n", osGetWifiStrength(), wifiPercent);
 
-	mcuGetVolume(&volume);
+	HIDUSER_GetSoundVolume(&volume);
 	volPercent = (volume * 1.5873015873);
 	printf("\x1b[32;1m*\x1b[0m Volume slider state: \x1b[32;1m%d\x1b[0m  (\x1b[32;1m%.0lf%%\x1b[0m) \n", volume, volPercent);
 
@@ -229,7 +225,7 @@ int main(int argc, char *argv[])
 		printf("\x1b[32;1m*\x1b[0m WiFi signal strength: \x1b[32;1m%d\x1b[0m  (\x1b[32;1m%.0lf%%\x1b[0m) \n", osGetWifiStrength(), wifiPercent);
 
 		printf("\x1b[25;0H"); //Move the cursor
-		mcuGetVolume(&volume);
+		HIDUSER_GetSoundVolume(&volume);
 		volPercent = (volume * 1.5873015873);
 		printf("\x1b[32;1m*\x1b[0m Volume slider state: \x1b[32;1m%d\x1b[0m  (\x1b[32;1m%.0lf%%\x1b[0m)  \n", volume, volPercent);
 
