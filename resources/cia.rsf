@@ -166,7 +166,6 @@ AccessControlInfo:
    - dlp:FKCL
    - dlp:SRVR
    - dsp::DSP
-   - frd:u
    - fs:USER
    - gsp::Gpu
    - gsp::Lcd

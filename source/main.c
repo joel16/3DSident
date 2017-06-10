@@ -62,6 +62,10 @@ int main(int argc, char *argv[])
 	
 	consoleInit(GFX_BOTTOM, NULL);
 	
+	printf("\x1b[36;1m*\x1b[0m Username: \x1b[36;1m %s \n\x1b[0m", getUsername());
+	printf("\x1b[36;1m*\x1b[0m Birthday: \x1b[36;1m%s\x1b[0m \n", getBirthday());
+	printf("\x1b[36;1m*\x1b[0m EULA version: \x1b[36;1m%s\x1b[0m \n\n ", getEulaVersion());
+	
 	printf("\n\x1b[32;1m> Press any key to exit =)\x1b[0m");
 	//printf("\x1b[31;1m*\x1b[0m Device cert: \x1b[31;1m%s\x1b[0m \n\n", getDeviceCert());
 	
