@@ -244,7 +244,7 @@ int main(int argc, char *argv[])
 		if ((kHeld & KEY_L) && (kHeld & KEY_R))
 			captureScreenshot();
 		
-		else if (hidKeysDown())
+		else if (hidKeysDown() & ANY_KEY)
 			break;
 		
 		gfxFlushBuffers();
