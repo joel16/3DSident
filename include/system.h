@@ -1,3 +1,6 @@
+#ifndef SYSTEM_H
+#define SYSTEM_H
+
 #include <3ds.h>
 
 const char * getModel();
@@ -13,6 +16,6 @@ char * getDeviceCert(void);
 char * getNNID(void);
 char * isDebugModeEnabled();
 char * getBrightness(u32 screen);
-const char * getUsername();
-char * getBirthday();
-char * getEulaVersion();
+char * getCardSlotStatus();
+
+#endif

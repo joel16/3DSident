@@ -8,6 +8,7 @@
 #include "actu.h"
 #include "am.h"
 #include "cfgs.h"
+#include "config.h"
 #include "gsplcd.h"
 #include "mcu.h"
 #include "misc.h"
@@ -77,19 +78,15 @@ int main(int argc, char *argv[])
 	
 	char *str_ver = (char *)malloc(sizeof(char) * 255), *str_sysver = (char *)malloc(sizeof(char) * 255);
 	double wifiPercent, volPercent, _3dSliderPercent;
-	u32 os_ver = osGetKernelVersion(), firm_ver = osGetKernelVersion(), installedTitles = titleCount(MEDIATYPE_SD), nnidNum = 0xFFFFFFFF;
+	u32 os_ver = osGetKernelVersion(), firm_ver = osGetKernelVersion(), nnidNum = 0xFFFFFFFF;
 	u8 buf[16], batteryPercent, batteryVolt, volume;
 	OS_VersionBin *nver = (OS_VersionBin *)malloc(sizeof(OS_VersionBin)), *cver = (OS_VersionBin *)malloc(sizeof(OS_VersionBin));
+	char sdFreeSize[16], sdTotalSize[16];
+	char ctrFreeSize[16], ctrTotalSize[16];	
 	s32 ret;
-	FS_ArchiveResource	resource = {0};
 
 	printf("\x1b[0;0H"); //Move the cursor to the top left corner of the screen
-	printf("\x1b[32;1m3DSident 0.7.5\x1b[0m\n\n");
-
-	//u32 brightness  = 0;
-	//GSPLCD_GetBrightness(brightness);
-	
-	//printf("\x1b[32;1m*\x1b[0m Brightness: \x1b[32;1m%i\x1b[0m\n", (int)brightness);
+	printf("\x1b[32;1m3DSident 0.7.6\x1b[0m\n\n");
 
 	//=====================================================================//
 	//------------------------------Firm Info------------------------------//
@@ -173,29 +170,23 @@ int main(int argc, char *argv[])
 	GetMcuFwVerHigh(&mcuFwMajor);
 	GetMcuFwVerLow(&mcuFwMinor);
 	
-	//if (CFG_UNITINFO == 0)
 	printf("\x1b[34;1m*\x1b[0m MCU firmware: \x1b[34;1m%u.%u\x1b[0m\n\n", (mcuFwMajor - 16), mcuFwMinor);
 		
 	//=====================================================================//
 	//------------------------------Misc Info------------------------------//
 	//=====================================================================//
 		
-	char sdFreeSize[16], sdTotalSize[16];
-	char ctrFreeSize[16], ctrTotalSize[16];	
-		
-	FSUSER_GetArchiveResource(&resource, SYSTEM_MEDIATYPE_SD);
-	getSizeString(sdFreeSize, (((u64) resource.freeClusters * (u64) resource.clusterSize)));
-	getSizeString(sdTotalSize, (((u64) resource.totalClusters * (u64) resource.clusterSize)));
+	getSizeString(sdFreeSize, getFreeStorage(SYSTEM_MEDIATYPE_SD));
+	getSizeString(sdTotalSize, getTotalStorage(SYSTEM_MEDIATYPE_SD));
 	printf("\x1b[32;1m*\x1b[0m SD Size: \x1b[32;1m%s\x1b[0m / \x1b[32;1m%s\x1b[0m \n", sdFreeSize, sdTotalSize);
 
-	FSUSER_GetArchiveResource(&resource, SYSTEM_MEDIATYPE_CTR_NAND);
-	getSizeString(ctrFreeSize, (((u64) resource.freeClusters * (u64) resource.clusterSize)));
-	getSizeString(ctrTotalSize, (((u64) resource.totalClusters * (u64) resource.clusterSize)));
+	getSizeString(ctrFreeSize, getFreeStorage(SYSTEM_MEDIATYPE_CTR_NAND));
+	getSizeString(ctrTotalSize, getTotalStorage(SYSTEM_MEDIATYPE_CTR_NAND));
 	printf("\x1b[32;1m*\x1b[0m CTR Size: \x1b[32;1m%s\x1b[0m / \x1b[32;1m%s\x1b[0m \n", ctrFreeSize, ctrTotalSize);
 
-	printf("\x1b[32;1m*\x1b[0m Installed titles: \x1b[32;1m%i\x1b[0m\n", (int)installedTitles);
+	printf("\x1b[32;1m*\x1b[0m Installed titles: SD: \x1b[32;1m%i\x1b[0m  (NAND: \x1b[32;1m%i\x1b[0m)\n", (int)titleCount(MEDIATYPE_SD), (int)titleCount(MEDIATYPE_NAND));
 	
-	wifiPercent = (osGetWifiStrength() * 33.3333333333);
+	/*wifiPercent = (osGetWifiStrength() * 33.3333333333);
 	printf("\x1b[32;1m*\x1b[0m WiFi signal strength: \x1b[32;1m%d\x1b[0m  (\x1b[32;1m%.0lf%%\x1b[0m) \n", osGetWifiStrength(), wifiPercent);
 
 	HIDUSER_GetSoundVolume(&volume);
@@ -205,7 +196,7 @@ int main(int argc, char *argv[])
 	_3dSliderPercent = (osGet3DSliderState() * 100.0);
 	printf("\x1b[32;1m*\x1b[0m 3D slider state: \x1b[32;1m%.1lf\x1b[0m  (\x1b[32;1m%.0lf%%\x1b[0m)   \n", osGet3DSliderState(), _3dSliderPercent);
 	
-	printf("\x1b[32;1m*\x1b[0m Brightness: \x1b[32;1m%s\x1b[0m \n", getBrightness(1));
+	printf("\x1b[32;1m*\x1b[0m Brightness: \x1b[32;1m%s\x1b[0m \n", getBrightness(1));*/
 
 	while (aptMainLoop())
 	{
@@ -224,18 +215,21 @@ int main(int argc, char *argv[])
 		//------------------------------Misc Info------------------------------//
 		//=====================================================================//
 		
-		printf("\x1b[24;0H"); // Move the cursor
+		printf("\x1b[25;0H"); // Move the cursor
 		wifiPercent = (osGetWifiStrength() * 33.3333333333);
 		printf("\x1b[32;1m*\x1b[0m WiFi signal strength: \x1b[32;1m%d\x1b[0m  (\x1b[32;1m%.0lf%%\x1b[0m) \n", osGetWifiStrength(), wifiPercent);
 
-		printf("\x1b[25;0H"); //Move the cursor
+		printf("\x1b[26;0H"); //Move the cursor
 		HIDUSER_GetSoundVolume(&volume);
 		volPercent = (volume * 1.5873015873);
 		printf("\x1b[32;1m*\x1b[0m Volume slider state: \x1b[32;1m%d\x1b[0m  (\x1b[32;1m%.0lf%%\x1b[0m)  \n", volume, volPercent);
 
-		printf("\x1b[26;0H"); //Move the cursor
+		printf("\x1b[27;0H"); //Move the cursor
 		_3dSliderPercent = (osGet3DSliderState() * 100.0);
 		printf("\x1b[32;1m*\x1b[0m 3D slider state: \x1b[32;1m%.1lf\x1b[0m  (\x1b[32;1m%.0lf%%\x1b[0m)   \n", osGet3DSliderState(), _3dSliderPercent);
+		
+		printf("\x1b[28;0H"); //Move the cursor
+		printf("\x1b[32;1m*\x1b[0m Brightness: \x1b[32;1m%s\x1b[0m \n", getBrightness(1));
 		
 		gspWaitForVBlank();
 		hidScanInput();

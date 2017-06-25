@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SCREENSHOT_H
+#define SCREENSHOT_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -15,3 +16,5 @@ int level, screenCapture;
 unsigned int format_choice;
 GSPGPU_FramebufferFormats format; // = GSP_RGBA8_OES
 void captureScreenshot();
+
+#endif

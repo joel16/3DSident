@@ -1,3 +1,6 @@
+#ifndef FS_H
+#define FS_H
+
 #include <3ds.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -11,3 +14,5 @@ int makeDir(const char * path);
 bool fileExists(char * path);
 bool dirExists(const char * path);
 bool deleteFile(const char *path);
+
+#endif
