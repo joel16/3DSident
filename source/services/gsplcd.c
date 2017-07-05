@@ -1,5 +1,7 @@
 #include "gsplcd.h"
 
+static Handle gspLcdHandle;
+
 Result GSPLCD_GetBrightness(u32 screen, u32 *brightness)
 {
     u32 *cmdbuf = getThreadCommandBuffer();

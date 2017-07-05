@@ -108,9 +108,9 @@ int main(int argc, char *argv[])
 	ret = osGetSystemVersionData(nver, cver);
 
 	if (ret)
-		printf("\x1b[33;1m*\x1b[0m osGetSystemVersionData returned 0x%08liX\n\n", ret);
+		printf("\x1b[33;1m*\x1b[0m System version: 0x%08liX\n\n", ret);
 
-	snprintf(str_sysver, 100, "\x1b[33;1m*\x1b[0m Current system version: \x1b[33;1m%d.%d.%d-%d\x1b[0m\n\n",
+	snprintf(str_sysver, 100, "\x1b[33;1m*\x1b[0m System version: \x1b[33;1m%d.%d.%d-%d\x1b[0m\n\n",
 			cver->mainver,
 			cver->minor,
 			cver->build,
@@ -163,7 +163,7 @@ int main(int argc, char *argv[])
 	printf("\x1b[34;1m*\x1b[0m Battery percentage: \x1b[34;1m%3d%%\x1b[0m (\x1b[34;1m%s\x1b[0m) \n\x1b[0m", batteryPercent, batteryStatus());
 
 	mcuGetBatteryVoltage(&batteryVolt);
-	printf("\x1b[34;1m*\x1b[0m Battery voltage: \x1b[34;1m%d\x1b[0m\n", batteryVolt);//,(Estimated: %0.1lf V) estimatedVolt);
+	printf("\x1b[34;1m*\x1b[0m Battery voltage: \x1b[34;1m%d\x1b[0m (\x1b[34;1m%.1f V\x1b[0m)\n", batteryVolt, 5.0 * ((double)batteryVolt / 256.0)); // Estimated volt
 	
 	u8 mcuFwMajor, mcuFwMinor;
 	
@@ -185,18 +185,6 @@ int main(int argc, char *argv[])
 	printf("\x1b[32;1m*\x1b[0m CTR Size: \x1b[32;1m%s\x1b[0m / \x1b[32;1m%s\x1b[0m \n", ctrFreeSize, ctrTotalSize);
 
 	printf("\x1b[32;1m*\x1b[0m Installed titles: SD: \x1b[32;1m%i\x1b[0m  (NAND: \x1b[32;1m%i\x1b[0m)\n", (int)titleCount(MEDIATYPE_SD), (int)titleCount(MEDIATYPE_NAND));
-	
-	/*wifiPercent = (osGetWifiStrength() * 33.3333333333);
-	printf("\x1b[32;1m*\x1b[0m WiFi signal strength: \x1b[32;1m%d\x1b[0m  (\x1b[32;1m%.0lf%%\x1b[0m) \n", osGetWifiStrength(), wifiPercent);
-
-	HIDUSER_GetSoundVolume(&volume);
-	volPercent = (volume * 1.5873015873);
-	printf("\x1b[32;1m*\x1b[0m Volume slider state: \x1b[32;1m%d\x1b[0m  (\x1b[32;1m%.0lf%%\x1b[0m) \n", volume, volPercent);
-
-	_3dSliderPercent = (osGet3DSliderState() * 100.0);
-	printf("\x1b[32;1m*\x1b[0m 3D slider state: \x1b[32;1m%.1lf\x1b[0m  (\x1b[32;1m%.0lf%%\x1b[0m)   \n", osGet3DSliderState(), _3dSliderPercent);
-	
-	printf("\x1b[32;1m*\x1b[0m Brightness: \x1b[32;1m%s\x1b[0m \n", getBrightness(1));*/
 
 	while (aptMainLoop())
 	{
@@ -210,7 +198,7 @@ int main(int argc, char *argv[])
 
 		printf("\x1b[19;0H"); //Move the cursor to the top left corner of the screen
 		mcuGetBatteryVoltage(&batteryVolt);
-		printf("\x1b[34;1m*\x1b[0m Battery voltage: \x1b[34;1m%d\x1b[0m\n", batteryVolt);//,(Estimated: %0.1lf V) estimatedVolt);
+		printf("\x1b[34;1m*\x1b[0m Battery voltage: \x1b[34;1m%d\x1b[0m (\x1b[34;1m%.1f V\x1b[0m)\n", batteryVolt, 5.0 * ((double)batteryVolt / 256.0));//,(Estimated: %0.1lf V) estimatedVolt);
 		//=====================================================================//
 		//------------------------------Misc Info------------------------------//
 		//=====================================================================//
