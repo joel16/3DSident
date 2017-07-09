@@ -1,23 +1,6 @@
 #include "actu.h"
 #include "kernel.h"
 
-char * getNNIDNum()
-{
-	s32 ret = 0;
-	static char nnidNumStr[30];
-	u32 nnidNum = 0xFFFFFFFF;
-	
-	ret = ACTU_Initialize(0xB0002C8, 0, 0);
-	ret = ACTU_GetAccountDataBlock(0xFE, 4, 12, &nnidNum);
-	if ((ret != 0 ) && (nnidNum != 0xFFFFFFFF))
-		sprintf(nnidNumStr, "%08X", (int) nnidNum);
-	
-	else 
-		sprintf(nnidNumStr, "could not retreive NNID num.");
-	
-	return nnidNumStr;
-}	
-
 char * getVersion(int version)
 {
 	char *str_kernel = (char *)malloc(sizeof(char) * 255), *str_ver = (char *)malloc(sizeof(char) * 255), *str_sysver = (char *)malloc(sizeof(char) * 255);

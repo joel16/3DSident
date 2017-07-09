@@ -1,3 +1,6 @@
+#ifndef UTILS_H
+#define UTILS_H
+
 #include <3ds.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -8,4 +11,7 @@
 		KEY_CSTICK_UP | KEY_CSTICK_DOWN | KEY_CSTICK_LEFT | KEY_CSTICK_RIGHT)
 
 void getSizeString(char *string, uint64_t size);
+void utf2ascii(char* dst, u16* src);
 char * base64Encode(u8 const * input);
+
+#endif

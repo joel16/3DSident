@@ -14,6 +14,15 @@ void getSizeString(char *string, uint64_t size) //Thanks TheOfficialFloW
 	sprintf(string, "%.*f %s", (i == 0) ? 0 : 2, double_size, units[i]);
 }
 
+void utf2ascii(char* dst, u16* src)
+{
+	if(!src || !dst)
+		return;
+	
+	while(*src)*(dst++)=(*(src++))&0xFF;
+	*dst=0x00;
+}
+
 char * base64Encode(u8 const * input)
 {
     int      len      = strlen((const char *)input);

@@ -83,7 +83,7 @@ char * getMacAddress()
     static char macAddress[18];
 
     //sprintf automatically zero-terminates the string
-    sprintf(macAddress, "%02X:%02X:%02X:%02X:%02X:%02X", *macByte, *(macByte + 1), *(macByte + 2), *(macByte + 3), *(macByte + 4), *(macByte + 5));
+    snprintf(macAddress, 18, "%02X:%02X:%02X:%02X:%02X:%02X", *macByte, *(macByte + 1), *(macByte + 2), *(macByte + 3), *(macByte + 4), *(macByte + 5));
 
     return macAddress;
 }
@@ -185,12 +185,15 @@ char * getDeviceCert(void)
     return base64Encode(cert);
 }
 
-char * getNNID(void)
+char * getNNIDInfo(u32 size, u32 blkId)
 {
-    static char tmp[0x11];
-    ACT_GetAccountInfo(tmp, 0x11, 0x8);
+    char info[size];
+	static char str[100];
 	
-    return tmp;
+    ACTU_GetAccountDataBlock(info, size, blkId);
+	snprintf(str, size, "%s", info);
+	
+    return str;
 }
 
 char * isDebugModeEnabled()
@@ -240,10 +243,10 @@ char * getCardSlotStatus()
 	if (isInserted)
 	{
 		FSUSER_GetCardType(&cardType);
-		sprintf(card, "inserted %s", cardType? "(TWL)" : "(CTR)");
+		snprintf(card, 20, "inserted %s", cardType? "(TWL)" : "(CTR)");
 		return card;
 	}
 	
-	sprintf(card, "not inserted");
+	snprintf(card, 20, "not inserted");
 	return card;
 }

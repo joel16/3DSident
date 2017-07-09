@@ -33,8 +33,7 @@ void initServices()
 	psInit();
 	aptInit();
 	hidInit();
-	actuInit();
-	actInit(SDK(11,2,0,200), 0x20000);
+	actInit(SDK(11, 2, 0, 200), 0x20000);
 	httpcInit(0x9000);
 }
 
@@ -42,7 +41,6 @@ void termServices()
 {
 	httpcExit();
 	actExit();
-	actuExit();
 	hidExit();
 	aptExit();
 	psExit();
@@ -78,7 +76,7 @@ int main(int argc, char *argv[])
 	
 	char *str_ver = (char *)malloc(sizeof(char) * 255), *str_sysver = (char *)malloc(sizeof(char) * 255);
 	double wifiPercent, volPercent, _3dSliderPercent;
-	u32 os_ver = osGetKernelVersion(), firm_ver = osGetKernelVersion(), nnidNum = 0xFFFFFFFF;
+	u32 os_ver = osGetKernelVersion(), firm_ver = osGetKernelVersion(), principalID = 0;
 	u8 buf[16], batteryPercent, batteryVolt, volume;
 	OS_VersionBin *nver = (OS_VersionBin *)malloc(sizeof(OS_VersionBin)), *cver = (OS_VersionBin *)malloc(sizeof(OS_VersionBin));
 	char sdFreeSize[16], sdTotalSize[16];
@@ -127,15 +125,9 @@ int main(int argc, char *argv[])
 	printf("\x1b[31;1m*\x1b[0m Model: \x1b[31;1m%s\x1b[0m (\x1b[31;1m%s\x1b[0m) \n\x1b[0m", getModel(), getRegion());
 	printf("\x1b[31;1m*\x1b[0m Screen type: \x1b[31;1m %s \n\x1b[0m", getScreenType());
 	printf("\x1b[31;1m*\x1b[0m Language: \x1b[31;1m%s\x1b[0m \n", getLang());
-	printf("\x1b[31;1m*\x1b[0m NNID: \x1b[31;1m%s\x1b[0m ", (char*)getNNID());
-
-	ret = ACTU_Initialize(0xB0002C8, 0, 0);
-	ret = ACTU_GetAccountDataBlock(0xFE, 4, 12, &nnidNum);
-
-	if (nnidNum != 0xFFFFFFFF)
-		printf("(\x1b[31;1m%d\x1b[0m) \n", (int) nnidNum);
-	else
-		printf("\x1b[31;1mError could not retrieve NNID\x1b[0m\n");
+	
+	ACTU_GetAccountDataBlock(&principalID, 0x4, 0xC);
+	printf("\x1b[31;1m*\x1b[0m NNID: \x1b[31;1m%s\x1b[0m (\x1b[31;1m%u\x1b[0m) \n", getNNIDInfo(0x11, 0x8), (unsigned int)principalID);
 
 	printf("\x1b[31;1m*\x1b[0m Device ID: \x1b[31;1m%lu \n", getDeviceId());
 	printf("\x1b[31;1m*\x1b[0m ECS Device ID: \x1b[31;1m%llu \n", getSoapId());

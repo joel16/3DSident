@@ -231,6 +231,7 @@ AccessControlInfo:
    - news:s
    - nwm::EXT
    - nwm::UDS
+   - ps:ps
    - ptm:sysm
    - ptm:u
    - pxi:dev
