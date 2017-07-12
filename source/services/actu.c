@@ -60,12 +60,12 @@ void actExit(void)
 	}
 }
 
-Result	ACTU_Initialize(u32 sdkVer, void *addr, u32 memSize)
+Result	ACTU_Initialize(u32 sdkVer, void * addr, u32 memSize)
 {
 	Result ret = 0;
 	u32 *cmdbuf = getThreadCommandBuffer();
 
-	cmdbuf[0] = IPC_MakeHeader(0x1,2,4); // 0x00010084
+	cmdbuf[0] = IPC_MakeHeader(0x1, 2, 4); // 0x00010084
 	cmdbuf[1] = sdkVer;
 	cmdbuf[2] = memSize;
 	cmdbuf[3] = 0x20;
@@ -79,12 +79,12 @@ Result	ACTU_Initialize(u32 sdkVer, void *addr, u32 memSize)
 	return (Result)cmdbuf[1];
 }
 
-Result ACTU_GetAccountDataBlock(void *buffer, u32 size, u32 blkId)
+Result ACTU_GetAccountDataBlock(void * buffer, u32 size, u32 blkId)
 {
 	Result ret = 0;
 	u32 *cmdbuf = getThreadCommandBuffer();
 
-	cmdbuf[0] = IPC_MakeHeader(6,3,2); // 0x00600C2
+	cmdbuf[0] = IPC_MakeHeader(6, 3, 2); // 0x00600C2
 	cmdbuf[1] = 0xFE;
 	cmdbuf[2] = size;
 	cmdbuf[3] = blkId;

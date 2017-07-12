@@ -176,7 +176,7 @@ int main(int argc, char *argv[])
 	getSizeString(ctrTotalSize, getTotalStorage(SYSTEM_MEDIATYPE_CTR_NAND));
 	printf("\x1b[32;1m*\x1b[0m CTR Size: \x1b[32;1m%s\x1b[0m / \x1b[32;1m%s\x1b[0m \n", ctrFreeSize, ctrTotalSize);
 
-	printf("\x1b[32;1m*\x1b[0m Installed titles: SD: \x1b[32;1m%i\x1b[0m  (NAND: \x1b[32;1m%i\x1b[0m)\n", (int)titleCount(MEDIATYPE_SD), (int)titleCount(MEDIATYPE_NAND));
+	printf("\x1b[32;1m*\x1b[0m Installed titles: SD: \x1b[32;1m%lu\x1b[0m  (NAND: \x1b[32;1m%lu\x1b[0m)\n", titleCount(MEDIATYPE_SD), titleCount(MEDIATYPE_NAND));
 
 	while (aptMainLoop())
 	{
