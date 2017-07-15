@@ -1,7 +1,6 @@
 #include "actu.h"
 #include "am.h"
 #include "cfgs.h"
-#include "gsplcd.h"
 #include "system.h"
 #include "utils.h"
 

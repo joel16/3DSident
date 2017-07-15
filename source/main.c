@@ -6,10 +6,8 @@
 #include <unistd.h>
 
 #include "actu.h"
-#include "am.h"
 #include "cfgs.h"
-#include "config.h"
-#include "gsplcd.h"
+#include "fs.h"
 #include "mcu.h"
 #include "misc.h"
 #include "power.h"
@@ -17,7 +15,7 @@
 #include "system.h"
 #include "utils.h"
 
-#define SDK(a,b,c,d) ((a<<24)|(b<<16)|(c<<8)|d)
+#define SDK(a, b, c, d) ((a<<24) | (b<<16) | (c<<8) | d)
 
 void initServices()
 {
@@ -26,6 +24,7 @@ void initServices()
 	cfgsInit();
 	fsInit();
 	sdmcInit();
+	openArchive(ARCHIVE_SDMC);
 	ptmuInit();
 	mcuInit();
 	amInit();
@@ -34,12 +33,10 @@ void initServices()
 	aptInit();
 	hidInit();
 	actInit(SDK(11, 2, 0, 200), 0x20000);
-	httpcInit(0x9000);
 }
 
 void termServices()
 {
-	httpcExit();
 	actExit();
 	hidExit();
 	aptExit();
@@ -48,6 +45,7 @@ void termServices()
 	amExit();
 	mcuExit();
 	ptmuExit();
+	closeArchive();
 	sdmcExit();
 	fsExit();
 	cfgsExit();
@@ -61,11 +59,7 @@ int main(int argc, char *argv[])
 	
 	consoleInit(GFX_BOTTOM, NULL);
 	
-	printf("\x1b[36;1m*\x1b[0m Username: \x1b[36;1m %s \n\x1b[0m", getUsername());
-	printf("\x1b[36;1m*\x1b[0m Birthday: \x1b[36;1m%s\x1b[0m \n", getBirthday());
-	printf("\x1b[36;1m*\x1b[0m EULA version: \x1b[36;1m%s\x1b[0m \n\n ", getEulaVersion());
-	
-	printf("\n\x1b[32;1m> Press any key to exit =)\x1b[0m");
+	printf("\x1b[32;1m> Press any key to exit =)\x1b[0m");
 	//printf("\x1b[31;1m*\x1b[0m Device cert: \x1b[31;1m%s\x1b[0m \n\n", getDeviceCert());
 	
 	consoleInit(GFX_TOP, NULL);
@@ -83,7 +77,7 @@ int main(int argc, char *argv[])
 	char ctrFreeSize[16], ctrTotalSize[16];	
 	s32 ret;
 
-	printf("\x1b[0;0H"); //Move the cursor to the top left corner of the screen
+	printf("\x1b[1;1H"); //Move the cursor to the top left corner of the screen
 	printf("\x1b[32;1m3DSident 0.7.6\x1b[0m\n\n");
 
 	//=====================================================================//
@@ -106,7 +100,7 @@ int main(int argc, char *argv[])
 	ret = osGetSystemVersionData(nver, cver);
 
 	if (ret)
-		printf("\x1b[33;1m*\x1b[0m System version: 0x%08liX\n\n", ret);
+		printf("\x1b[33;1m*\x1b[0m System version: \x1b[33;1m0x%08liX\x1b[0m\n\n", ret);
 
 	snprintf(str_sysver, 100, "\x1b[33;1m*\x1b[0m System version: \x1b[33;1m%d.%d.%d-%d\x1b[0m\n\n",
 			cver->mainver,
@@ -184,31 +178,31 @@ int main(int argc, char *argv[])
 		//----------------------------Battery Info-----------------------------//
 		//=====================================================================//
 		
-		printf("\x1b[18;0H"); //Move the cursor to the top left corner of the screen
+		printf("\x1b[19;0H"); //Move the cursor to the top left corner of the screen
 		mcuGetBatteryLevel(&batteryPercent);
 		printf("\x1b[34;1m*\x1b[0m Battery percentage: \x1b[34;1m%3d%%\x1b[0m (\x1b[34;1m%s\x1b[0m) \n\x1b[0m", batteryPercent, batteryStatus());
 
-		printf("\x1b[19;0H"); //Move the cursor to the top left corner of the screen
+		printf("\x1b[20;0H"); //Move the cursor to the top left corner of the screen
 		mcuGetBatteryVoltage(&batteryVolt);
 		printf("\x1b[34;1m*\x1b[0m Battery voltage: \x1b[34;1m%d\x1b[0m (\x1b[34;1m%.1f V\x1b[0m)\n", batteryVolt, 5.0 * ((double)batteryVolt / 256.0));//,(Estimated: %0.1lf V) estimatedVolt);
 		//=====================================================================//
 		//------------------------------Misc Info------------------------------//
 		//=====================================================================//
 		
-		printf("\x1b[25;0H"); // Move the cursor
+		printf("\x1b[26;0H"); // Move the cursor
 		wifiPercent = (osGetWifiStrength() * 33.3333333333);
 		printf("\x1b[32;1m*\x1b[0m WiFi signal strength: \x1b[32;1m%d\x1b[0m  (\x1b[32;1m%.0lf%%\x1b[0m) \n", osGetWifiStrength(), wifiPercent);
 
-		printf("\x1b[26;0H"); //Move the cursor
+		printf("\x1b[27;0H"); //Move the cursor
 		HIDUSER_GetSoundVolume(&volume);
 		volPercent = (volume * 1.5873015873);
 		printf("\x1b[32;1m*\x1b[0m Volume slider state: \x1b[32;1m%d\x1b[0m  (\x1b[32;1m%.0lf%%\x1b[0m)  \n", volume, volPercent);
 
-		printf("\x1b[27;0H"); //Move the cursor
+		printf("\x1b[28;0H"); //Move the cursor
 		_3dSliderPercent = (osGet3DSliderState() * 100.0);
 		printf("\x1b[32;1m*\x1b[0m 3D slider state: \x1b[32;1m%.1lf\x1b[0m  (\x1b[32;1m%.0lf%%\x1b[0m)   \n", osGet3DSliderState(), _3dSliderPercent);
 		
-		printf("\x1b[28;0H"); //Move the cursor
+		printf("\x1b[29;0H"); //Move the cursor
 		printf("\x1b[32;1m*\x1b[0m Brightness: \x1b[32;1m%s\x1b[0m \n", getBrightness(1));
 		
 		gspWaitForVBlank();

@@ -2,17 +2,13 @@
 #define FS_H
 
 #include <3ds.h>
-#include <stdbool.h>
-#include <stdio.h>
-#include <sys/stat.h>
 
-FS_Archive sdmcArchive;
+FS_Archive fsArchive;
 
-void openSdArchive();
-void closeSdArchive();
-int makeDir(const char * path);
-bool fileExists(char * path);
-bool dirExists(const char * path);
-bool deleteFile(const char *path);
+void openArchive(FS_ArchiveID id);
+void closeArchive(void);
+Result makeDir(FS_Archive archive, const char * path);
+bool fileExists(FS_Archive archive, const char * path);
+bool dirExists(FS_Archive archive, const char * path);
 
 #endif

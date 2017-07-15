@@ -43,10 +43,6 @@ BANNER := $(RESOURCES)/banner.png
 JINGLE := $(RESOURCES)/banner.wav
 LOGO := $(RESOURCES)/logo.bcma.lz
 
-VERSION_MAJOR := 0
-VERSION_MINOR := 7
-VERSION_MICRO := 2
-
 # CIA
 APP_PRODUCT_CODE := 3DS-I
 APP_UNIQUE_ID := 0x16000
@@ -57,10 +53,10 @@ APP_SYSTEM_MODE_EXT := Legacy
 # options for code generation
 #---------------------------------------------------------------------------------
 
-ARCH	:=	-march=armv6k -mtune=mpcore -mfloat-abi=hard
+ARCH	:=	-march=armv6k -mtune=mpcore -mfloat-abi=hard -mtp=soft
 
-CFLAGS	:=	-g -Wall -O2 -mword-relocations -Werror -DVERSION=$(VERSION)\
-			-fomit-frame-pointer -ffast-math \
+CFLAGS	:=	-g -Wall -O2 -mword-relocations -Werror \
+			-fomit-frame-pointer -ffunction-sections \
 			$(ARCH)
 
 CFLAGS	+=	$(INCLUDE) -DARM11 -D_3DS
@@ -70,7 +66,7 @@ CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions -std=gnu++11
 ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-specs=3dsx.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
 
-LIBS	:= -lpng16 -lz -lm -lctru
+LIBS	:= -lctru -lm -lpng16 -lz
 
 OS := $(shell uname)
 
@@ -194,7 +190,7 @@ banner:
 	
 cia: clean all
 	@arm-none-eabi-strip $(TARGET).elf
-	@makerom -f cia -o $(TARGET).cia -elf $(TARGET).elf -rsf $(RESOURCE)/cia.rsf -icon $(RESOURCES)/icon.png -banner $(RESOURCES)/banner.png -major $(VERSION_MAJOR) -minor $(VERSION_MINOR) -micro $(VERSION_MICRO) -exefslogo -target t
+	@makerom -f cia -o $(TARGET).cia -elf $(TARGET).elf -rsf $(RESOURCE)/cia.rsf -icon $(RESOURCES)/icon.png -banner $(RESOURCES)/banner.png -exefslogo -target t
 	
 #---------------------------------------------------------------------------------
 

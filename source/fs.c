@@ -1,50 +1,59 @@
 #include "fs.h"
 
-void openSdArchive()
+void openArchive(FS_ArchiveID id)
 {
-	FSUSER_OpenArchive(&sdmcArchive, ARCHIVE_SDMC, fsMakePath(PATH_EMPTY, ""));
+	FSUSER_OpenArchive(&fsArchive, id, fsMakePath(PATH_EMPTY, ""));
 }
 
-void closeSdArchive()
+void closeArchive(void)
 {
-	FSUSER_CloseArchive(sdmcArchive);
+	FSUSER_CloseArchive(fsArchive);
 }
 
-int makeDir(const char *path)
+Result makeDir(FS_Archive archive, const char * path)
 {
-	if (!path) 
+	if((!archive) || (!path))
 		return -1;
 	
-	return mkdir(path, 0777);
+	return FSUSER_CreateDirectory(archive, fsMakePath(PATH_ASCII, path), 0);
 }
 
-bool fileExists(char *path) 
+bool fileExists(FS_Archive archive, const char * path)
 {
-    FILE * temp = fopen(path, "r");
-    if(temp == NULL)
-        return false;
+	if((!path) || (!archive))
+		return false;
+	
+	Handle handle;
 
-    fclose(temp);
+	Result ret = FSUSER_OpenFile(&handle, archive, fsMakePath(PATH_ASCII, path), FS_OPEN_READ, 0);
+	
+	if(ret != 0)
+		return false;
 
-    return true;
+	ret = FSFILE_Close(handle);
+	
+	if(ret != 0)
+		return false;
+	
+	return true;
 }
 
-bool dirExists(const char *path)
-{
-    struct stat info;
+bool dirExists(FS_Archive archive, const char * path)
+{	
+	if((!path) || (!archive))
+		return false;
+	
+	Handle handle;
 
-    if(stat( path, &info ) != 0)
-        return false;
-    else if(info.st_mode & S_IFDIR)
-        return true;
-    else
-        return false;
-}
+	Result ret = FSUSER_OpenDirectory(&handle, archive, fsMakePath(PATH_ASCII, path));
+	
+	if(ret != 0)
+		return false;
 
-bool deleteFile(const char *path) 
-{
-	openSdArchive();
-	Result ret = FSUSER_DeleteFile(sdmcArchive, fsMakePath(PATH_ASCII, path));
-	closeSdArchive();
-	return ret == 0;
+	ret = FSDIR_Close(handle);
+	
+	if(ret != 0)
+		return false;
+	
+	return true;
 }
