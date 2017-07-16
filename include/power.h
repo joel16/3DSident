@@ -3,6 +3,6 @@
 
 #include <3ds.h>
 
-const char * batteryStatus();
+const char * batteryStatus(void);
 
 #endif

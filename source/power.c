@@ -1,7 +1,7 @@
 #include "power.h"
 #include "screenshot.h"
 
-const char * batteryStatus()
+const char * batteryStatus(void)
 {
     u8 batteryStateBool;
     PTMU_GetBatteryChargeState(&batteryStateBool);

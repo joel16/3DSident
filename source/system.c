@@ -4,9 +4,9 @@
 #include "system.h"
 #include "utils.h"
 
-const char * getModel()
+const char * getModel(void)
 {
-    const char *models[] = 
+    const char * models[] = 
 	{
 		"OLD 3DS - CTR",
 		"OLD 3DS XL - SPR",
@@ -26,9 +26,9 @@ const char * getModel()
         return models[6];
 }
 
-const char * getRegion()
+const char * getRegion(void)
 {
-    const char *regions[] = 
+    const char * regions[] = 
 	{
         "JPN",
         "USA",
@@ -49,9 +49,30 @@ const char * getRegion()
         return regions[7];
 }
 
-const char * getLang()
+const char getFirmRegion(void)
 {
-    const char *languages[] = 
+	u8 canadaOrUsa = 0;
+	CFGU_GetRegionCanadaUSA(&canadaOrUsa);
+	
+	if (strncmp(getRegion(), "JPN", 3) == 0)
+		return 'J';
+	else if (canadaOrUsa == 1)
+		return 'U';
+	else if ((strncmp(getRegion(), "EUR", 3) == 0) || (strncmp(getRegion(), "AUS", 3) == 0))
+		return 'E';
+	else if (strncmp(getRegion(), "CHN", 3) == 0)
+		return 'C';
+	else if (strncmp(getRegion(), "KOR", 3) == 0)
+		return 'K';
+	else if (strncmp(getRegion(), "TWN", 3) == 0)
+		return 'T';
+	else 
+		return 'X';
+}
+
+const char * getLang(void)
+{
+    const char * languages[] = 
 	{
         "Japanese",
         "English",
@@ -76,9 +97,9 @@ const char * getLang()
         return languages[11];
 }
 
-char * getMacAddress()
+char * getMacAddress(void)
 {
-    u8* macByte = (u8*)0x1FF81060; 
+    u8 * macByte = (u8*)0x1FF81060; 
     static char macAddress[18];
 
     //sprintf automatically zero-terminates the string
@@ -87,7 +108,7 @@ char * getMacAddress()
     return macAddress;
 }
 
-char * getScreenType()
+char * getScreenType(void)
 {
 	bool isNew3DS = 0;
 	APT_CheckNew3DS(&isNew3DS);
@@ -143,7 +164,7 @@ char * getScreenType()
 	return screenType;
 }
 
-u64 getLocalFriendCodeSeed()
+u64 getLocalFriendCodeSeed(void)
 {
 	u64 seed = 0;
 	
@@ -181,7 +202,7 @@ char * getDeviceCert(void)
 {
     u8 const cert[0x180];
     amNetGetDeviceCert(cert);
-    return base64Encode(cert);
+    return base64Encode(cert, 0x180);
 }
 
 char * getNNIDInfo(u32 size, u32 blkId)
@@ -195,7 +216,7 @@ char * getNNIDInfo(u32 size, u32 blkId)
     return str;
 }
 
-char * isDebugModeEnabled()
+char * isDebugModeEnabled(void)
 {
 	u8 debugMode = 0;
 	CFG_GetConfig(4, 0x130000, &debugMode);
@@ -230,7 +251,7 @@ char * getBrightness(u32 screen)
 		return "n3DS only";
 }
 
-char * getCardSlotStatus()
+char * getCardSlotStatus(void)
 {
 	bool isInserted = false;
 	FS_CardType cardType = 0;

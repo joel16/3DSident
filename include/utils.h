@@ -12,6 +12,6 @@
 
 void getSizeString(char *string, uint64_t size);
 void utf2ascii(char* dst, u16* src);
-char * base64Encode(u8 const * input);
+char * base64Encode(u8 const * bytesToEnc, size_t bufLen);
 
 #endif

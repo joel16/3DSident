@@ -9,7 +9,7 @@ u32 titleCount(FS_MediaType mediaType)
     return count;
 }
 
-bool detectSD()
+bool detectSD(void)
 {
     bool isSD;
     FSUSER_IsSdmcDetected(&isSD);

@@ -53,7 +53,7 @@ char * getCID(int type)
 	else if (type == 1) //NAND
 		FSUSER_GetNandCid(buf, 0x10);
 		
-	sprintf(cid, "%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X",
+	snprintf(cid, 33, "%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X",
 			buf[0], buf[1], buf[2], buf[3], buf[4], buf[5],
 			buf[6], buf[7], buf[8], buf[9], buf[10], buf[11],
 			buf[12], buf[13], buf[14], buf[15]);

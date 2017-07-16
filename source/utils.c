@@ -23,57 +23,50 @@ void utf2ascii(char* dst, u16* src)
 	*dst=0x00;
 }
 
-char * base64Encode(u8 const * input)
+// Crashes doesn't work. Leavign it here for anyone who's interested.
+// Also, this is Rei's function (initially in C++, in working condition) not mine.
+static const char * base64_chars = 
+	"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	"abcdefghijklmnopqrstuvwxyz"
+	"0123456789+/";
+
+char * base64Encode(u8 const * bytesToEnc, size_t bufLen) 
 {
-    int      len      = strlen((const char *)input);
-    int      leftover = len % 3;
-    char    *ret      = malloc(((len/3) * 4) + ((leftover)?4:0) + 1);
-    int      n        = 0;
-    int      outlen   = 0;
-    uint8_t  i        = 0;
-    uint8_t *inp      = (uint8_t *) input;
-    const char *index = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                        "abcdefghijklmnopqrstuvwxyz"
-                        "0123456789+/";
+	char * ret = "";
+	int i = 0, j = 0;
+	u8 temp[3];
+	u8 str[4];
 
-    if (ret == NULL)
-        return NULL;
+	while (bufLen--) 
+	{
+		temp[i++] = *(bytesToEnc++);
+		if (i == 3) 
+		{
+			str[0] = (temp[0] & 0xfc) >> 2;
+			str[1] = ((temp[0] & 0x03) << 4) + ((temp[1] & 0xf0) >> 4);
+			str[2] = ((temp[1] & 0x0f) << 2) + ((temp[2] & 0xc0) >> 6);
+			str[3] = temp[2] & 0x3f;
 
-    // Convert each 3 bytes of input to 4 bytes of output.
-    len -= leftover;
-    for (n = 0; n < len; n+=3) {
-        i = inp[n] >> 2;
-        ret[outlen++] = index[i];
+			for(i = 0; (i <4) ; i++) ret += base64_chars[str[i]];
+				i = 0;
+		}
+	}
 
-        i  = (inp[n]   & 0x03) << 4;
-        i |= (inp[n+1] & 0xf0) >> 4;
-        ret[outlen++] = index[i];
+	if (i)
+	{
+		for(j = i; j < 3; j++) temp[j] = '\0';
 
-        i  = ((inp[n+1] & 0x0f) << 2);
-        i |= ((inp[n+2] & 0xc0) >> 6);
-        ret[outlen++] = index[i];
+		str[0] = (temp[0] & 0xfc) >> 2;
+		str[1] = ((temp[0] & 0x03) << 4) + ((temp[1] & 0xf0) >> 4);
+		str[2] = ((temp[1] & 0x0f) << 2) + ((temp[2] & 0xc0) >> 6);
+		str[3] = temp[2] & 0x3f;
 
-        i  = (inp[n+2] & 0x3f);
-        ret[outlen++] = index[i];
-    }
+		for (j = 0; (j < i + 1); j++) 
+			ret += base64_chars[str[j]];
 
-    // Handle leftover 1 or 2 bytes.
-    if (leftover) {
-        i = (inp[n] >> 2);
-        ret[outlen++] = index[i];
+		while((i++ < 3)) 
+			ret += '=';
+	}
 
-        i = (inp[n]   & 0x03) << 4;
-        if (leftover == 2) {
-            i |= (inp[n+1] & 0xf0) >> 4;
-            ret[outlen++] = index[i];
-
-            i  = ((inp[n+1] & 0x0f) << 2);
-        }
-        ret[outlen++] = index[i];
-        ret[outlen++] = '=';
-        if (leftover == 1)
-            ret[outlen++] = '=';
-    }
-    ret[outlen] = '\0';
-    return ret;
+	return ret;
 }
