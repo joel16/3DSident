@@ -1,5 +1,5 @@
-#include "actu.h"
 #include "kernel.h"
+#include "system.h"
 
 char * getVersion(int version)
 {
@@ -14,7 +14,7 @@ char * getVersion(int version)
 			GET_VERSION_REVISION(os_ver)
 	);
 	
-	snprintf(str_ver, 255, "%lu.%lu-%lu\n",
+	snprintf(str_ver, 255, "%lu.%lu-%lu",
 			GET_VERSION_MAJOR(firm_ver),
 			GET_VERSION_MINOR(firm_ver),
 			GET_VERSION_REVISION(firm_ver)
@@ -27,12 +27,13 @@ char * getVersion(int version)
 	if (ret)
 		snprintf(str_sysver, 100, "0x%08liX", ret);
 	else
-		snprintf(str_sysver, 100, "%d.%d.%d-%d",
+		snprintf(str_sysver, 100, "%d.%d.%d-%d%c",
 			cver->mainver,
 			cver->minor,
 			cver->build,
-			nver->mainver
-	);
+			nver->mainver,
+			getFirmRegion()
+		);
 	
 	if (version == 0)
 		return str_kernel;
@@ -45,7 +46,7 @@ char * getVersion(int version)
 char * getCID(int type)
 {
 	u8 buf[16];
-	static char cid[32];
+	static char cid[33];
 	
 	if (type == 0) //SDMC
 		FSUSER_GetSdmcCid(buf, 0x10);

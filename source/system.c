@@ -130,10 +130,10 @@ char * getScreenType(void)
         
 		switch ((screens >> 4) & 0xF)
 		{
-			case 1:
+			case 1: // 0x01 = JDI => IPS
 				sprintf(uScreenType, "Upper: IPS");
 				break;
-			case 0xC:
+			case 0xC: // 0x0C = SHARP => TN
 				sprintf(uScreenType, "Upper: TN");
 				break;
 			default:
@@ -142,10 +142,10 @@ char * getScreenType(void)
 		}
 		switch (screens & 0xF)
 		{
-			case 1:
+			case 1: // 0x01 = JDI => IPS
 				sprintf(dScreenType, " | Lower: IPS");
 				break;
-			case 0xC:
+			case 0xC: // 0x0C = SHARP => TN
 				sprintf(dScreenType, " | Lower: TN");
 				break;
 			default:
@@ -157,9 +157,7 @@ char * getScreenType(void)
 		strcat(screenType, dScreenType);
 	}
 	else
-	{
-		sprintf(screenType, "Upper: TN | Lower: TN");
-	}    
+		sprintf(screenType, "Upper: TN | Lower: TN"); 
 	
 	return screenType;
 }
@@ -216,17 +214,6 @@ char * getNNIDInfo(u32 size, u32 blkId)
     return str;
 }
 
-char * isDebugModeEnabled(void)
-{
-	u8 debugMode = 0;
-	CFG_GetConfig(4, 0x130000, &debugMode);
-	
-	if (debugMode == 0x10)
-		return "enabled";
-	else
-		return "disabled";
-}
-
 char * getBrightness(u32 screen)
 {
 	u32 brightness = 0;
@@ -239,13 +226,13 @@ char * getBrightness(u32 screen)
 	
 	if (brightness == 0x10)
 		return "1 (20%)";
-	else if (brightness == 0x1c)
+	else if (brightness == 0x1C)
 		return "2 (40%)";
 	else if (brightness == 0x30)
 		return "3 (60%)";
 	else if (brightness == 0x52)
 		return "4 (80%)";
-	else if (brightness == 0x8e)
+	else if (brightness == 0x8E)
 		return "5 (100%)";
 	else
 		return "n3DS only";

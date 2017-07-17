@@ -3,6 +3,7 @@
 #include "actu.h"
 #include "cfgs.h"
 #include "fs.h"
+#include "kernel.h"
 #include "mcu.h"
 #include "misc.h"
 #include "power.h"
@@ -59,17 +60,15 @@ int main(int argc, char *argv[])
 	//------------------------Variable Declaration-------------------------//
 	//=====================================================================//
 	
-	char *str_ver = (char *)malloc(sizeof(char) * 255), *str_sysver = (char *)malloc(sizeof(char) * 255);
 	double wifiPercent, volPercent, _3dSliderPercent;
 	unsigned long long transferableID = 0, homemenuID = 0;
-	u32 os_ver = osGetKernelVersion(), firm_ver = osGetKernelVersion(), ip;
+	u32 ip;
 	unsigned int principalID = 0, persistentID = 0;
 	u16 info[0x16];
-	u8 buf[16], batteryPercent = 0, batteryVolt = 0, volume = 0, mcuFwMajor = 0, mcuFwMinor = 0;
+	u8 batteryPercent = 0, batteryVolt = 0, volume = 0, mcuFwMajor = 0, mcuFwMinor = 0;
 	bool isConnected = false;
-	OS_VersionBin *nver = (OS_VersionBin *)malloc(sizeof(OS_VersionBin)), *cver = (OS_VersionBin *)malloc(sizeof(OS_VersionBin));
 	char sdFreeSize[16], sdTotalSize[16], ctrFreeSize[16], ctrTotalSize[16], name[0x16];
-	Result ret = 0, wifiRet = 0;
+	Result ret = 0;
 	wifiBlock slotData;
 	
 	consoleInit(GFX_BOTTOM, NULL);
@@ -114,34 +113,52 @@ int main(int argc, char *argv[])
 	//------------------------------WIFI Info------------------------------//
 	//=====================================================================//
 	
-	wifiRet = CFG_GetConfigInfoBlk8(CFG_WIFI_SLOT_SIZE, CFG_WIFI_BLKID + 0, (u8*)&slotData);
-	if ((!wifiRet) && (slotData.exists))
+	ret = CFG_GetConfigInfoBlk8(CFG_WIFI_SLOT_SIZE, CFG_WIFI_BLKID + 0, (u8*)&slotData);
+	if ((!ret) && (slotData.exists))
 	{
 		if (slotData.network.use) 
-			printf("\x1b[32;1m*\x1b[0m WiFi Slot 1: \x1b[32;1m%s\x1b[0m (\x1b[32;1m%s\x1b[0m)\n", slotData.network.SSID, slotData.network.password);
-		else if (slotData.network_WPS.use) 
-			printf("\x1b[32;1m*\x1b[0m WiFi Slot 1: \x1b[32;1m%s\x1b[0m (\x1b[32;1m%s\x1b[0m)\n", slotData.network_WPS.SSID, slotData.network_WPS.password);
+		{
+			printf("\x1b[32;1m*\x1b[0m WiFi 1 SSID: \x1b[32;1m%s\x1b[0m\n", slotData.network.SSID);
+			printf("\x1b[32;1m*\x1b[0m WiFi 1 pass: \x1b[32;1m%s\x1b[0m\n\n", slotData.network.password);
+		}
+		else if (slotData.network_WPS.use)
+		{
+			printf("\x1b[32;1m*\x1b[0m WiFi 1 SSID: \x1b[32;1m%s\x1b[0m\n", slotData.network_WPS.SSID);
+			printf("\x1b[32;1m*\x1b[0m WiFi 1 pass: \x1b[32;1m%s\x1b[0m\n\n", slotData.network_WPS.password);
+		}
 	}
 	
-	wifiRet = CFG_GetConfigInfoBlk8(CFG_WIFI_SLOT_SIZE, CFG_WIFI_BLKID + 1, (u8*)&slotData);
-	if ((!wifiRet) && (slotData.exists))
+	ret = CFG_GetConfigInfoBlk8(CFG_WIFI_SLOT_SIZE, CFG_WIFI_BLKID + 1, (u8*)&slotData);
+	if ((!ret) && (slotData.exists))
 	{
 		if (slotData.network.use) 
-			printf("\x1b[32;1m*\x1b[0m WiFi Slot 2: \x1b[32;1m%s\x1b[0m (\x1b[32;1m%s\x1b[0m)\n", slotData.network.SSID, slotData.network.password);
-		else if (slotData.network_WPS.use) 
-			printf("\x1b[32;1m*\x1b[0m WiFi Slot 2: \x1b[32;1m%s\x1b[0m (\x1b[32;1m%s\x1b[0m)\n", slotData.network_WPS.SSID, slotData.network_WPS.password);
+		{
+			printf("\x1b[32;1m*\x1b[0m WiFi 2 SSID: \x1b[32;1m%s\x1b[0m\n", slotData.network.SSID);
+			printf("\x1b[32;1m*\x1b[0m WiFi 2 pass: \x1b[32;1m%s\x1b[0m\n\n", slotData.network.password);
+		}
+		else if (slotData.network_WPS.use)
+		{
+			printf("\x1b[32;1m*\x1b[0m WiFi 2 SSID: \x1b[32;1m%s\x1b[0m\n", slotData.network_WPS.SSID);
+			printf("\x1b[32;1m*\x1b[0m WiFi 2 pass: \x1b[32;1m%s\x1b[0m\n\n", slotData.network_WPS.password);
+		}
 	}
 	
-	wifiRet = CFG_GetConfigInfoBlk8(CFG_WIFI_SLOT_SIZE, CFG_WIFI_BLKID + 2, (u8*)&slotData);
-	if ((!wifiRet) && (slotData.exists))
+	ret = CFG_GetConfigInfoBlk8(CFG_WIFI_SLOT_SIZE, CFG_WIFI_BLKID + 2, (u8*)&slotData);
+	if ((!ret) && (slotData.exists))
 	{
 		if (slotData.network.use) 
-			printf("\x1b[32;1m*\x1b[0m WiFi Slot 3: \x1b[32;1m%s\x1b[0m (\x1b[32;1m%s\x1b[0m)\n", slotData.network.SSID, slotData.network.password);
-		else if (slotData.network_WPS.use) 
-			printf("\x1b[32;1m*\x1b[0m WiFi Slot 3: \x1b[32;1m%s\x1b[0m (\x1b[32;1m%s\x1b[0m)\n", slotData.network_WPS.SSID, slotData.network_WPS.password);
+		{
+			printf("\x1b[32;1m*\x1b[0m WiFi 3 SSID: \x1b[32;1m%s\x1b[0m\n", slotData.network.SSID);
+			printf("\x1b[32;1m*\x1b[0m WiFi 3 pass: \x1b[32;1m%s\x1b[0m\n\n", slotData.network.password);
+		}
+		else if (slotData.network_WPS.use)
+		{
+			printf("\x1b[32;1m*\x1b[0m WiFi 3 SSID: \x1b[32;1m%s\x1b[0m\n", slotData.network_WPS.SSID);
+			printf("\x1b[32;1m*\x1b[0m WiFi 3 pass: \x1b[32;1m%s\x1b[0m\n\n", slotData.network_WPS.password);
+		}
 	}
 	
-	printf("\n\x1b[32;1m> Press any key to exit =)\x1b[0m");
+	printf("\x1b[32;1m> Press any key to exit =)\x1b[0m");
 	
 	consoleInit(GFX_TOP, NULL);
 
@@ -151,35 +168,12 @@ int main(int argc, char *argv[])
 	//=====================================================================//
 	//------------------------------Firm Info------------------------------//
 	//=====================================================================//
-		
-	snprintf(str_ver, 255, "\x1b[33;1m*\x1b[0m Kernel version: \x1b[33;1m%lu.%lu-%lu\n*\x1b[0m FIRM version is: \x1b[33;1m%lu.%lu-%lu\x1b[0m \n",
-			GET_VERSION_MAJOR(os_ver),
-			GET_VERSION_MINOR(os_ver),
-			GET_VERSION_REVISION(os_ver),
-			GET_VERSION_MAJOR(firm_ver),
-			GET_VERSION_MINOR(firm_ver),
-			GET_VERSION_REVISION(firm_ver)
-			);
-
-	printf(str_ver);
-
-	memset(nver, 0, sizeof(OS_VersionBin));
-	memset(cver, 0, sizeof(OS_VersionBin));
-	ret = osGetSystemVersionData(nver, cver);
-
-	if (ret)
-		printf("\x1b[33;1m*\x1b[0m System version: \x1b[33;1m0x%08liX\x1b[0m\n\n", ret);
-
-	snprintf(str_sysver, 100, "\x1b[33;1m*\x1b[0m System version: \x1b[33;1m%d.%d.%d-%d%c\x1b[0m\n\n",
-			cver->mainver,
-			cver->minor,
-			cver->build,
-			nver->mainver,
-			getFirmRegion()
-			);
-
-	if (!ret)
-		printf(str_sysver);
+			
+	printf("\x1b[33;1m*\x1b[0m Kernel version: \x1b[33;1m%s\n", getVersion(0));
+	
+	printf("\x1b[33;1m*\x1b[0m Firm version: \x1b[33;1m%s\n", getVersion(1));
+	
+	printf("\x1b[33;1m*\x1b[0m System version: \x1b[33;1m%s\n\n", getVersion(2));
 		
 	//=====================================================================//
 	//-----------------------------System Info-----------------------------//
@@ -195,17 +189,9 @@ int main(int argc, char *argv[])
 	printf("\x1b[31;1m*\x1b[0m MAC Address: \x1b[31;1m%s\x1b[0m \n", getMacAddress());
 	printf("\x1b[31;1m*\x1b[0m Serial number: \x1b[31;1m%s\x1b[0m \n", getSerialNum());
 
-	FSUSER_GetSdmcCid(buf, 0x10);
-	printf("\x1b[31;1m*\x1b[0m SDMC CID: \x1b[31;1m%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X\x1b[0m \n",
-			buf[0], buf[1], buf[2], buf[3], buf[4], buf[5],
-			buf[6], buf[7], buf[8], buf[9], buf[10], buf[11],
-			buf[12], buf[13], buf[14], buf[15]);
+	printf("\x1b[31;1m*\x1b[0m SDMC CID: \x1b[31;1m%s\x1b[0m \n", getCID(0));
 
-	FSUSER_GetNandCid(buf, 0x10);
-	printf("\x1b[31;1m*\x1b[0m NAND CID: \x1b[31;1m%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X\x1b[0m \n",
-			buf[0], buf[1], buf[2], buf[3], buf[4], buf[5],
-			buf[6], buf[7], buf[8], buf[9], buf[10], buf[11], 
-			buf[12], buf[13], buf[14], buf[15]);
+	printf("\x1b[31;1m*\x1b[0m NAND CID: \x1b[31;1m%s\x1b[0m \n", getCID(1));
 			
 	ret = APT_GetAppletInfo(APPID_HOMEMENU, &homemenuID, NULL, NULL, NULL, NULL);
 	printf("\x1b[31;1m*\x1b[0m Homemenu ID: \x1b[31;1m%016llX\x1b[0m \n\n", homemenuID);
@@ -276,11 +262,6 @@ int main(int argc, char *argv[])
 		gfxFlushBuffers();
 		gfxSwapBuffers();
 	}
-	
-	free(nver);
-	free(cver);
-	free(str_ver);
-	free(str_sysver);
 	
 	termServices();
 	return 0;

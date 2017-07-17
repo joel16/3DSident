@@ -15,7 +15,6 @@ u32 getDeviceId(void);
 u64 getSoapId(void);
 char * getDeviceCert(void);
 char * getNNIDInfo(u32 size, u32 blkId);
-char * isDebugModeEnabled(void);
 char * getBrightness(u32 screen);
 char * getCardSlotStatus(void);
 
