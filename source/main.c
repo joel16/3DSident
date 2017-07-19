@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
 	bool isConnected = false;
 	char sdFreeSize[16], sdTotalSize[16], ctrFreeSize[16], ctrTotalSize[16], name[0x16];
 	Result ret = 0;
-	wifiBlock slotData;
+	wifiSlotStructure slotData;
 	
 	consoleInit(GFX_BOTTOM, NULL);
 	
@@ -114,48 +114,54 @@ int main(int argc, char *argv[])
 	//=====================================================================//
 	
 	ret = CFG_GetConfigInfoBlk8(CFG_WIFI_SLOT_SIZE, CFG_WIFI_BLKID + 0, (u8*)&slotData);
-	if ((!ret) && (slotData.exists))
+	if ((!ret) && (slotData.set))
 	{
 		if (slotData.network.use) 
 		{
 			printf("\x1b[32;1m*\x1b[0m WiFi 1 SSID: \x1b[32;1m%s\x1b[0m\n", slotData.network.SSID);
-			printf("\x1b[32;1m*\x1b[0m WiFi 1 pass: \x1b[32;1m%s\x1b[0m\n\n", slotData.network.password);
+			printf("\x1b[32;1m*\x1b[0m WiFi 1 pass: \x1b[32;1m%s\x1b[0m\n", slotData.network.passphrase);
 		}
 		else if (slotData.network_WPS.use)
 		{
 			printf("\x1b[32;1m*\x1b[0m WiFi 1 SSID: \x1b[32;1m%s\x1b[0m\n", slotData.network_WPS.SSID);
-			printf("\x1b[32;1m*\x1b[0m WiFi 1 pass: \x1b[32;1m%s\x1b[0m\n\n", slotData.network_WPS.password);
+			printf("\x1b[32;1m*\x1b[0m WiFi 1 pass: \x1b[32;1m%s\x1b[0m\n", slotData.network_WPS.passphrase);
 		}
+		
+		printf("\x1b[32;1m*\x1b[0m WiFi 1 mac address: \x1b[32;1m%02X:%02X:%02X:%02X:%02X:%02X\x1b[0m\n\n", slotData.mac_addr[0], slotData.mac_addr[1], slotData.mac_addr[2], slotData.mac_addr[3], slotData.mac_addr[4], slotData.mac_addr[5]);
 	}
 	
 	ret = CFG_GetConfigInfoBlk8(CFG_WIFI_SLOT_SIZE, CFG_WIFI_BLKID + 1, (u8*)&slotData);
-	if ((!ret) && (slotData.exists))
+	if ((!ret) && (slotData.set))
 	{
 		if (slotData.network.use) 
 		{
 			printf("\x1b[32;1m*\x1b[0m WiFi 2 SSID: \x1b[32;1m%s\x1b[0m\n", slotData.network.SSID);
-			printf("\x1b[32;1m*\x1b[0m WiFi 2 pass: \x1b[32;1m%s\x1b[0m\n\n", slotData.network.password);
+			printf("\x1b[32;1m*\x1b[0m WiFi 2 pass: \x1b[32;1m%s\x1b[0m\n", slotData.network.passphrase);
 		}
 		else if (slotData.network_WPS.use)
 		{
 			printf("\x1b[32;1m*\x1b[0m WiFi 2 SSID: \x1b[32;1m%s\x1b[0m\n", slotData.network_WPS.SSID);
-			printf("\x1b[32;1m*\x1b[0m WiFi 2 pass: \x1b[32;1m%s\x1b[0m\n\n", slotData.network_WPS.password);
+			printf("\x1b[32;1m*\x1b[0m WiFi 2 pass: \x1b[32;1m%s\x1b[0m\n", slotData.network_WPS.passphrase);
 		}
+		
+		printf("\x1b[32;1m*\x1b[0m WiFi 2 mac address: \x1b[32;1m%02X:%02X:%02X:%02X:%02X:%02X\x1b[0m\n\n", slotData.mac_addr[0], slotData.mac_addr[1], slotData.mac_addr[2], slotData.mac_addr[3], slotData.mac_addr[4], slotData.mac_addr[5]);
 	}
 	
 	ret = CFG_GetConfigInfoBlk8(CFG_WIFI_SLOT_SIZE, CFG_WIFI_BLKID + 2, (u8*)&slotData);
-	if ((!ret) && (slotData.exists))
+	if ((!ret) && (slotData.set))
 	{
 		if (slotData.network.use) 
 		{
 			printf("\x1b[32;1m*\x1b[0m WiFi 3 SSID: \x1b[32;1m%s\x1b[0m\n", slotData.network.SSID);
-			printf("\x1b[32;1m*\x1b[0m WiFi 3 pass: \x1b[32;1m%s\x1b[0m\n\n", slotData.network.password);
+			printf("\x1b[32;1m*\x1b[0m WiFi 3 pass: \x1b[32;1m%s\x1b[0m\n", slotData.network.passphrase);
 		}
 		else if (slotData.network_WPS.use)
 		{
 			printf("\x1b[32;1m*\x1b[0m WiFi 3 SSID: \x1b[32;1m%s\x1b[0m\n", slotData.network_WPS.SSID);
-			printf("\x1b[32;1m*\x1b[0m WiFi 3 pass: \x1b[32;1m%s\x1b[0m\n\n", slotData.network_WPS.password);
+			printf("\x1b[32;1m*\x1b[0m WiFi 3 pass: \x1b[32;1m%s\x1b[0m\n", slotData.network_WPS.passphrase);
 		}
+		
+		printf("\x1b[32;1m*\x1b[0m WiFi 3 mac address: \x1b[32;1m%02X:%02X:%02X:%02X:%02X:%02X\x1b[0m\n\n", slotData.mac_addr[0], slotData.mac_addr[1], slotData.mac_addr[2], slotData.mac_addr[3], slotData.mac_addr[4], slotData.mac_addr[5]);
 	}
 	
 	printf("\x1b[32;1m> Press any key to exit =)\x1b[0m");
