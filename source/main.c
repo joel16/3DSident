@@ -77,7 +77,7 @@ int main(int argc, char *argv[])
 	//------------------------------MISC Info (continued)------------------//
 	//=====================================================================//
 	
-	printf("\x1b[36;1m*\x1b[0m Brightness: \x1b[36;1m%s\x1b[0m    \n", getBrightness(1));
+	printf("\x1b[36;1m*\x1b[0m Installed titles: SD: \x1b[36;1m%lu\x1b[0m  (NAND: \x1b[36;1m%lu\x1b[0m)\n", titleCount(MEDIATYPE_SD), titleCount(MEDIATYPE_NAND));
 	
 	ip = gethostid();
 	printf("\x1b[36;1m*\x1b[0m IP: \x1b[36;1m%lu.%lu.%lu.%lu\x1b[0m     \n\n", ip & 0xFF, (ip>>8)&0xFF, (ip>>16)&0xFF, (ip>>24)&0xFF);
@@ -240,7 +240,7 @@ int main(int argc, char *argv[])
 		printf("\x1b[36;1m*\x1b[0m CTR Size: \x1b[36;1m%s\x1b[0m / \x1b[36;1m%s\x1b[0m \n", ctrFreeSize, ctrTotalSize);
 
 		printf("\x1b[26;0H");
-		printf("\x1b[36;1m*\x1b[0m Installed titles: SD: \x1b[36;1m%lu\x1b[0m  (NAND: \x1b[36;1m%lu\x1b[0m)\n", titleCount(MEDIATYPE_SD), titleCount(MEDIATYPE_NAND));
+		printf("\x1b[36;1m*\x1b[0m Brightness: \x1b[36;1m%s\x1b[0m    \n", getBrightness(1));
 		
 		printf("\x1b[27;0H");
 		wifiPercent = (osGetWifiStrength() * 33.3333333333);
