@@ -8,29 +8,36 @@ I decided to fork this project, and added additional info similar to PSPident, h
 
 # Features:
 - Current kernel, FIRM and system version detection. 
-- Model detection.
-- Displays screen type.
-- Region detection.
-- Language detection.
-- MAC address detection.
-- Device serial detection.
-- SDMC CID detection.
-- NAND CID detection.
-- NNID number, and account name detection.
-- Device ID.
-- Soap ID.
+- Model detection with code name.
+- Displays screen type (TN/IPS).
+- Displays region.
+- Displays language.
+- Displays MAC address.
+- Displays serial.
+- Displays SDMC and NAND CID
+- Displays NNID username, principal ID, persistent ID, transferable base ID, country and timezone. 
+- Displays Mii's name.
+- Displays device ID.
+- Displays soap ID.
 - Battery charging status.
-- Battery percentage (actual battery percentage).
-- Displays battery voltage (estimated) and unknown value format.
+- AC Adapter connection status.
+- Battery percentage (actual battery percentage using mcu::HWC).
+- Displays battery voltage (estimated) and unknown format.
 - Displays MCU firmware.
 - SD detection.
-- SD free storage and total storage capacity.
-- CTR free storage and total storage capacity.
-- Displays number of titles installed.
-- Displays volume slider state.
-- 3D slider state and percentage.
-- Wifi signal strength.
-- Brightness status.
-- Headphone status.
-- Card slot status.
-- Using L+R triggers a screenshot in the GUI version. (Automatic on original)
+- Displays SD free and total storage capacity.
+- Displays CTR free and total storage capacity.
+- Displays TWL free and total storage capacity. (GUI exclusive)
+- Displays TWL photo free and total storage capacity. (GUI exclusive)
+- Displays number of titles installed on SD and NAND.
+- Displays volume slider state and percentage.
+- Displays 3D slider state and percentage.
+- Displays Wifi signal strength.
+- Displays IP address.
+- Displays brightness status and percentage.
+- Displays headphone/audio jack status. (GUI exclusive)
+- Card slot status and inserted card type (CTR/NAND). (GUI exclusive)
+- Displays parental control pin,  email address and secret answer. (GUI exclusive)
+- Displays home menu ID.
+- Displays Wifi slot info (SSID, password and MAC address).
+- Using L+R triggers a screenshot in the GUI version.
