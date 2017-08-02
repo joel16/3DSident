@@ -15,9 +15,9 @@ struct Birthday
 
 typedef struct
 {
-	u8 miiID[0x4]; // Mii ID
+	u32 miiID; // Mii ID
 	u64 systemID; // System ID (identifies owner, for purpose of enforcing editing restrictions and blue pants).
-	u8 dateOfCreation[0x4]; // Specialness and date of creation (big-endian 32bit unsigned integer)
+	u32 dateOfCreation; // Specialness and date of creation (big-endian 32bit unsigned integer)
 	u8 mac_addr[0x6]; // Creator's full MAC
 	u16 padding1;
 	u16 birthday; // Bit-mapped: Birthday (4bit-day,5bit-month), Sex, Shirt color, Favorite

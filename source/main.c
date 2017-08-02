@@ -61,15 +61,16 @@ int main(int argc, char *argv[])
 	//=====================================================================//
 	
 	double wifiPercent, volPercent, _3dSliderPercent;
-	unsigned long long transferableID = 0, homemenuID = 0;
+	unsigned long long homemenuID = 0;
 	u32 ip;
-	unsigned int principalID = 0, persistentID = 0;
-	u16 info[0x16];
+	unsigned int principalID = 0;
 	u8 batteryPercent = 0, batteryVolt = 0, volume = 0, mcuFwMajor = 0, mcuFwMinor = 0;
 	bool isConnected = false;
 	char sdFreeSize[16], sdTotalSize[16], ctrFreeSize[16], ctrTotalSize[16], name[0x16];
 	Result ret = 0;
 	wifiSlotStructure slotData;
+	AccountDataBlock accountDataBlock;
+	MiiData miiData;
 	
 	consoleInit(GFX_BOTTOM, NULL);
 	
@@ -88,21 +89,21 @@ int main(int argc, char *argv[])
 	
 	ACTU_GetAccountDataBlock(&principalID, 0x4, 0xC); // First check if principal ID exists then display NNID info.
 	
+	ACTU_GetAccountDataBlock((u8*)&accountDataBlock, 0xA0, 0x11);
+	ACTU_GetAccountDataBlock((u8*)&miiData, 0x60, 0x7);
+	
 	if (principalID != 0)
 	{
 		printf("\x1b[35;1m*\x1b[0m NNID: \x1b[35;1m%s\x1b[0m\n", getNNIDInfo(0x11, 0x8));
 	
-		ACTU_GetAccountDataBlock(info, 0x16, 0x1B);
-		utf2ascii(name, info);
-		printf("\x1b[35;1m*\x1b[0m Mii name: \x1b[35;1m%s\x1b[0m\n", name);
+		utf2ascii(name, accountDataBlock.miiName);
+		printf("\x1b[35;1m*\x1b[0m Mii name: \x1b[35;1m%s\x1b[0m (\x1b[35;1m%u\x1b[0m)\n", name, (unsigned int)miiData.miiID);
 
 		printf("\x1b[35;1m*\x1b[0m Principal ID: \x1b[35;1m%u\x1b[0m\n", principalID);
-	
-		ACTU_GetAccountDataBlock(&persistentID, 0x4, 0x5);
-		printf("\x1b[35;1m*\x1b[0m Persistent ID: \x1b[35;1m%u\x1b[0m\n", persistentID);
-	
-		ACTU_GetAccountDataBlock(&transferableID, 0x8, 0x6);
-		printf("\x1b[35;1m*\x1b[0m Transferable ID: \x1b[35;1m%llu\x1b[0m\n", transferableID);
+
+		printf("\x1b[35;1m*\x1b[0m Persistent ID: \x1b[35;1m%u\x1b[0m\n", (unsigned int)accountDataBlock.persistentID);
+
+		printf("\x1b[35;1m*\x1b[0m Transferable ID: \x1b[35;1m%llu\x1b[0m\n", accountDataBlock.transferableID);
 	
 		printf("\x1b[35;1m*\x1b[0m Country: \x1b[35;1m%s\x1b[0m\n", getNNIDInfo(0x3, 0xB));
 	
