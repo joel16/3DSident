@@ -1,13 +1,18 @@
 #include <3ds.h>
 
+#include <malloc.h>
+
+#include "ac.h"
 #include "actu.h"
 #include "cfgs.h"
 #include "fs.h"
+#include "hardware.h"
 #include "kernel.h"
 #include "mcu.h"
 #include "misc.h"
 #include "power.h"
 #include "screenshot.h"
+#include "storage.h"
 #include "system.h"
 #include "utils.h"
 #include "wifi.h"
@@ -19,9 +24,6 @@ void initServices()
 	gfxInitDefault();
 	cfguInit();
 	cfgsInit();
-	fsInit();
-	sdmcInit();
-	openArchive(ARCHIVE_SDMC);
 	ptmuInit();
 	mcuInit();
 	amInit();
@@ -29,24 +31,37 @@ void initServices()
 	psInit();
 	aptInit();
 	hidInit();
-	actInit(SDK(11, 2, 0, 200), 0x20000);
+	acGetServiceHandle();
+	actInit();
 	socInit((u32*)memalign(0x1000, 0x10000), 0x10000);
+	
+	fsInit();
+	sdmcInit();
+	openArchive(&fsArchive, ARCHIVE_SDMC);
+	
+	if (isN3DS())
+		osSetSpeedupEnable(true);
 }
 
 void termServices()
 {
+	if (isN3DS())
+		osSetSpeedupEnable(false);
+	
+	closeArchive(fsArchive);
+	sdmcExit();
+	fsExit();
+	
 	socExit();
 	actExit();
 	hidExit();
 	aptExit();
 	psExit();
 	acExit();
+	acCloseServiceHandle();
 	amExit();
 	mcuExit();
 	ptmuExit();
-	closeArchive();
-	sdmcExit();
-	fsExit();
 	cfgsExit();
 	cfguExit();
 	gfxExit();
@@ -66,8 +81,7 @@ int main(int argc, char *argv[])
 	unsigned int principalID = 0;
 	u8 batteryPercent = 0, batteryVolt = 0, volume = 0, mcuFwMajor = 0, mcuFwMinor = 0;
 	bool isConnected = false;
-	char sdFreeSize[16], sdTotalSize[16], ctrFreeSize[16], ctrTotalSize[16], name[0x16];
-	Result ret = 0;
+	char sdFreeSize[16], sdTotalSize[16], ctrFreeSize[16], ctrTotalSize[16], country[0x3], name[0x16], nnid[0x11], timeZone[0x41];
 	wifiSlotStructure slotData;
 	AccountDataBlock accountDataBlock;
 	MiiData miiData;
@@ -94,9 +108,10 @@ int main(int argc, char *argv[])
 	
 	if (principalID != 0)
 	{
-		printf("\x1b[35;1m*\x1b[0m NNID: \x1b[35;1m%s\x1b[0m\n", getNNIDInfo(0x11, 0x8));
-	
-		utf2ascii(name, accountDataBlock.miiName);
+		if (R_SUCCEEDED(ACTU_GetAccountDataBlock(nnid, 0x11, 0x8)))
+			printf("\x1b[35;1m*\x1b[0m NNID: \x1b[35;1m%s\x1b[0m\n", nnid);
+		
+		u16_to_u8(name, accountDataBlock.miiName, 0x16);
 		printf("\x1b[35;1m*\x1b[0m Mii name: \x1b[35;1m%s\x1b[0m (\x1b[35;1m%u\x1b[0m)\n", name, (unsigned int)miiData.miiID);
 
 		printf("\x1b[35;1m*\x1b[0m Principal ID: \x1b[35;1m%u\x1b[0m\n", principalID);
@@ -105,17 +120,18 @@ int main(int argc, char *argv[])
 
 		printf("\x1b[35;1m*\x1b[0m Transferable ID: \x1b[35;1m%llu\x1b[0m\n", accountDataBlock.transferableID);
 	
-		printf("\x1b[35;1m*\x1b[0m Country: \x1b[35;1m%s\x1b[0m\n", getNNIDInfo(0x3, 0xB));
+		if (R_SUCCEEDED(ACTU_GetAccountDataBlock(country, 0x3, 0xB)))
+			printf("\x1b[35;1m*\x1b[0m Country: \x1b[35;1m%s\x1b[0m\n", country);
 	
-		printf("\x1b[35;1m*\x1b[0m Time Zone: \x1b[35;1m%s\x1b[0m\n\n", getNNIDInfo(0x41, 0x1E));
+		if (R_SUCCEEDED(ACTU_GetAccountDataBlock(timeZone, 0x41, 0x1E)))
+			printf("\x1b[35;1m*\x1b[0m Time Zone: \x1b[35;1m%s\x1b[0m\n\n", timeZone);
 	}
 	
 	//=====================================================================//
 	//------------------------------WIFI Info------------------------------//
 	//=====================================================================//
 	
-	ret = CFG_GetConfigInfoBlk8(CFG_WIFI_SLOT_SIZE, CFG_WIFI_BLKID + 0, (u8*)&slotData);
-	if ((!ret) && (slotData.set))
+	if ((R_SUCCEEDED(CFG_GetConfigInfoBlk8(CFG_WIFI_SLOT_SIZE, CFG_WIFI_BLKID + 0, (u8*)&slotData))) && (slotData.set))
 	{
 		if (slotData.network.use) 
 		{
@@ -131,8 +147,7 @@ int main(int argc, char *argv[])
 		printf("\x1b[32;1m*\x1b[0m WiFi 1 mac address: \x1b[32;1m%02X:%02X:%02X:%02X:%02X:%02X\x1b[0m\n\n", slotData.mac_addr[0], slotData.mac_addr[1], slotData.mac_addr[2], slotData.mac_addr[3], slotData.mac_addr[4], slotData.mac_addr[5]);
 	}
 	
-	ret = CFG_GetConfigInfoBlk8(CFG_WIFI_SLOT_SIZE, CFG_WIFI_BLKID + 1, (u8*)&slotData);
-	if ((!ret) && (slotData.set))
+	if ((R_SUCCEEDED(CFG_GetConfigInfoBlk8(CFG_WIFI_SLOT_SIZE, CFG_WIFI_BLKID + 1, (u8*)&slotData))) && (slotData.set))
 	{
 		if (slotData.network.use) 
 		{
@@ -148,8 +163,7 @@ int main(int argc, char *argv[])
 		printf("\x1b[32;1m*\x1b[0m WiFi 2 mac address: \x1b[32;1m%02X:%02X:%02X:%02X:%02X:%02X\x1b[0m\n\n", slotData.mac_addr[0], slotData.mac_addr[1], slotData.mac_addr[2], slotData.mac_addr[3], slotData.mac_addr[4], slotData.mac_addr[5]);
 	}
 	
-	ret = CFG_GetConfigInfoBlk8(CFG_WIFI_SLOT_SIZE, CFG_WIFI_BLKID + 2, (u8*)&slotData);
-	if ((!ret) && (slotData.set))
+	if ((R_SUCCEEDED(CFG_GetConfigInfoBlk8(CFG_WIFI_SLOT_SIZE, CFG_WIFI_BLKID + 2, (u8*)&slotData))) && (slotData.set))
 	{
 		if (slotData.network.use) 
 		{
@@ -170,7 +184,7 @@ int main(int argc, char *argv[])
 	consoleInit(GFX_TOP, NULL);
 
 	printf("\x1b[1;1H"); //Move the cursor to the top left corner of the screen
-	printf("\x1b[32;1m3DSident 0.7.6\x1b[0m\n\n");
+	printf("\x1b[32;1m3DSident 0.7.7\x1b[0m\n\n");
 
 	//=====================================================================//
 	//------------------------------Firm Info------------------------------//
@@ -194,14 +208,14 @@ int main(int argc, char *argv[])
 	printf("\x1b[31;1m*\x1b[0m ECS Device ID: \x1b[31;1m%llu \n", getSoapId());
 	printf("\x1b[31;1m*\x1b[0m Local friend code seed: \x1b[31;1m%010llX\x1b[0m \n", getLocalFriendCodeSeed());	
 	printf("\x1b[31;1m*\x1b[0m MAC Address: \x1b[31;1m%s\x1b[0m \n", getMacAddress());
-	printf("\x1b[31;1m*\x1b[0m Serial number: \x1b[31;1m%s\x1b[0m \n", getSerialNum());
+	printf("\x1b[31;1m*\x1b[0m Serial number: \x1b[31;1m%s\x1b[0m \n", getSerialNumber());
 
-	printf("\x1b[31;1m*\x1b[0m SDMC CID: \x1b[31;1m%s\x1b[0m \n", getCID(0));
+	printf("\x1b[31;1m*\x1b[0m SDMC CID: \x1b[31;1m%s\x1b[0m \n", getSdmcCid());
 
-	printf("\x1b[31;1m*\x1b[0m NAND CID: \x1b[31;1m%s\x1b[0m \n", getCID(1));
+	printf("\x1b[31;1m*\x1b[0m NAND CID: \x1b[31;1m%s\x1b[0m \n", getNandCid());
 			
-	ret = APT_GetAppletInfo(APPID_HOMEMENU, &homemenuID, NULL, NULL, NULL, NULL);
-	printf("\x1b[31;1m*\x1b[0m Homemenu ID: \x1b[31;1m%016llX\x1b[0m \n\n", homemenuID);
+	if (R_SUCCEEDED(APT_GetAppletInfo(APPID_HOMEMENU, &homemenuID, NULL, NULL, NULL, NULL)))
+		printf("\x1b[31;1m*\x1b[0m Homemenu ID: \x1b[31;1m%016llX\x1b[0m \n\n", homemenuID);
 		
 	while (aptMainLoop())
 	{
@@ -210,21 +224,20 @@ int main(int argc, char *argv[])
 		//=====================================================================//
 		
 		printf("\x1b[19;0H");
-		mcuGetBatteryLevel(&batteryPercent);
-		printf("\x1b[34;1m*\x1b[0m Battery percentage: \x1b[34;1m%3d%%\x1b[0m (\x1b[34;1m%s\x1b[0m)     \n", batteryPercent, batteryStatus());
+		if (R_SUCCEEDED(MCU_GetBatteryLevel(&batteryPercent)))
+			printf("\x1b[34;1m*\x1b[0m Battery percentage: \x1b[34;1m%3d%%\x1b[0m (\x1b[34;1m%s\x1b[0m)     \n", batteryPercent, batteryStatus());
 
 		printf("\x1b[20;0H");
-		mcuGetBatteryVoltage(&batteryVolt);
-		printf("\x1b[34;1m*\x1b[0m Battery voltage: \x1b[34;1m%d\x1b[0m (\x1b[34;1m%.1f V\x1b[0m)    \n", batteryVolt, 5.0 * ((double)batteryVolt / 256.0));//,(Estimated: %0.1lf V) estimatedVolt);
+		if (R_SUCCEEDED(MCU_GetBatteryVoltage(&batteryVolt)))
+			printf("\x1b[34;1m*\x1b[0m Battery voltage: \x1b[34;1m%d\x1b[0m (\x1b[34;1m%.1f V\x1b[0m)    \n", batteryVolt, 5.0 * ((double)batteryVolt / 256.0));//,(Estimated: %0.1lf V) estimatedVolt);
 		
 		printf("\x1b[21;0H");
-		PTMU_GetAdapterState(&isConnected);
-		printf("\x1b[34;1m*\x1b[0m Adapter state: \x1b[34;1m%s\x1b[0m\n", isConnected? "connected   " : "disconnected");
+		if (R_SUCCEEDED(PTMU_GetAdapterState(&isConnected)))
+			printf("\x1b[34;1m*\x1b[0m Adapter state: \x1b[34;1m%s\x1b[0m\n", isConnected? "connected   " : "disconnected");
 		
 		printf("\x1b[22;0H");
-		GetMcuFwVerHigh(&mcuFwMajor);
-		GetMcuFwVerLow(&mcuFwMinor);
-		printf("\x1b[34;1m*\x1b[0m MCU firmware: \x1b[34;1m%u.%u\x1b[0m\n\n", (mcuFwMajor - 16), mcuFwMinor);
+		if ((R_SUCCEEDED(MCU_GetFwVerHigh(&mcuFwMajor))) && (R_SUCCEEDED(MCU_GetFwVerLow(&mcuFwMinor))))
+			printf("\x1b[34;1m*\x1b[0m MCU firmware: \x1b[34;1m%u.%u\x1b[0m\n\n", (mcuFwMajor - 16), mcuFwMinor);
 		
 		//=====================================================================//
 		//------------------------------Misc Info------------------------------//
@@ -248,9 +261,11 @@ int main(int argc, char *argv[])
 		printf("\x1b[36;1m*\x1b[0m WiFi signal strength: \x1b[36;1m%d\x1b[0m  (\x1b[36;1m%.0lf%%\x1b[0m)    \n", osGetWifiStrength(), wifiPercent);
 
 		printf("\x1b[28;0H");
-		HIDUSER_GetSoundVolume(&volume);
-		volPercent = (volume * 1.5873015873);
-		printf("\x1b[36;1m*\x1b[0m Volume slider state: \x1b[36;1m%d\x1b[0m  (\x1b[36;1m%.0lf%%\x1b[0m)    \n", volume, volPercent);
+		if (R_SUCCEEDED(HIDUSER_GetSoundVolume(&volume)))
+		{
+			volPercent = (volume * 1.5873015873);
+			printf("\x1b[36;1m*\x1b[0m Volume slider state: \x1b[36;1m%d\x1b[0m  (\x1b[36;1m%.0lf%%\x1b[0m)    \n", volume, volPercent);
+		}
 
 		printf("\x1b[29;0H");
 		_3dSliderPercent = (osGet3DSliderState() * 100.0);

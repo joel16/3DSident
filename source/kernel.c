@@ -1,3 +1,7 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include "kernel.h"
 #include "system.h"
 
@@ -43,21 +47,44 @@ char * getVersion(int version)
 		return str_sysver;
 }
 
-char * getCID(int type)
+char * getSdmcCid(void)
 {
 	u8 buf[16];
 	static char cid[33];
-	
-	if (type == 0) //SDMC
-		FSUSER_GetSdmcCid(buf, 0x10);
-	
-	else if (type == 1) //NAND
-		FSUSER_GetNandCid(buf, 0x10);
 		
-	snprintf(cid, 33, "%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X",
+	if (R_SUCCEEDED(FSUSER_GetSdmcCid(buf, 0x10)))
+	{
+		snprintf(cid, 33, "%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X",
 			buf[0], buf[1], buf[2], buf[3], buf[4], buf[5],
 			buf[6], buf[7], buf[8], buf[9], buf[10], buf[11],
 			buf[12], buf[13], buf[14], buf[15]);
+	}
 	
 	return cid;
+}
+
+char * getNandCid(void)
+{
+	u8 buf[16];
+	static char cid[33];
+		
+	if (R_SUCCEEDED(FSUSER_GetNandCid(buf, 0x10)))
+	{
+		snprintf(cid, 33, "%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X",
+			buf[0], buf[1], buf[2], buf[3], buf[4], buf[5],
+			buf[6], buf[7], buf[8], buf[9], buf[10], buf[11],
+			buf[12], buf[13], buf[14], buf[15]);
+	}
+	
+	return cid;
+}
+
+u32 getDeviceId(void) // Same as PS_GetDeviceId
+{
+    u32 id = 0;
+	
+    if (R_SUCCEEDED(AM_GetDeviceId(&id)))
+		return id;
+	
+	return 0;
 }

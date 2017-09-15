@@ -3,11 +3,13 @@
 
 #include <3ds.h>
 
-Result mcuInit();
-Result mcuExit();
-Result mcuGetBatteryLevel(u8* out);
-Result mcuGetBatteryVoltage(u8* out);
-Result GetMcuFwVerHigh(u8* out);
-Result GetMcuFwVerLow(u8* out);
+Result mcuInit(void);
+Result mcuExit(void);
+Result MCU_ReadRegister(u8 reg, u32 size, void * data);
+Result MCU_GetBatteryVoltage(u8 * out);
+Result MCU_GetBatteryLevel(u8 * out);
+Result MCU_GetSoundVolume(u8 * out);
+Result MCU_GetFwVerHigh(u8 * out);
+Result MCU_GetFwVerLow(u8 * out);
 
 #endif

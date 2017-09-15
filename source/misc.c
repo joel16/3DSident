@@ -1,44 +1,23 @@
+#include "am.h"
 #include "misc.h"
+#include "utils.h"
 
 u32 titleCount(FS_MediaType mediaType)
 {
 	u32 count = 0;
 	
-	AM_GetTitleCount(mediaType, &count);
+	if (R_SUCCEEDED(AM_GetTitleCount(mediaType, &count)))
+		return count;
 
-    return count;
+    return 0;
 }
 
-bool detectSD(void)
+char * getDeviceCert(void)
 {
-    bool isSD;
-    FSUSER_IsSdmcDetected(&isSD);
-    return isSD;
-}
-
-u64 getFreeStorage(FS_SystemMediaType mediaType)
-{
-	FS_ArchiveResource	resource = {0};
+	u8 const cert[0x180];
 	
-	FSUSER_GetArchiveResource(&resource, mediaType);
+	if (R_SUCCEEDED(amNetGetDeviceCert(cert)))
+		return base64Encode(cert, 0x180);
 	
-	return (((u64) resource.freeClusters * (u64) resource.clusterSize));
-}
-
-u64 getTotalStorage(FS_SystemMediaType mediaType)
-{
-	FS_ArchiveResource	resource = {0};
-	
-	FSUSER_GetArchiveResource(&resource, mediaType);
-	
-	return (((u64) resource.totalClusters * (u64) resource.clusterSize));
-}
-
-u64 getUsedStorage(FS_SystemMediaType mediaType)
-{
-	FS_ArchiveResource	resource = {0};
-	
-	FSUSER_GetArchiveResource(&resource, mediaType);
-	
-	return ((((u64) resource.totalClusters * (u64) resource.clusterSize)) - (((u64) resource.freeClusters * (u64) resource.clusterSize)));
+	return NULL;
 }

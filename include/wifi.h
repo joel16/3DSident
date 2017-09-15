@@ -65,4 +65,6 @@ typedef struct
 	u8 padding8[0x7EC];
 } wifiSlotStructure;
 
+char * getSecurityMode();
+
 #endif

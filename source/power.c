@@ -3,11 +3,15 @@
 
 const char * batteryStatus(void)
 {
-    u8 batteryStateBool;
-    PTMU_GetBatteryChargeState(&batteryStateBool);
-
-    if (!batteryStateBool) 
-        return "not charging";
-    else 
-        return "charging";
+    u8 batteryStatus;
+    
+	if (R_SUCCEEDED(PTMU_GetBatteryChargeState(&batteryStatus)))
+	{
+		if (batteryStatus)
+			return "charging";
+		
+		return "not charging";
+	}
+	
+	return NULL;
 }

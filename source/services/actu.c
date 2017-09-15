@@ -1,44 +1,27 @@
+#include <malloc.h> 
+#include <stdio.h>
+#include <string.h>
+
 #include "actu.h"
 
 static Handle actHandle;
 static int actRefCount;
 
-static u32 *act_shareMemAddr;
-static u32 act_shareMemSize;
-static Handle act_shareMemHandle;
-
-Result actInit(u32 sdkVer, u32 sharedMemSize)
+Result actInit(void)
 {
 	Result ret = 0;
 
+	if (AtomicPostIncrement(&actRefCount)) 	
+		return 0;
+	
 	ret = srvGetServiceHandle(&actHandle, "act:u");
 	
 	if (R_FAILED(ret)) 
 		ret = srvGetServiceHandle(&actHandle, "act:a");
 	
-	if (R_SUCCEEDED(ret))
-	{
-		act_shareMemSize = sharedMemSize;
-		act_shareMemHandle = 0;
+	if (R_FAILED(ret)) 
+		AtomicDecrement(&actRefCount);
 
-		if(act_shareMemSize)
-		{
-			act_shareMemAddr = (u32*)memalign(0x1000, act_shareMemSize);
-			
-			if(act_shareMemAddr != NULL)
-			{
-				memset((void*)act_shareMemAddr, 0, act_shareMemSize);
-				ret = svcCreateMemoryBlock(&act_shareMemHandle, (u32)act_shareMemAddr, act_shareMemSize, 0, MEMPERM_READ | MEMPERM_WRITE);
-				if(R_FAILED(ret))
-					actExit();
-			}
-		}
-		
-		ret = ACTU_Initialize(sdkVer, &act_shareMemHandle, act_shareMemSize);
-        
-		if (R_FAILED(ret))
-			actExit();
-	}
 	return ret;
 }
 
@@ -48,35 +31,6 @@ void actExit(void)
 		return;
 	
 	svcCloseHandle(actHandle);
-
-	if(act_shareMemHandle)
-	{
-		svcUnmapMemoryBlock(act_shareMemHandle, (u32)act_shareMemAddr);
-		free(act_shareMemAddr);
-		act_shareMemAddr = NULL;
-		svcCloseHandle(act_shareMemHandle);
-		act_shareMemHandle = 0;
-		act_shareMemSize = 0;
-	}
-}
-
-Result	ACTU_Initialize(u32 sdkVer, void * addr, u32 memSize)
-{
-	Result ret = 0;
-	u32 *cmdbuf = getThreadCommandBuffer();
-
-	cmdbuf[0] = IPC_MakeHeader(0x1, 2, 4); // 0x00010084
-	cmdbuf[1] = sdkVer;
-	cmdbuf[2] = memSize;
-	cmdbuf[3] = 0x20;
-	cmdbuf[4] = IPC_Desc_CurProcessHandle();
-	cmdbuf[5] = 0;
-	cmdbuf[6] = (u32)addr;
-
-	if(R_FAILED(ret = svcSendSyncRequest(actHandle))) 
-		return ret;
-	
-	return (Result)cmdbuf[1];
 }
 
 Result ACTU_GetAccountDataBlock(void * buffer, u32 size, u32 blkId)
@@ -91,7 +45,7 @@ Result ACTU_GetAccountDataBlock(void * buffer, u32 size, u32 blkId)
 	cmdbuf[4] = 0x10 * size | 0xC;
 	cmdbuf[5] = (u32)buffer;
     
-	if(R_FAILED(ret = svcSendSyncRequest(actHandle))) 
+	if (R_FAILED(ret = svcSendSyncRequest(actHandle))) 
 		return ret;
 	
 	return (Result)cmdbuf[1];

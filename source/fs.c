@@ -1,13 +1,13 @@
 #include "fs.h"
 
-void openArchive(FS_ArchiveID id)
+Result openArchive(FS_Archive * archive, FS_ArchiveID id)
 {
-	FSUSER_OpenArchive(&fsArchive, id, fsMakePath(PATH_EMPTY, ""));
+	return FSUSER_OpenArchive(archive, id, fsMakePath(PATH_EMPTY, ""));
 }
 
-void closeArchive(void)
+Result closeArchive(FS_Archive archive)
 {
-	FSUSER_CloseArchive(fsArchive);
+	return FSUSER_CloseArchive(archive);
 }
 
 Result makeDir(FS_Archive archive, const char * path)
@@ -20,19 +20,15 @@ Result makeDir(FS_Archive archive, const char * path)
 
 bool fileExists(FS_Archive archive, const char * path)
 {
-	if((!path) || (!archive))
+	if ((!path) || (!archive))
 		return false;
 	
 	Handle handle;
 
-	Result ret = FSUSER_OpenFile(&handle, archive, fsMakePath(PATH_ASCII, path), FS_OPEN_READ, 0);
-	
-	if(ret != 0)
+	if (R_FAILED(FSUSER_OpenFile(&handle, archive, fsMakePath(PATH_ASCII, path), FS_OPEN_READ, 0)))
 		return false;
 
-	ret = FSFILE_Close(handle);
-	
-	if(ret != 0)
+	if (R_FAILED(FSFILE_Close(handle)))
 		return false;
 	
 	return true;
@@ -40,19 +36,15 @@ bool fileExists(FS_Archive archive, const char * path)
 
 bool dirExists(FS_Archive archive, const char * path)
 {	
-	if((!path) || (!archive))
+	if ((!path) || (!archive))
 		return false;
 	
 	Handle handle;
 
-	Result ret = FSUSER_OpenDirectory(&handle, archive, fsMakePath(PATH_ASCII, path));
-	
-	if(ret != 0)
+	if (R_FAILED(FSUSER_OpenDirectory(&handle, archive, fsMakePath(PATH_ASCII, path))))
 		return false;
 
-	ret = FSDIR_Close(handle);
-	
-	if(ret != 0)
+	if (R_FAILED(FSDIR_Close(handle)))
 		return false;
 	
 	return true;

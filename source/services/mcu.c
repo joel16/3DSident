@@ -1,73 +1,116 @@
 #include "mcu.h"
 
-static Handle mcuhwcHandle;
+static Handle mcuHandle;
+static int mcuRefCount;
 
-Result mcuInit()
+Result mcuInit(void)
 {
-    return srvGetServiceHandle(&mcuhwcHandle, "mcu::HWC");
-}
-
-Result mcuExit()
-{
-    return svcCloseHandle(mcuhwcHandle);
-}
-
-Result mcuGetBatteryLevel(u8* out)
-{
-	u32* ipc = getThreadCommandBuffer();
-	ipc[0] = 0x50000;
-   
-	Result ret = svcSendSyncRequest(mcuhwcHandle);
+	Result ret = 0;
 	
-	if(ret < 0) 
+	if (AtomicPostIncrement(&mcuRefCount)) 
+		return 0;
+	
+	ret = srvGetServiceHandle(&mcuHandle, "mcu::HWC");
+	
+	if (R_FAILED(ret)) 
+		AtomicDecrement(&mcuRefCount);
+	
+	return ret;
+}
+
+Result mcuExit(void)
+{
+	return svcCloseHandle(mcuHandle);
+}
+
+Result MCU_ReadRegister(u8 reg, u32 size, void * data)
+{
+	Result ret = 0;
+	u32 * cmdbuf = getThreadCommandBuffer();
+	
+	cmdbuf[0] = IPC_MakeHeader(0x01, 2, 2); // 0x00010082
+	cmdbuf[1] = reg;
+	cmdbuf[2] = size;
+	cmdbuf[3] = size << 4 | 0xC;
+	cmdbuf[4] = (u32)data;
+	
+	if (R_FAILED(ret = svcSendSyncRequest(mcuHandle)))
 		return ret;
 	
-	*out = ipc[2];
-	
-	return ipc[1];
+	return cmdbuf[1];
 }
 
-Result mcuGetBatteryVoltage(u8* out)
+Result MCU_GetBatteryVoltage(u8 * out)
 {
-	u32* ipc = getThreadCommandBuffer();
-	ipc[0] = 0x40000;
-    
-	Result ret = svcSendSyncRequest(mcuhwcHandle);
-	
-	if(ret < 0) 
+	Result ret = 0;
+	u32 * cmdbuf = getThreadCommandBuffer();
+
+	cmdbuf[0] = IPC_MakeHeader(0x04, 0, 0); // 0x00040000
+
+	if (R_FAILED(ret = svcSendSyncRequest(mcuHandle)))
 		return ret;
-	
-	*out = ipc[2];
-	
-	return ipc[1];
+
+	*out = cmdbuf[2];
+
+	return cmdbuf[1];
 }
 
-Result GetMcuFwVerHigh(u8* out) 
+Result MCU_GetBatteryLevel(u8 * out)
 {
-	u32* ipc = getThreadCommandBuffer();
-	ipc[0] = 0x100000;
-	
-	Result ret = svcSendSyncRequest(mcuhwcHandle);
-	
-	if(ret < 0) 
+	Result ret = 0;
+	u32 * cmdbuf = getThreadCommandBuffer();
+
+	cmdbuf[0] = IPC_MakeHeader(0x05, 0, 0); // 0x00050000
+
+	if (R_FAILED(ret = svcSendSyncRequest(mcuHandle)))
 		return ret;
-	
-	*out = ipc[2];
-	
-	return ipc[1];
+
+	*out = cmdbuf[2];
+
+	return cmdbuf[1];
 }
 
-Result GetMcuFwVerLow(u8* out) 
+Result MCU_GetSoundVolume(u8 * out) // Same as HIDUSER_GetSoundVolume
 {
-	u32* ipc = getThreadCommandBuffer();
-	ipc[0] = 0x110000;
-	
-	Result ret = svcSendSyncRequest(mcuhwcHandle);
-	
-	if(ret < 0) 
+	Result ret = 0;
+	u32 * cmdbuf = getThreadCommandBuffer();
+
+	cmdbuf[0] = IPC_MakeHeader(0x0B, 0, 0); // 0x000B0000
+
+	if (R_FAILED(ret = svcSendSyncRequest(mcuHandle)))
 		return ret;
-		
-	*out = ipc[2];
-	
-	return ipc[1];
+
+	*out = cmdbuf[2];
+
+	return cmdbuf[1];
+}
+
+Result MCU_GetFwVerHigh(u8 * out)
+{
+	Result ret = 0;
+	u32 * cmdbuf = getThreadCommandBuffer();
+
+	cmdbuf[0] = IPC_MakeHeader(0x10, 0, 0); // 0x00100000
+
+	if (R_FAILED(ret = svcSendSyncRequest(mcuHandle)))
+		return ret;
+
+	*out = cmdbuf[2];
+
+	return cmdbuf[1];
+}
+
+Result MCU_GetFwVerLow(u8 * out)
+{
+	Result ret = 0;
+	u32 * cmdbuf = getThreadCommandBuffer();
+
+	cmdbuf[0] = IPC_MakeHeader(0x11, 0, 0); // 0x00110000
+
+	if (R_FAILED(ret = svcSendSyncRequest(mcuHandle)))
+		return ret;
+
+	*out = cmdbuf[2];
+
+	return cmdbuf[1];
 }

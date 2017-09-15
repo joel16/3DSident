@@ -2,6 +2,16 @@
 
 static Handle amHandle;
 
+Result amGetServiceHandle(void)
+{
+	return srvGetServiceHandle(&amHandle, "am:net");
+}
+
+Result amCloseServiceHandle(void)
+{
+	return svcCloseHandle(amHandle);
+}
+
 Result amNetGetDeviceCert(u8 const * buffer)
 {
 	Result ret = 0;

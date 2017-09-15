@@ -2,9 +2,6 @@
 #define ACTU_H
 
 #include <3ds.h>
-#include <malloc.h>
-#include <stdio.h>
-#include <string.h>
 
 struct Birthday
 {
@@ -50,9 +47,8 @@ typedef struct
 	u32 principalID; // Principal ID
 } AccountDataBlock;
 
-Result actInit(u32 sdkVer, u32 sharedMemSize);
+Result actInit(void);
 void actExit(void);
-Result ACTU_Initialize(u32 sdkVer, void *addr, u32 memSize);
-Result ACTU_GetAccountDataBlock(void *buffer, u32 size, u32 blkId);
+Result ACTU_GetAccountDataBlock(void * buffer, u32 size, u32 blkId);
 
 #endif

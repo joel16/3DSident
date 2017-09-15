@@ -1,12 +1,13 @@
-#include "actu.h"
-#include "am.h"
+#include <stdio.h>
+#include <string.h>
+
 #include "cfgs.h"
 #include "system.h"
 #include "utils.h"
 
 const char * getModel(void)
 {
-    const char * models[] = 
+	const char * models[] = 
 	{
 		"OLD 3DS - CTR",
 		"OLD 3DS XL - SPR",
@@ -15,48 +16,49 @@ const char * getModel(void)
 		"NEW 3DS XL - RED",
 		"NEW 2DS XL - JAN",
 		"Unknown"
-    };
+	};
 
-    u8 model = 0;
-    CFGU_GetSystemModel(&model);
-
-    if (model < 6)
-        return models[model];
-    else
-        return models[6];
+	u8 model = 0;
+   
+	if (R_SUCCEEDED(CFGU_GetSystemModel(&model)))
+	{
+		if (model < 6)
+			return models[model];
+	}
+	
+	return models[6];
 }
 
 const char * getRegion(void)
 {
-    const char * regions[] = 
+	const char * regions[] = 
 	{
-        "JPN",
-        "USA",
-        "EUR",
-        "AUS",
-        "CHN",
-        "KOR",
-        "TWN",
-        "Unknown"
-    };
+		"JPN",
+		"USA",
+		"EUR",
+		"AUS",
+		"CHN",
+		"KOR",
+		"TWN",
+		"Unknown"
+	};
 
-    u8 region = 0;
-    CFGU_SecureInfoGetRegion(&region);
-
-    if (region < 7)
-        return regions[region];
-    else
-        return regions[7];
+	u8 region = 0;
+	
+	if (R_SUCCEEDED(CFGU_SecureInfoGetRegion(&region)))
+	{
+		if (region < 7)
+			return regions[region];
+	}
+	
+	return regions[7];
 }
 
 const char getFirmRegion(void)
 {
-	u8 canadaOrUsa = 0;
-	CFGU_GetRegionCanadaUSA(&canadaOrUsa);
-	
 	if (strncmp(getRegion(), "JPN", 3) == 0)
 		return 'J';
-	else if (canadaOrUsa == 1)
+	else if (strncmp(getRegion(), "USA", 3) == 0)
 		return 'U';
 	else if ((strncmp(getRegion(), "EUR", 3) == 0) || (strncmp(getRegion(), "AUS", 3) == 0))
 		return 'E';
@@ -66,66 +68,78 @@ const char getFirmRegion(void)
 		return 'K';
 	else if (strncmp(getRegion(), "TWN", 3) == 0)
 		return 'T';
-	else 
-		return 'X';
+	
+	return 0;
+}
+
+bool IsCoppacsSupported()
+{
+	u8 IsCoppacs = 0;
+	
+	if (R_SUCCEEDED(CFGU_GetRegionCanadaUSA(&IsCoppacs)))
+	{
+		if (IsCoppacs)
+			return true;
+	}
+	
+	return false;
 }
 
 const char * getLang(void)
 {
-    const char * languages[] = 
+	const char * languages[] = 
 	{
-        "Japanese",
-        "English",
-        "French",
-        "German",
-        "Italian",
-        "Spanish",
-        "Simplified Chinese",
-        "Korean",
-        "Dutch",
-        "Portugese",
-        "Russian",
-        "Traditional Chinese"
-    };
+		"Japanese",
+		"English",
+		"French",
+		"German",
+		"Italian",
+		"Spanish",
+		"Simplified Chinese",
+		"Korean",
+		"Dutch",
+		"Portugese",
+		"Russian",
+		"Traditional Chinese",
+		"Unknown"
+	};
 
-    u8 language;
-    CFGU_GetSystemLanguage(&language);
-
-    if (language < 11)
-        return languages[language];
-    else
-        return languages[11];
+	u8 language;
+	
+	if (R_SUCCEEDED(CFGU_GetSystemLanguage(&language)))
+	{
+		if (language < 12)
+			return languages[language];
+	}
+	
+	return languages[12];
 }
 
 char * getMacAddress(void)
 {
-    u8 * macByte = (u8*)0x1FF81060; 
-    static char macAddress[18];
+	u8 * macByte = (u8 *)0x1FF81060; 
+	static char macAddress[18];
+	
+	snprintf(macAddress, 18, "%02X:%02X:%02X:%02X:%02X:%02X", *macByte, *(macByte + 1), *(macByte + 2), *(macByte + 3), *(macByte + 4), *(macByte + 5));
 
-    //sprintf automatically zero-terminates the string
-    snprintf(macAddress, 18, "%02X:%02X:%02X:%02X:%02X:%02X", *macByte, *(macByte + 1), *(macByte + 2), *(macByte + 3), *(macByte + 4), *(macByte + 5));
-
-    return macAddress;
+	return macAddress;
 }
 
 char * getScreenType(void)
-{
-	bool isNew3DS = 0;
-	APT_CheckNew3DS(&isNew3DS);
-	
+{	
 	static char uScreenType[20];
 	static char dScreenType[20];
 	
 	static char screenType[32];
 	
-	if (isNew3DS)
+	if (isN3DS())
 	{
 		u8 screens = 0;
 		
 		if(R_SUCCEEDED(gspLcdInit()))
 		{
-			GSPLCD_GetVendors(&screens);
-			gspLcdExit();
+			if (R_SUCCEEDED(GSPLCD_GetVendors(&screens)))
+				gspLcdExit();
 		}	
         
 		switch ((screens >> 4) & 0xF)
@@ -166,94 +180,28 @@ u64 getLocalFriendCodeSeed(void)
 {
 	u64 seed = 0;
 	
-    PS_GetLocalFriendCodeSeed(&seed);
-    
-	return seed;
-}
-
-char * getSerialNum(void)
-{
-	static char str[32];
-    char serial[0x10];
+    if (R_SUCCEEDED(PS_GetLocalFriendCodeSeed(&seed)))
+		return seed;
 	
-    cfgsSecureInfoGetSerialNo(serial);
-    strcpy(str, serial);
-    
-	return str;
+	return 0;
 }
 
-u32 getDeviceId(void) // Same as PS_GetDeviceId
+u8 * getSerialNumber(void)
 {
-    u32 tmp = 0;
-    AM_GetDeviceId(&tmp);
-    return tmp;
+    static u8 serial[0xF];
+	
+    if (R_SUCCEEDED(CFGS_SecureInfoGetSerialNo(serial)))
+		return serial;
+    
+	return NULL;
 }
 
 u64 getSoapId(void)
 {
-    u32 tmp = 0;
-    AM_GetDeviceId(&tmp);
-    return (tmp | (((u64) 4) << 32));
-}
-
-char * getDeviceCert(void)
-{
-    u8 const cert[0x180];
-    amNetGetDeviceCert(cert);
-    return base64Encode(cert, 0x180);
-}
-
-char * getNNIDInfo(u32 size, u32 blkId)
-{
-    char info[size];
-	static char str[100];
+    u32 id = 0;
 	
-    ACTU_GetAccountDataBlock(info, size, blkId);
-	snprintf(str, size, "%s", info);
+    if (R_SUCCEEDED(AM_GetDeviceId(&id)))
+		return (id | (((u64) 4) << 32));
 	
-    return str;
-}
-
-char * getBrightness(u32 screen)
-{
-	u32 brightness = 0;
-	
-	if(R_SUCCEEDED(gspLcdInit()))
-	{
-		GSPLCD_GetBrightness(screen, &brightness);
-		gspLcdExit();
-	}	
-	
-	if (brightness == 0x10)
-		return "1 (20%)";
-	else if (brightness == 0x1C)
-		return "2 (40%)";
-	else if (brightness == 0x30)
-		return "3 (60%)";
-	else if (brightness == 0x52)
-		return "4 (80%)";
-	else if (brightness == 0x8E)
-		return "5 (100%)";
-	else
-		return "n3DS only";
-}
-
-char * getCardSlotStatus(void)
-{
-	bool isInserted = false;
-	FS_CardType cardType = 0;
-	
-	static char card[20];
-	
-	FSUSER_CardSlotIsInserted(&isInserted);
-	
-	if (isInserted)
-	{
-		FSUSER_GetCardType(&cardType);
-		snprintf(card, 20, "inserted %s", cardType? "(TWL)" : "(CTR)");
-		return card;
-	}
-	
-	snprintf(card, 20, "not inserted");
-	return card;
+	return 0;
 }
