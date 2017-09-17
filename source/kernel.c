@@ -40,7 +40,7 @@ char * getVersion(int version)
 	
 	if (version == 0)
 		return str_kernel;
-	else if(version == 1)
+	else if (version == 1)
 		return str_ver;
 	else 
 		return str_sysver;
@@ -80,9 +80,9 @@ char * getNandCid(void)
 
 u32 getDeviceId(void) // Same as PS_GetDeviceId
 {
-    u32 id = 0;
+	u32 id = 0;
 	
-    if (R_SUCCEEDED(AM_GetDeviceId(&id)))
+	if (R_SUCCEEDED(AM_GetDeviceId(&id)))
 		return id;
 	
 	return 0;

@@ -200,7 +200,7 @@ int main(int argc, char *argv[])
 	//-----------------------------System Info-----------------------------//
 	//=====================================================================//
 	
-	printf("\x1b[31;1m*\x1b[0m Model: \x1b[31;1m%s\x1b[0m (\x1b[31;1m%s\x1b[0m) \n\x1b[0m", getModel(), getRegion());
+	printf("\x1b[31;1m*\x1b[0m Model: \x1b[31;1m%s\x1b[0m (\x1b[31;1m%s\x1b[0m - \x1b[31;1m%s\x1b[0m) \n\x1b[0m", getModel(), getRunningHW(), getRegion());
 	printf("\x1b[31;1m*\x1b[0m Screen type: \x1b[31;1m %s \n\x1b[0m", getScreenType());
 	printf("\x1b[31;1m*\x1b[0m Language: \x1b[31;1m%s\x1b[0m \n", getLang());
 
