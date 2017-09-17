@@ -8,7 +8,7 @@ I decided to fork this project, and added additional info similar to PSPident, h
 
 # Features:
 - Current kernel, FIRM and system version detection. 
-- Model detection with code name.
+- Model detection with code name and hardware info (Retail/Devboard/Debugger/Capture unit)
 - Displays screen type (TN/IPS).
 - Displays region.
 - Displays language.
@@ -35,9 +35,10 @@ I decided to fork this project, and added additional info similar to PSPident, h
 - Displays Wifi signal strength.
 - Displays IP address.
 - Displays brightness status and percentage.
+- Displays if the console is a debug unit. (GUI exclusive)
 - Displays headphone/audio jack status. (GUI exclusive)
 - Card slot status and inserted card type (CTR/NAND). (GUI exclusive)
 - Displays parental control pin,  email address and secret answer. (GUI exclusive)
 - Displays home menu ID.
 - Displays Wifi slot info (SSID, password and MAC address).
-- Using L+R triggers a screenshot in the GUI version.
+- Using L + R triggers a screenshot in the GUI version.
