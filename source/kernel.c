@@ -26,9 +26,8 @@ char * getVersion(int version)
 				
 	memset(nver, 0, sizeof(OS_VersionBin));
 	memset(cver, 0, sizeof(OS_VersionBin));
-	ret = osGetSystemVersionData(nver, cver);
 
-	if (ret)
+	if (R_FAILED(ret = osGetSystemVersionData(nver, cver)))
 		snprintf(str_sysver, 100, "0x%08liX", ret);
 	else
 		snprintf(str_sysver, 100, "%d.%d.%d-%d%c",

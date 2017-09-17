@@ -117,7 +117,7 @@ const char * getLang(void)
 
 char * getMacAddress(void)
 {
-	u8 * macByte = (u8 *)0x1FF81060; 
+	u8 * macByte = (u8 *)WIFI_MACADDR; 
 	static char macAddress[18];
 	
 	snprintf(macAddress, 18, "%02X:%02X:%02X:%02X:%02X:%02X", *macByte, *(macByte + 1), *(macByte + 2), *(macByte + 3), *(macByte + 4), *(macByte + 5));
@@ -125,10 +125,39 @@ char * getMacAddress(void)
 	return macAddress;
 }
 
+char * getRunningHW(void)
+{
+	u8 * data = (u8 *)RUNNING_HW; 
+	static char runningHW[0x9];
+	
+	switch (*data)
+	{
+		case 1:
+			snprintf(runningHW, 0x7, "Retail");
+			break;
+		case 2:
+			snprintf(runningHW, 0x9, "Devboard");
+			break;
+		case 3:
+			snprintf(runningHW, 0x9, "Debugger");
+			break;
+		case 4:
+			snprintf(runningHW, 0x8, "Capture");
+			break;
+	}
+
+	return runningHW;
+}
+
+char * isDebugUnit(void)
+{
+	return *(char *)0x1FF80015 ? "(Debug Unit)" : "";
+}
+
 char * getScreenType(void)
 {	
-	static char uScreenType[20];
-	static char dScreenType[20];
+	static char upperScreen[20];
+	static char lowerScreen[20];
 	
 	static char screenType[32];
 	
@@ -144,31 +173,31 @@ char * getScreenType(void)
         
 		switch ((screens >> 4) & 0xF)
 		{
-			case 1: // 0x01 = JDI => IPS
-				sprintf(uScreenType, "Upper: IPS");
+			case 0x01: // 0x01 = JDI => IPS
+				sprintf(upperScreen, "Upper: IPS");
 				break;
-			case 0xC: // 0x0C = SHARP => TN
-				sprintf(uScreenType, "Upper: TN");
+			case 0x0C: // 0x0C = SHARP => TN
+				sprintf(upperScreen, "Upper: TN");
 				break;
 			default:
-				sprintf(uScreenType, "Upper: Unknown");
+				sprintf(upperScreen, "Upper: Unknown");
 				break;
 		}
 		switch (screens & 0xF)
 		{
-			case 1: // 0x01 = JDI => IPS
-				sprintf(dScreenType, " | Lower: IPS");
+			case 0x01: // 0x01 = JDI => IPS
+				sprintf(lowerScreen, " | Lower: IPS");
 				break;
-			case 0xC: // 0x0C = SHARP => TN
-				sprintf(dScreenType, " | Lower: TN");
+			case 0x0C: // 0x0C = SHARP => TN
+				sprintf(lowerScreen, " | Lower: TN");
 				break;
 			default:
-				sprintf(dScreenType, " | Lower: Unknown");
+				sprintf(lowerScreen, " | Lower: Unknown");
 				break;
 		}
 		
-		strcpy(screenType, uScreenType);
-		strcat(screenType, dScreenType);
+		strcpy(screenType, upperScreen);
+		strcat(screenType, lowerScreen);
 	}
 	else
 		sprintf(screenType, "Upper: TN | Lower: TN"); 
