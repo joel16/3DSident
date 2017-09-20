@@ -43,7 +43,7 @@ const char * getRegion(void)
 		"Unknown"
 	};
 
-	u8 region = 0;
+	CFG_Region region = 0;
 	
 	if (R_SUCCEEDED(CFGU_SecureInfoGetRegion(&region)))
 	{
@@ -104,7 +104,7 @@ const char * getLang(void)
 		"Unknown"
 	};
 
-	u8 language;
+	CFG_Language language;
 	
 	if (R_SUCCEEDED(CFGU_GetSystemLanguage(&language)))
 	{
@@ -132,16 +132,16 @@ char * getRunningHW(void)
 	
 	switch (*data)
 	{
-		case 1:
+		case 0x1:
 			snprintf(runningHW, 0x7, "Retail");
 			break;
-		case 2:
+		case 0x2:
 			snprintf(runningHW, 0x9, "Devboard");
 			break;
-		case 3:
+		case 0x3:
 			snprintf(runningHW, 0x9, "Debugger");
 			break;
-		case 4:
+		case 0x4:
 			snprintf(runningHW, 0x8, "Capture");
 			break;
 	}
