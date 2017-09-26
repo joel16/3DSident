@@ -36,23 +36,15 @@ bool detectSD(void)
 char * getBrightness(u32 screen)
 {
 	u32 brightness = 0;
+	static char level[5];
 	
 	if(R_SUCCEEDED(gspLcdInit()))
 	{
 		if (R_SUCCEEDED(GSPLCD_GetBrightness(screen, &brightness)))
 			gspLcdExit();
-	}	
+	}
 	
-	if (brightness == 0x10)
-		return "1 (20%)";
-	else if (brightness == 0x1C)
-		return "2 (40%)";
-	else if (brightness == 0x30)
-		return "3 (60%)";
-	else if (brightness == 0x52)
-		return "4 (80%)";
-	else if (brightness == 0x8E)
-		return "5 (100%)";
-	else
-		return "n3DS only";
+	snprintf(level, 5, "%d%%", (int)brightness);
+	
+	return level;
 }
