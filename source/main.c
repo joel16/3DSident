@@ -85,8 +85,14 @@ int main(int argc, char *argv[])
 	wifiSlotStructure slotData;
 	AccountDataBlock accountDataBlock;
 	MiiData miiData;
-	
+	bool hidePrivateData = false;
 	consoleInit(GFX_BOTTOM, NULL);
+	hidScanInput();
+	u32 kHeld = hidKeysHeld();
+		
+	if (kHeld & KEY_L)
+		hidePrivateData = true;
+
 	
 	//=====================================================================//
 	//------------------------------MISC Info (continued)------------------//
@@ -95,7 +101,8 @@ int main(int argc, char *argv[])
 	printf("\x1b[36;1m*\x1b[0m Installed titles: SD: \x1b[36;1m%lu\x1b[0m  (NAND: \x1b[36;1m%lu\x1b[0m)\n", titleCount(MEDIATYPE_SD), titleCount(MEDIATYPE_NAND));
 	
 	ip = gethostid();
-	printf("\x1b[36;1m*\x1b[0m IP: \x1b[36;1m%lu.%lu.%lu.%lu\x1b[0m     \n\n", ip & 0xFF, (ip>>8)&0xFF, (ip>>16)&0xFF, (ip>>24)&0xFF);
+	if (hidePrivateData == false)
+		printf("\x1b[36;1m*\x1b[0m IP: \x1b[36;1m%lu.%lu.%lu.%lu\x1b[0m     \n\n", ip & 0xFF, (ip>>8)&0xFF, (ip>>16)&0xFF, (ip>>24)&0xFF);
 	
 	//=====================================================================//
 	//------------------------------NNID Info------------------------------//
@@ -106,6 +113,7 @@ int main(int argc, char *argv[])
 	ACTU_GetAccountDataBlock((u8*)&accountDataBlock, 0xA0, 0x11);
 	ACTU_GetAccountDataBlock((u8*)&miiData, 0x60, 0x7);
 	
+	if (hidePrivateData == false)
 	if (principalID != 0)
 	{
 		if (R_SUCCEEDED(ACTU_GetAccountDataBlock(nnid, 0x11, 0x8)))
@@ -131,6 +139,7 @@ int main(int argc, char *argv[])
 	//------------------------------WIFI Info------------------------------//
 	//=====================================================================//
 	
+	if (hidePrivateData == false)
 	if ((R_SUCCEEDED(CFG_GetConfigInfoBlk8(CFG_WIFI_SLOT_SIZE, CFG_WIFI_BLKID + 0, (u8*)&slotData))) && (slotData.set))
 	{
 		if (slotData.network.use) 
@@ -147,6 +156,7 @@ int main(int argc, char *argv[])
 		printf("\x1b[32;1m*\x1b[0m WiFi 1 mac address: \x1b[32;1m%02X:%02X:%02X:%02X:%02X:%02X\x1b[0m\n\n", slotData.mac_addr[0], slotData.mac_addr[1], slotData.mac_addr[2], slotData.mac_addr[3], slotData.mac_addr[4], slotData.mac_addr[5]);
 	}
 	
+	if (hidePrivateData == false)
 	if ((R_SUCCEEDED(CFG_GetConfigInfoBlk8(CFG_WIFI_SLOT_SIZE, CFG_WIFI_BLKID + 1, (u8*)&slotData))) && (slotData.set))
 	{
 		if (slotData.network.use) 
@@ -163,6 +173,7 @@ int main(int argc, char *argv[])
 		printf("\x1b[32;1m*\x1b[0m WiFi 2 mac address: \x1b[32;1m%02X:%02X:%02X:%02X:%02X:%02X\x1b[0m\n\n", slotData.mac_addr[0], slotData.mac_addr[1], slotData.mac_addr[2], slotData.mac_addr[3], slotData.mac_addr[4], slotData.mac_addr[5]);
 	}
 	
+	if (hidePrivateData == false)
 	if ((R_SUCCEEDED(CFG_GetConfigInfoBlk8(CFG_WIFI_SLOT_SIZE, CFG_WIFI_BLKID + 2, (u8*)&slotData))) && (slotData.set))
 	{
 		if (slotData.network.use) 
@@ -184,7 +195,7 @@ int main(int argc, char *argv[])
 	consoleInit(GFX_TOP, NULL);
 
 	printf("\x1b[1;1H"); //Move the cursor to the top left corner of the screen
-	printf("\x1b[32;1m3DSident 0.7.7\x1b[0m\n\n");
+	printf("\x1b[32;1m3DSident 0.7.7 | Boot holding L to hide priv info\x1b[0m\n\n");
 
 	//=====================================================================//
 	//------------------------------Firm Info------------------------------//
@@ -204,15 +215,18 @@ int main(int argc, char *argv[])
 	printf("\x1b[31;1m*\x1b[0m Screen type: \x1b[31;1m %s \n\x1b[0m", getScreenType());
 	printf("\x1b[31;1m*\x1b[0m Language: \x1b[31;1m%s\x1b[0m \n", getLang());
 
-	printf("\x1b[31;1m*\x1b[0m Device ID: \x1b[31;1m%lu \n", getDeviceId());
-	printf("\x1b[31;1m*\x1b[0m ECS Device ID: \x1b[31;1m%llu \n", getSoapId());
-	printf("\x1b[31;1m*\x1b[0m Local friend code seed: \x1b[31;1m%010llX\x1b[0m \n", getLocalFriendCodeSeed());	
-	printf("\x1b[31;1m*\x1b[0m MAC Address: \x1b[31;1m%s\x1b[0m \n", getMacAddress());
-	printf("\x1b[31;1m*\x1b[0m Serial number: \x1b[31;1m%s\x1b[0m \n", getSerialNumber());
+	if (hidePrivateData == false)
+	{
+		printf("\x1b[31;1m*\x1b[0m Device ID: \x1b[31;1m%lu \n", getDeviceId());
+		printf("\x1b[31;1m*\x1b[0m ECS Device ID: \x1b[31;1m%llu \n", getSoapId());
+		printf("\x1b[31;1m*\x1b[0m Local friend code seed: \x1b[31;1m%010llX\x1b[0m \n", getLocalFriendCodeSeed());	
+		printf("\x1b[31;1m*\x1b[0m MAC Address: \x1b[31;1m%s\x1b[0m \n", getMacAddress());
+		printf("\x1b[31;1m*\x1b[0m Serial number: \x1b[31;1m%s\x1b[0m \n", getSerialNumber());
 
-	printf("\x1b[31;1m*\x1b[0m SDMC CID: \x1b[31;1m%s\x1b[0m \n", getSdmcCid());
+		printf("\x1b[31;1m*\x1b[0m SDMC CID: \x1b[31;1m%s\x1b[0m \n", getSdmcCid());
 
-	printf("\x1b[31;1m*\x1b[0m NAND CID: \x1b[31;1m%s\x1b[0m \n", getNandCid());
+		printf("\x1b[31;1m*\x1b[0m NAND CID: \x1b[31;1m%s\x1b[0m \n", getNandCid());
+	}
 			
 	if (R_SUCCEEDED(APT_GetAppletInfo(APPID_HOMEMENU, &homemenuID, NULL, NULL, NULL, NULL)))
 		printf("\x1b[31;1m*\x1b[0m Homemenu ID: \x1b[31;1m%016llX\x1b[0m \n\n", homemenuID);
