@@ -28,7 +28,6 @@ void initServices()
 	mcuInit();
 	amInit();
 	amAppInit();
-	psInit();
 	aptInit();
 	hidInit();
 	acGetServiceHandle();
@@ -56,7 +55,6 @@ void termServices()
 	actExit();
 	hidExit();
 	aptExit();
-	psExit();
 	acExit();
 	acCloseServiceHandle();
 	amExit();

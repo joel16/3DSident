@@ -1,5 +1,7 @@
 #include "fs.h"
 
+//test from gedit.
+
 Result openArchive(FS_Archive * archive, FS_ArchiveID id)
 {
 	return FSUSER_OpenArchive(archive, id, fsMakePath(PATH_EMPTY, ""));
