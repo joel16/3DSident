@@ -4,7 +4,6 @@
 
 #include "ac.h"
 #include "actu.h"
-#include "cfgs.h"
 #include "fs.h"
 #include "hardware.h"
 #include "kernel.h"
@@ -22,7 +21,6 @@ void initServices()
 {
 	gfxInitDefault();
 	cfguInit();
-	cfgsInit();
 	ptmuInit();
 	mcuInit();
 	amInit();
@@ -59,7 +57,6 @@ void termServices()
 	amExit();
 	mcuExit();
 	ptmuExit();
-	cfgsExit();
 	cfguExit();
 	gfxExit();
 }

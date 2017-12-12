@@ -219,7 +219,7 @@ u8 * getSerialNumber(void)
 {
     static u8 serial[0xF];
 	
-    if (R_SUCCEEDED(CFGS_SecureInfoGetSerialNo(serial)))
+    if (R_SUCCEEDED(CFGI_SecureInfoGetSerialNumber(serial)))
 		return serial;
     
 	return NULL;
