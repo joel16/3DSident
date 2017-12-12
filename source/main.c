@@ -15,7 +15,6 @@
 #include "storage.h"
 #include "system.h"
 #include "utils.h"
-#include "wifi.h"
 
 #define SDK(a, b, c, d) ((a<<24) | (b<<16) | (c<<8) | d)
 
@@ -30,7 +29,7 @@ void initServices()
 	amAppInit();
 	aptInit();
 	hidInit();
-	acGetServiceHandle();
+	aciInit();
 	actInit();
 	socInit((u32*)memalign(0x1000, 0x10000), 0x10000);
 	
@@ -56,7 +55,7 @@ void termServices()
 	hidExit();
 	aptExit();
 	acExit();
-	acCloseServiceHandle();
+	aciExit();
 	amExit();
 	mcuExit();
 	ptmuExit();
@@ -80,7 +79,6 @@ int main(int argc, char *argv[])
 	u8 batteryPercent = 0, batteryVolt = 0, volume = 0, mcuFwMajor = 0, mcuFwMinor = 0;
 	bool isConnected = false;
 	char sdFreeSize[16], sdTotalSize[16], ctrFreeSize[16], ctrTotalSize[16], country[0x3], name[0x16], nnid[0x11], timeZone[0x41];
-	wifiSlotStructure slotData;
 	AccountDataBlock accountDataBlock;
 	MiiData miiData;
 	
@@ -129,52 +127,37 @@ int main(int argc, char *argv[])
 	//------------------------------WIFI Info------------------------------//
 	//=====================================================================//
 	
-	if ((R_SUCCEEDED(CFG_GetConfigInfoBlk8(CFG_WIFI_SLOT_SIZE, CFG_WIFI_BLKID + 0, (u8*)&slotData))) && (slotData.set))
+	if (R_SUCCEEDED(ACI_LoadWiFiSlot(0)))
 	{
-		if (slotData.network.use) 
-		{
-			printf("\x1b[32;1m*\x1b[0m WiFi 1 SSID: \x1b[32;1m%s\x1b[0m\n", slotData.network.SSID);
-			printf("\x1b[32;1m*\x1b[0m WiFi 1 pass: \x1b[32;1m%s\x1b[0m\n", slotData.network.passphrase);
-		}
-		else if (slotData.network_WPS.use)
-		{
-			printf("\x1b[32;1m*\x1b[0m WiFi 1 SSID: \x1b[32;1m%s\x1b[0m\n", slotData.network_WPS.SSID);
-			printf("\x1b[32;1m*\x1b[0m WiFi 1 pass: \x1b[32;1m%s\x1b[0m\n", slotData.network_WPS.passphrase);
-		}
+		char ssid[0x20], passphrase[0x40];
 		
-		printf("\x1b[32;1m*\x1b[0m WiFi 1 mac address: \x1b[32;1m%02X:%02X:%02X:%02X:%02X:%02X\x1b[0m\n\n", slotData.mac_addr[0], slotData.mac_addr[1], slotData.mac_addr[2], slotData.mac_addr[3], slotData.mac_addr[4], slotData.mac_addr[5]);
+		if (R_SUCCEEDED(ACI_GetSSID(ssid)))
+			printf("\x1b[32;1m*\x1b[0m WiFi 1 SSID: \x1b[32;1m%s\x1b[0m\n", ssid);
+
+		if (R_SUCCEEDED(ACI_GetPassphrase(passphrase)))
+			printf("\x1b[32;1m*\x1b[0m WiFi 1 pass: \x1b[32;1m%s\x1b[0m\n\n", passphrase);
 	}
 	
-	if ((R_SUCCEEDED(CFG_GetConfigInfoBlk8(CFG_WIFI_SLOT_SIZE, CFG_WIFI_BLKID + 1, (u8*)&slotData))) && (slotData.set))
+	if (R_SUCCEEDED(ACI_LoadWiFiSlot(1)))
 	{
-		if (slotData.network.use) 
-		{
-			printf("\x1b[32;1m*\x1b[0m WiFi 2 SSID: \x1b[32;1m%s\x1b[0m\n", slotData.network.SSID);
-			printf("\x1b[32;1m*\x1b[0m WiFi 2 pass: \x1b[32;1m%s\x1b[0m\n", slotData.network.passphrase);
-		}
-		else if (slotData.network_WPS.use)
-		{
-			printf("\x1b[32;1m*\x1b[0m WiFi 2 SSID: \x1b[32;1m%s\x1b[0m\n", slotData.network_WPS.SSID);
-			printf("\x1b[32;1m*\x1b[0m WiFi 2 pass: \x1b[32;1m%s\x1b[0m\n", slotData.network_WPS.passphrase);
-		}
+		char ssid[0x20], passphrase[0x40];
 		
-		printf("\x1b[32;1m*\x1b[0m WiFi 2 mac address: \x1b[32;1m%02X:%02X:%02X:%02X:%02X:%02X\x1b[0m\n\n", slotData.mac_addr[0], slotData.mac_addr[1], slotData.mac_addr[2], slotData.mac_addr[3], slotData.mac_addr[4], slotData.mac_addr[5]);
+		if (R_SUCCEEDED(ACI_GetSSID(ssid)))
+			printf("\x1b[32;1m*\x1b[0m WiFi 2 SSID: \x1b[32;1m%s\x1b[0m\n", ssid);
+
+		if (R_SUCCEEDED(ACI_GetPassphrase(passphrase)))
+			printf("\x1b[32;1m*\x1b[0m WiFi 2 pass: \x1b[32;1m%s\x1b[0m\n\n", passphrase);
 	}
 	
-	if ((R_SUCCEEDED(CFG_GetConfigInfoBlk8(CFG_WIFI_SLOT_SIZE, CFG_WIFI_BLKID + 2, (u8*)&slotData))) && (slotData.set))
+	if (R_SUCCEEDED(ACI_LoadWiFiSlot(2)))
 	{
-		if (slotData.network.use) 
-		{
-			printf("\x1b[32;1m*\x1b[0m WiFi 3 SSID: \x1b[32;1m%s\x1b[0m\n", slotData.network.SSID);
-			printf("\x1b[32;1m*\x1b[0m WiFi 3 pass: \x1b[32;1m%s\x1b[0m\n", slotData.network.passphrase);
-		}
-		else if (slotData.network_WPS.use)
-		{
-			printf("\x1b[32;1m*\x1b[0m WiFi 3 SSID: \x1b[32;1m%s\x1b[0m\n", slotData.network_WPS.SSID);
-			printf("\x1b[32;1m*\x1b[0m WiFi 3 pass: \x1b[32;1m%s\x1b[0m\n", slotData.network_WPS.passphrase);
-		}
+		char ssid[0x20], passphrase[0x40];
 		
-		printf("\x1b[32;1m*\x1b[0m WiFi 3 mac address: \x1b[32;1m%02X:%02X:%02X:%02X:%02X:%02X\x1b[0m\n\n", slotData.mac_addr[0], slotData.mac_addr[1], slotData.mac_addr[2], slotData.mac_addr[3], slotData.mac_addr[4], slotData.mac_addr[5]);
+		if (R_SUCCEEDED(ACI_GetSSID(ssid)))
+			printf("\x1b[32;1m*\x1b[0m WiFi 3 SSID: \x1b[32;1m%s\x1b[0m\n", ssid);
+
+		if (R_SUCCEEDED(ACI_GetPassphrase(passphrase)))
+			printf("\x1b[32;1m*\x1b[0m WiFi 3 pass: \x1b[32;1m%s\x1b[0m\n\n", passphrase);
 	}
 	
 	printf("\x1b[32;1m> Press any key to exit =)\x1b[0m");
