@@ -31,5 +31,6 @@ char * getScreenType(void);
 u64 getLocalFriendCodeSeed(void);
 u8 * getSerialNumber(void);
 u64 getSoapId(void);
+char * getSecurityMode();
 
 #endif

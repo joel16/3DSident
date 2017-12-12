@@ -132,7 +132,9 @@ int main(int argc, char *argv[])
 			printf("\x1b[32;1m*\x1b[0m WiFi 1 SSID: \x1b[32;1m%s\x1b[0m\n", ssid);
 
 		if (R_SUCCEEDED(ACI_GetPassphrase(passphrase)))
-			printf("\x1b[32;1m*\x1b[0m WiFi 1 pass: \x1b[32;1m%s\x1b[0m\n\n", passphrase);
+			printf("\x1b[32;1m*\x1b[0m WiFi 1 pass: \x1b[32;1m%s\x1b[0m\n", passphrase);
+
+		printf("\x1b[32;1m*\x1b[0m WiFi 1 security: \x1b[32;1m%s\x1b[0m\n\n", getSecurityMode());
 	}
 	
 	if (R_SUCCEEDED(ACI_LoadWiFiSlot(1)))
@@ -143,7 +145,9 @@ int main(int argc, char *argv[])
 			printf("\x1b[32;1m*\x1b[0m WiFi 2 SSID: \x1b[32;1m%s\x1b[0m\n", ssid);
 
 		if (R_SUCCEEDED(ACI_GetPassphrase(passphrase)))
-			printf("\x1b[32;1m*\x1b[0m WiFi 2 pass: \x1b[32;1m%s\x1b[0m\n\n", passphrase);
+			printf("\x1b[32;1m*\x1b[0m WiFi 2 pass: \x1b[32;1m%s\x1b[0m\n", passphrase);
+
+		printf("\x1b[32;1m*\x1b[0m WiFi 2 security: \x1b[32;1m%s\x1b[0m\n\n", getSecurityMode());
 	}
 	
 	if (R_SUCCEEDED(ACI_LoadWiFiSlot(2)))
@@ -154,7 +158,9 @@ int main(int argc, char *argv[])
 			printf("\x1b[32;1m*\x1b[0m WiFi 3 SSID: \x1b[32;1m%s\x1b[0m\n", ssid);
 
 		if (R_SUCCEEDED(ACI_GetPassphrase(passphrase)))
-			printf("\x1b[32;1m*\x1b[0m WiFi 3 pass: \x1b[32;1m%s\x1b[0m\n\n", passphrase);
+			printf("\x1b[32;1m*\x1b[0m WiFi 3 pass: \x1b[32;1m%s\x1b[0m\n", passphrase);
+
+		printf("\x1b[32;1m*\x1b[0m WiFi 3 security: \x1b[32;1m%s\x1b[0m\n\n", getSecurityMode());
 	}
 	
 	printf("\x1b[32;1m> Press any key to exit =)\x1b[0m");
