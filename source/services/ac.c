@@ -15,20 +15,21 @@ Result aciExit(void)
 Result ACI_LoadWiFiSlot(u8 slot)
 {
 	u32 *cmdbuf = getThreadCommandBuffer();
-	cmdbuf[0] = 0x04010040;
-	cmdbuf[1] = (u32)slot;
 	
+	cmdbuf[0] = IPC_MakeHeader(0x401,1,0); // 0x04010040
+	cmdbuf[1] = (u32)slot;
+
 	Result ret = 0;
 	if(R_FAILED(ret = svcSendSyncRequest(acHandle))) return ret;
-	
-	ret = cmdbuf[1];
-	return ret;
+
+	return (Result)cmdbuf[1];
 }
 
 Result ACI_GetSSID(char * ssid)
 {
 	u32* cmdbuf = getThreadCommandBuffer();
-	cmdbuf[0] = 0x040F0000;
+	
+	cmdbuf[0] = IPC_MakeHeader(0x40F,0,0); // 0x040F0000
 	
 	u32* staticbufs = getThreadStaticBuffers();
 	
@@ -38,14 +39,14 @@ Result ACI_GetSSID(char * ssid)
 	Result ret = 0;
 	if(R_FAILED(ret = svcSendSyncRequest(acHandle))) return ret;
 	
-	ret = cmdbuf[1];
-	return ret;
+	return (Result)cmdbuf[1];
 }
 
 Result ACI_GetPassphrase(char * passphrase)
 {
 	u32* cmdbuf = getThreadCommandBuffer();
-	cmdbuf[0] = 0x04150000;
+	
+	cmdbuf[0] = IPC_MakeHeader(0x415,0,0); // 0x04150000
 	
 	u32* staticbufs = getThreadStaticBuffers();
 	
@@ -55,32 +56,30 @@ Result ACI_GetPassphrase(char * passphrase)
 	Result ret = 0;
 	if(R_FAILED(ret = svcSendSyncRequest(acHandle))) return ret;
 	
-	ret = cmdbuf[1];
-	return ret;
+	return (Result)cmdbuf[1];
 }
 
 Result ACI_GetSSIDLength(u8 * length)
 {
 	u32 *cmdbuf = getThreadCommandBuffer();
-	cmdbuf[0] = 0x04110000;
+
+	cmdbuf[0] = IPC_MakeHeader(0x411,0,0); // 0x04110000
 	
 	Result ret = 0;
 	if(R_FAILED(ret = svcSendSyncRequest(acHandle))) return ret;
 	
-	ret = cmdbuf[1];
 	*length = (u8)cmdbuf[2];
-	return ret;
+	return (Result)cmdbuf[1];
 }
 
 Result ACI_GetSecurityMode(u8 * securityMode)
 {
 	u32 *cmdbuf = getThreadCommandBuffer();
-	cmdbuf[0] = 0x04130000;
+	cmdbuf[0] = IPC_MakeHeader(0x413,0,0); // 0x04130000
 	
 	Result ret = 0;
 	if(R_FAILED(ret = svcSendSyncRequest(acHandle))) return ret;
 	
-	ret = cmdbuf[1];
 	*securityMode = (u8)cmdbuf[2];
-	return ret;
+	return (Result)cmdbuf[1];
 }
