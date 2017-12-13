@@ -44,7 +44,7 @@ char * getBrightness(u32 screen)
 			gspLcdExit();
 	}
 	
-	snprintf(level, 5, "%d%%", (int)brightness);
+	snprintf(level, 4, "%d", (int)brightness);
 	
 	return level;
 }
