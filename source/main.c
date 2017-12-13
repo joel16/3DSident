@@ -78,6 +78,13 @@ int main(int argc, char *argv[])
 	char sdFreeSize[16], sdTotalSize[16], ctrFreeSize[16], ctrTotalSize[16], country[0x3], name[0x16], nnid[0x11], timeZone[0x41];
 	AccountDataBlock accountDataBlock;
 	MiiData miiData;
+	bool displayInfo = true; // By default nothing is hidden.
+
+	hidScanInput();
+	u32 kHeld = hidKeysHeld();
+		
+	if (kHeld & KEY_SELECT)
+		displayInfo = false; // Holding select on boot hides user specific details.
 	
 	consoleInit(GFX_BOTTOM, NULL);
 	
@@ -88,8 +95,12 @@ int main(int argc, char *argv[])
 	printf("\x1b[36;1m*\x1b[0m Installed titles: SD: \x1b[36;1m%lu\x1b[0m  (NAND: \x1b[36;1m%lu\x1b[0m)\n", titleCount(MEDIATYPE_SD), titleCount(MEDIATYPE_NAND));
 	
 	ip = gethostid();
-	printf("\x1b[36;1m*\x1b[0m IP: \x1b[36;1m%lu.%lu.%lu.%lu\x1b[0m     \n\n", ip & 0xFF, (ip>>8)&0xFF, (ip>>16)&0xFF, (ip>>24)&0xFF);
-	
+
+	if (displayInfo)
+		printf("\x1b[36;1m*\x1b[0m IP: \x1b[36;1m%lu.%lu.%lu.%lu\x1b[0m     \n\n", ip & 0xFF, (ip>>8)&0xFF, (ip>>16)&0xFF, (ip>>24)&0xFF);
+	else 
+		printf("\x1b[36;1m*\x1b[0m IP: \x1b[36;1m%s\x1b[0m     \n\n", NULL);
+
 	//=====================================================================//
 	//------------------------------NNID Info------------------------------//
 	//=====================================================================//
@@ -102,22 +113,23 @@ int main(int argc, char *argv[])
 	if (principalID != 0)
 	{
 		if (R_SUCCEEDED(ACTU_GetAccountDataBlock(nnid, 0x11, 0x8)))
-			printf("\x1b[35;1m*\x1b[0m NNID: \x1b[35;1m%s\x1b[0m\n", nnid);
+			printf("\x1b[35;1m*\x1b[0m NNID: \x1b[35;1m%s\x1b[0m\n", displayInfo? nnid : NULL);
 		
 		u16_to_u8(name, accountDataBlock.miiName, 0x16);
-		printf("\x1b[35;1m*\x1b[0m Mii name: \x1b[35;1m%s\x1b[0m (\x1b[35;1m%u\x1b[0m)\n", name, (unsigned int)miiData.miiID);
+		printf("\x1b[35;1m*\x1b[0m Mii name: \x1b[35;1m%s\x1b[0m (\x1b[35;1m%u\x1b[0m)\n", displayInfo? name : NULL, 
+			displayInfo? (unsigned int)miiData.miiID : 0);
 
-		printf("\x1b[35;1m*\x1b[0m Principal ID: \x1b[35;1m%u\x1b[0m\n", principalID);
+		printf("\x1b[35;1m*\x1b[0m Principal ID: \x1b[35;1m%u\x1b[0m\n", displayInfo? principalID : 0);
 
-		printf("\x1b[35;1m*\x1b[0m Persistent ID: \x1b[35;1m%u\x1b[0m\n", (unsigned int)accountDataBlock.persistentID);
+		printf("\x1b[35;1m*\x1b[0m Persistent ID: \x1b[35;1m%u\x1b[0m\n", displayInfo? (unsigned int)accountDataBlock.persistentID : 0);
 
-		printf("\x1b[35;1m*\x1b[0m Transferable ID: \x1b[35;1m%llu\x1b[0m\n", accountDataBlock.transferableID);
+		printf("\x1b[35;1m*\x1b[0m Transferable ID: \x1b[35;1m%llu\x1b[0m\n", displayInfo? accountDataBlock.transferableID : 0);
 	
 		if (R_SUCCEEDED(ACTU_GetAccountDataBlock(country, 0x3, 0xB)))
-			printf("\x1b[35;1m*\x1b[0m Country: \x1b[35;1m%s\x1b[0m\n", country);
+			printf("\x1b[35;1m*\x1b[0m Country: \x1b[35;1m%s\x1b[0m\n", displayInfo? country : NULL);
 	
 		if (R_SUCCEEDED(ACTU_GetAccountDataBlock(timeZone, 0x41, 0x1E)))
-			printf("\x1b[35;1m*\x1b[0m Time Zone: \x1b[35;1m%s\x1b[0m\n\n", timeZone);
+			printf("\x1b[35;1m*\x1b[0m Time Zone: \x1b[35;1m%s\x1b[0m\n\n", displayInfo? timeZone : NULL);
 	}
 	
 	//=====================================================================//
@@ -129,12 +141,12 @@ int main(int argc, char *argv[])
 		char ssid[0x20], passphrase[0x40];
 		
 		if (R_SUCCEEDED(ACI_GetSSID(ssid)))
-			printf("\x1b[32;1m*\x1b[0m WiFi 1 SSID: \x1b[32;1m%s\x1b[0m\n", ssid);
+			printf("\x1b[32;1m*\x1b[0m WiFi 1 SSID: \x1b[32;1m%s\x1b[0m\n", displayInfo? ssid : NULL);
 
 		if (R_SUCCEEDED(ACI_GetPassphrase(passphrase)))
-			printf("\x1b[32;1m*\x1b[0m WiFi 1 pass: \x1b[32;1m%s\x1b[0m\n", passphrase);
+			printf("\x1b[32;1m*\x1b[0m WiFi 1 pass: \x1b[32;1m%s\x1b[0m\n", displayInfo? passphrase : NULL);
 
-		printf("\x1b[32;1m*\x1b[0m WiFi 1 security: \x1b[32;1m%s\x1b[0m\n\n", getSecurityMode());
+		printf("\x1b[32;1m*\x1b[0m WiFi 1 security: \x1b[32;1m%s\x1b[0m\n\n", displayInfo? getSecurityMode() : NULL);
 	}
 	
 	if (R_SUCCEEDED(ACI_LoadWiFiSlot(1)))
@@ -142,12 +154,12 @@ int main(int argc, char *argv[])
 		char ssid[0x20], passphrase[0x40];
 		
 		if (R_SUCCEEDED(ACI_GetSSID(ssid)))
-			printf("\x1b[32;1m*\x1b[0m WiFi 2 SSID: \x1b[32;1m%s\x1b[0m\n", ssid);
+			printf("\x1b[32;1m*\x1b[0m WiFi 2 SSID: \x1b[32;1m%s\x1b[0m\n", displayInfo? ssid : NULL);
 
 		if (R_SUCCEEDED(ACI_GetPassphrase(passphrase)))
-			printf("\x1b[32;1m*\x1b[0m WiFi 2 pass: \x1b[32;1m%s\x1b[0m\n", passphrase);
+			printf("\x1b[32;1m*\x1b[0m WiFi 2 pass: \x1b[32;1m%s\x1b[0m\n", displayInfo? passphrase : NULL);
 
-		printf("\x1b[32;1m*\x1b[0m WiFi 2 security: \x1b[32;1m%s\x1b[0m\n\n", getSecurityMode());
+		printf("\x1b[32;1m*\x1b[0m WiFi 2 security: \x1b[32;1m%s\x1b[0m\n\n", displayInfo? getSecurityMode() : NULL);
 	}
 	
 	if (R_SUCCEEDED(ACI_LoadWiFiSlot(2)))
@@ -155,12 +167,12 @@ int main(int argc, char *argv[])
 		char ssid[0x20], passphrase[0x40];
 		
 		if (R_SUCCEEDED(ACI_GetSSID(ssid)))
-			printf("\x1b[32;1m*\x1b[0m WiFi 3 SSID: \x1b[32;1m%s\x1b[0m\n", ssid);
+			printf("\x1b[32;1m*\x1b[0m WiFi 3 SSID: \x1b[32;1m%s\x1b[0m\n", displayInfo? ssid : NULL);
 
 		if (R_SUCCEEDED(ACI_GetPassphrase(passphrase)))
-			printf("\x1b[32;1m*\x1b[0m WiFi 3 pass: \x1b[32;1m%s\x1b[0m\n", passphrase);
+			printf("\x1b[32;1m*\x1b[0m WiFi 3 pass: \x1b[32;1m%s\x1b[0m\n", displayInfo? passphrase : NULL);
 
-		printf("\x1b[32;1m*\x1b[0m WiFi 3 security: \x1b[32;1m%s\x1b[0m\n\n", getSecurityMode());
+		printf("\x1b[32;1m*\x1b[0m WiFi 3 security: \x1b[32;1m%s\x1b[0m\n\n", displayInfo? getSecurityMode() : NULL);
 	}
 	
 	printf("\x1b[32;1m> Press any key to exit =)\x1b[0m");
@@ -188,15 +200,15 @@ int main(int argc, char *argv[])
 	printf("\x1b[31;1m*\x1b[0m Screen type: \x1b[31;1m %s \n\x1b[0m", getScreenType());
 	printf("\x1b[31;1m*\x1b[0m Language: \x1b[31;1m%s\x1b[0m \n", getLang());
 
-	printf("\x1b[31;1m*\x1b[0m Device ID: \x1b[31;1m%lu \n", getDeviceId());
-	printf("\x1b[31;1m*\x1b[0m ECS Device ID: \x1b[31;1m%llu \n", getSoapId());
-	printf("\x1b[31;1m*\x1b[0m Local friend code seed: \x1b[31;1m%010llX\x1b[0m \n", getLocalFriendCodeSeed());	
-	printf("\x1b[31;1m*\x1b[0m MAC Address: \x1b[31;1m%s\x1b[0m \n", getMacAddress());
-	printf("\x1b[31;1m*\x1b[0m Serial number: \x1b[31;1m%s\x1b[0m \n", getSerialNumber());
+	printf("\x1b[31;1m*\x1b[0m Device ID: \x1b[31;1m%lu \n", displayInfo? getDeviceId() : 0);
+	printf("\x1b[31;1m*\x1b[0m ECS Device ID: \x1b[31;1m%llu \n", displayInfo? getSoapId() : 0);
+	printf("\x1b[31;1m*\x1b[0m Local friend code seed: \x1b[31;1m%010llX\x1b[0m \n", displayInfo? getLocalFriendCodeSeed() : 0);	
+	printf("\x1b[31;1m*\x1b[0m MAC Address: \x1b[31;1m%s\x1b[0m \n", displayInfo? getMacAddress() : 0);
+	printf("\x1b[31;1m*\x1b[0m Serial number: \x1b[31;1m%s\x1b[0m \n", displayInfo? getSerialNumber() : 0);
 
-	printf("\x1b[31;1m*\x1b[0m SDMC CID: \x1b[31;1m%s\x1b[0m \n", getSdmcCid());
+	printf("\x1b[31;1m*\x1b[0m SDMC CID: \x1b[31;1m%s\x1b[0m \n", displayInfo? getSdmcCid() : 0);
 
-	printf("\x1b[31;1m*\x1b[0m NAND CID: \x1b[31;1m%s\x1b[0m \n", getNandCid());
+	printf("\x1b[31;1m*\x1b[0m NAND CID: \x1b[31;1m%s\x1b[0m \n", displayInfo? getNandCid() : 0);
 			
 	if (R_SUCCEEDED(APT_GetAppletInfo(APPID_HOMEMENU, &homemenuID, NULL, NULL, NULL, NULL)))
 		printf("\x1b[31;1m*\x1b[0m Homemenu ID: \x1b[31;1m%016llX\x1b[0m \n\n", homemenuID);
