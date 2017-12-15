@@ -180,7 +180,7 @@ int main(int argc, char *argv[])
 	consoleInit(GFX_TOP, NULL);
 
 	printf("\x1b[1;1H"); //Move the cursor to the top left corner of the screen
-	printf("\x1b[32;1m3DSident 0.7.7\x1b[0m\n\n");
+	printf("\x1b[32;1m3DSident 0.7.8\x1b[0m\n\n");
 
 	//=====================================================================//
 	//------------------------------Firm Info------------------------------//

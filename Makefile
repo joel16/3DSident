@@ -27,46 +27,45 @@ include $(DEVKITARM)/3ds_rules
 #     - icon.png
 #     - <libctru folder>/default_icon.png
 #---------------------------------------------------------------------------------
-TARGET		:=	$(notdir $(CURDIR))
-BUILD		:=	build
-RESOURCES   :=	resources
-SOURCES		:=	source source/services
-DATA		:=	data
-INCLUDES	:=	include include/services
+APP_TITLE       := 3DSident
+APP_DESCRIPTION := Identity tool for the Nintendo 3DS. 
+APP_AUTHOR      := Joel16
 
-APP_TITLE	:= 3DSident
-APP_DESCRIPTION	:= Get more info about your 3DS, firmware, region etc. 
-APP_AUTHOR	:= Joel16
+TARGET      := $(subst $e ,_,$(notdir $(APP_TITLE)))
+OUTDIR      := out
+BUILD       := build
+RESOURCES   := resources
+SOURCES     := source source/graphics source/services
+DATA        := data
+INCLUDES    := include include/graphics include/services
 
-ICON := $(RESOURCES)/icon.png
-BANNER := $(RESOURCES)/banner.png
-JINGLE := $(RESOURCES)/banner.wav
-LOGO := $(RESOURCES)/logo.bcma.lz
+ICON        := $(RESOURCES)/icon.png
+BANNER      := $(RESOURCES)/banner.png
+JINGLE      := $(RESOURCES)/banner.wav
+ICON_FLAGS  := nosavebackups,visible
 
 # CIA
-APP_PRODUCT_CODE := 3DS-I
-APP_UNIQUE_ID := 0x16000
-APP_SYSTEM_MODE := 64MB
-APP_SYSTEM_MODE_EXT := Legacy
-RSF_FILE	:= resources/cia.rsf
+APP_PRODUCT_CODE    := CTR-C-3DSI
+APP_UNIQUE_ID       := 0x16000
+RSF_FILE            := resources/cia.rsf
 
 #---------------------------------------------------------------------------------
 # options for code generation
 #---------------------------------------------------------------------------------
-ARCH	:=	-march=armv6k -mtune=mpcore -mfloat-abi=hard -mtp=soft
+ARCH     := -march=armv6k -mtune=mpcore -mfloat-abi=hard -mtp=soft
 
-CFLAGS	:=	-g -Werror -O2 -mword-relocations \
-			-fomit-frame-pointer -ffunction-sections \
-			$(ARCH)
+CFLAGS   := -g -Werror -O2 -mword-relocations \
+		    -fomit-frame-pointer -ffunction-sections \
+		    $(ARCH)
 
-CFLAGS	+=	$(INCLUDE) -DARM11 -D_3DS
+CFLAGS   += $(INCLUDE) -DARM11 -D_3DS
 
-CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions -std=gnu++11
+CXXFLAGS := $(CFLAGS) -fno-rtti -fno-exceptions -std=gnu++11
 
-ASFLAGS	:=	-g $(ARCH)
-LDFLAGS	=	-specs=3dsx.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
+ASFLAGS  := -g $(ARCH)
+LDFLAGS  = -specs=3dsx.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
 
-LIBS	:= -lctru -lm -lpng16 -lz
+LIBS     := -lctru -lm -lpng16 -lz
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing
@@ -81,7 +80,7 @@ LIBDIRS	:= $(CTRULIB) $(PORTLIBS)
 ifneq ($(BUILD),$(notdir $(CURDIR)))
 #---------------------------------------------------------------------------------
 
-export OUTPUT	:=	$(CURDIR)/$(TARGET)
+export OUTPUT	:=	$(CURDIR)/$(OUTDIR)/$(TARGET)
 export TOPDIR	:=	$(CURDIR)
 
 export VPATH	:=	$(foreach dir,$(SOURCES),$(CURDIR)/$(dir)) \
@@ -110,14 +109,9 @@ else
 endif
 #---------------------------------------------------------------------------------
 
-export OFILES_SOURCES 	:=	$(CPPFILES:.cpp=.o) $(CFILES:.c=.o) $(SFILES:.s=.o)
-
-export OFILES_BIN	:=	$(addsuffix .o,$(BINFILES)) \
-			$(PICAFILES:.v.pica=.shbin.o) $(SHLISTFILES:.shlist=.shbin.o)
-
-export OFILES := $(OFILES_BIN) $(OFILES_SOURCES)
-
-export HFILES	:=	$(PICAFILES:.v.pica=_shbin.h) $(addsuffix .h,$(subst .,_,$(BINFILES)))
+export OFILES	:=	$(addsuffix .o,$(BINFILES)) \
+			$(PICAFILES:.v.pica=.shbin.o) $(SHLISTFILES:.shlist=.shbin.o) \
+			$(CPPFILES:.cpp=.o) $(CFILES:.c=.o) $(SFILES:.s=.o)
 
 export INCLUDE	:=	$(foreach dir,$(INCLUDES),-I$(CURDIR)/$(dir)) \
 			$(foreach dir,$(LIBDIRS),-I$(dir)/include) \
@@ -139,36 +133,79 @@ else
 endif
 
 ifeq ($(strip $(NO_SMDH)),)
-	export _3DSXFLAGS += --smdh=$(CURDIR)/$(TARGET).smdh
+	export _3DSXFLAGS += --smdh=$(OUTPUT).smdh
 endif
 
 ifneq ($(ROMFS),)
 	export _3DSXFLAGS += --romfs=$(CURDIR)/$(ROMFS)
 endif
 
-.PHONY: $(BUILD) clean all cia
+.PHONY: $(BUILD) clean all
 
 #---------------------------------------------------------------------------------
-all: $(BUILD)
-	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
+all: 3dsx cia
 
+3dsx: $(BUILD) $(OUTPUT).3dsx
+
+cia : $(BUILD) $(OUTPUT).cia
+
+citra: export CITRA_MODE = 1
+citra: 3dsx
 #---------------------------------------------------------------------------------
 $(BUILD):
-	@[ -d $@ ] || mkdir -p $@
+	@mkdir -p $(OUTDIR)
+	@[ -d "$@" ] || mkdir -p "$@"
+	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
 
 #---------------------------------------------------------------------------------
 clean:
 	@echo clean ...
-	@rm -fr $(BUILD) $(TARGET).bin $(TARGET).3dsx $(TARGET).smdh $(TARGET).cia $(TARGET).elf
-
-
-#---------------------------------------------------------------------------------
-cia: $(BUILD)
-	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile cia
+	@rm -fr $(BUILD) $(OUTDIR)
 
 #---------------------------------------------------------------------------------
-3dsx: $(BUILD)
-	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile 3dsx
+ifeq ($(strip $(NO_SMDH)),)
+$(OUTPUT).3dsx	:	$(OUTPUT).elf $(OUTPUT).smdh
+else
+$(OUTPUT).3dsx	:	$(OUTPUT).elf
+endif
+
+#---------------------------------------------------------------------------------
+MAKEROM		?=	makerom
+
+MAKEROM_ARGS	:=	-elf "$(OUTPUT).elf" -rsf "$(RSF_FILE)" -banner "$(BUILD)/banner.bnr" -icon "$(BUILD)/icon.icn" -DAPP_TITLE="$(APP_TITLE)" -DAPP_PRODUCT_CODE="$(APP_PRODUCT_CODE)" -DAPP_UNIQUE_ID="$(APP_UNIQUE_ID)"
+
+ifneq ($(strip $(LOGO)),)
+	MAKEROM_ARGS	+=	 -logo "$(LOGO)"
+endif
+
+ifeq ($(strip $(ROMFS)),)
+$(OUTPUT).cia: $(OUTPUT).elf $(BUILD)/banner.bnr $(BUILD)/icon.icn
+	$(MAKEROM) -f cia -o "$@" -target t -exefslogo $(MAKEROM_ARGS)
+else
+$(OUTPUT).cia: $(OUTPUT).elf $(BUILD)/banner.bnr $(BUILD)/icon.icn
+	$(MAKEROM) -f cia -o "$@" -target t -exefslogo $(MAKEROM_ARGS)
+endif
+
+
+BANNERTOOL	?=	bannertool
+
+ifeq ($(suffix $(BANNER)),.cgfx)
+	BANNER_ARG := -ci
+else
+	BANNER_ARG := -i
+endif
+
+ifeq ($(suffix $(JINGLE)),.cwav)
+	JINGLE_ARG := -ca
+else
+	JINGLE_ARG := -a
+endif
+
+$(BUILD)/banner.bnr	:	$(BANNER) $(JINGLE)
+	$(BANNERTOOL) makebanner $(BANNER_ARG) "$(BANNER)" $(JINGLE_ARG) "$(JINGLE)" -o "$@"
+
+$(BUILD)/icon.icn	:	$(APP_ICON)
+	$(BANNERTOOL) makesmdh -s "$(APP_TITLE)" -l "$(APP_DESCRIPTION)" -p "$(APP_AUTHOR)" -i "$(APP_ICON)" -f "$(ICON_FLAGS)" -o "$@"
 
 #---------------------------------------------------------------------------------
 else
@@ -178,35 +215,8 @@ DEPENDS	:=	$(OFILES:.o=.d)
 #---------------------------------------------------------------------------------
 # main targets
 #---------------------------------------------------------------------------------
-all: $(OUTPUT).cia $(OUTPUT).3dsx
 
-3dsx: $(OUTPUT).3dsx
-
-cia: $(OUTPUT).cia
-
-ifeq ($(strip $(NO_SMDH)),)
-$(OUTPUT).3dsx	: $(OUTPUT).elf $(OUTPUT).smdh
-$(OUTPUT).smdh	: $(TOPDIR)/Makefile
-else
-$(OUTPUT).3dsx	: $(OUTPUT).elf
-endif
-
-$(OUTPUT).elf	: $(OFILES)
-
-$(OUTPUT).smdh	: $(APP_ICON)
-	@bannertool makesmdh -s "$(APP_TITLE)" -l "$(APP_DESCRIPTION)"  -p "$(APP_AUTHOR)" -i $(APP_ICON) -o $@
-	@echo "built ... $(notdir $@)"
-
-$(OUTPUT).cia	: $(OUTPUT).elf $(OUTPUT).smdh $(TARGET).bnr
-	@makerom	-f cia -o $(OUTPUT).cia -DAPP_ENCRYPTED=false -DAPP_UNIQUE_ID=$(APP_UNIQUE_ID) \
-				-elf $(OUTPUT).elf -rsf $(TOPDIR)/$(RSF_FILE) \
-				-icon $(OUTPUT).smdh -banner $(TARGET).bnr  \
-				-exefslogo -target t
-	@echo "built ... $(notdir $@)"
-
-$(TARGET).bnr	: $(TOPDIR)/$(BANNER) $(TOPDIR)/$(JINGLE)
-	@bannertool	makebanner -o $@ -i $(TOPDIR)/$(BANNER) -ca $(TOPDIR)/$(JINGLE)
-	@echo "built ... $@"
+$(OUTPUT).elf	:	$(OFILES)
 
 #---------------------------------------------------------------------------------
 # you need a rule like this for each extension you use as binary data
@@ -215,7 +225,7 @@ $(TARGET).bnr	: $(TOPDIR)/$(BANNER) $(TOPDIR)/$(JINGLE)
 #---------------------------------------------------------------------------------
 	@echo $(notdir $<)
 	@$(bin2o)
-	
+
 #---------------------------------------------------------------------------------------
 endif
 #---------------------------------------------------------------------------------------
