@@ -8,6 +8,7 @@ I decided to fork this project, and added additional info similar to PSPident, h
 
 # Features:
 - Current kernel, FIRM and system version detection. 
+- Display initial system version. (GUI exclusive)
 - Model detection with code name and hardware info (Retail/Devboard/Debugger/Capture unit)
 - Displays screen type (TN/IPS).
 - Displays region.
@@ -30,11 +31,15 @@ I decided to fork this project, and added additional info similar to PSPident, h
 - Displays TWL free and total storage capacity. (GUI exclusive)
 - Displays TWL photo free and total storage capacity. (GUI exclusive)
 - Displays number of titles installed on SD and NAND.
+- Displays number of tickets installed. (GUI exclusive)
 - Displays volume slider state and percentage.
 - Displays 3D slider state and percentage.
 - Displays Wifi signal strength.
 - Displays IP address.
-- Displays brightness status and percentage.
+- Displays current brightness.
+- Display auto-brightness status. (GUI exclusive)
+- Display power saving mode. (GUI exclusive)
+- Display sound output mode. (GUI exclusive)
 - Displays if the console is a debug unit. (GUI exclusive)
 - Displays headphone/audio jack status. (GUI exclusive)
 - Card slot status and inserted card type (CTR/NAND). (GUI exclusive)
