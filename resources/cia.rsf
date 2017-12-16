@@ -132,10 +132,10 @@ AccessControlInfo:
   ServiceAccessControl: 
    - APT:U
    - ac:u
+   - ac:i
    - act:u
    - am:net
    - boss:U
-   - cam:u
    - cecd:u
    - cfg:nor
    - cfg:u
