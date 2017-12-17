@@ -250,7 +250,7 @@ int main(int argc, char *argv[])
 		printf("\x1b[36;1m*\x1b[0m CTR Size: \x1b[36;1m%s\x1b[0m / \x1b[36;1m%s\x1b[0m \n", ctrFreeSize, ctrTotalSize);
 
 		printf("\x1b[26;0H");
-		printf("\x1b[36;1m*\x1b[0m Brightness level: \x1b[36;1m%s\x1b[0m    \n", getBrightness(1));
+		printf("\x1b[36;1m*\x1b[0m Brightness level: \x1b[36;1m%s\x1b[0m    \n", getBrightness(GSPLCD_SCREEN_TOP));
 		
 		printf("\x1b[27;0H");
 		wifiPercent = (osGetWifiStrength() * 33.3333333333);
