@@ -62,7 +62,7 @@ void Menu_Controls(void)
 		Draw_Rect(115, 122, 190, 5, C2D_Color32(219, 219, 219, 255));
 		Draw_Rect(115, 122, ((_3dSliderPercent / 100) * 190), 5, C2D_Color32(241, 122, 74, 255));
 		
-		Draw_Textf(90, 138, 0.45f, C2D_Color32(77, 76, 74, 255), "Use home button to exit.");
+		Draw_Textf(90, 138, 0.45f, C2D_Color32(77, 76, 74, 255), "Press START + SELECT to return.");
 	
 		Draw_Image(btn_home, 180, 215);
 		

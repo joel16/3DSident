@@ -344,8 +344,10 @@ void Menu_Main(void)
 	nand_titles = Misc_TitleCount(MEDIATYPE_NAND);
 	tickets = Misc_TicketCount();
 
-	float instr_width = 0.0f, instr_height = 0.0f;
-	Draw_GetTextSize(0.5f, &instr_width, &instr_height, "Press select to hide user-specific info");
+	float instr_width = 0.0f, instr_width2 = 0.0f, instr_width3 = 0.0f, instr_height = 0.0f;
+	Draw_GetTextSize(0.5f, &instr_width, &instr_height, "Press select to hide user-specific info.");
+	Draw_GetTextSize(0.5f, &instr_width2, NULL, "Press L + R to capture a screenshot.");
+	Draw_GetTextSize(0.5f, &instr_width3, NULL, "Press START + SELECT to use button tester.");
 
 	while (aptMainLoop()) 
 	{
@@ -389,9 +391,9 @@ void Menu_Main(void)
 				Menu_Misc();
 				break;
 			case 9:
-				Draw_Text((400 - instr_width) / 2, (240 - instr_height) / 2, 0.5f, MENU_INFO_TITLE_COLOUR, "Press select to hide user-specific info");
-				Draw_Text((400 - instr_width) / 2, ((240 - instr_height) / 2) + 18, 0.5f, MENU_INFO_TITLE_COLOUR, "  Press L + R to capture a screenshot  ");
-				Draw_Text((400 - instr_width) / 2, ((240 - instr_height) / 2) + 36, 0.5f, MENU_INFO_TITLE_COLOUR, "Press START + SELECT to use button test");
+				Draw_Text((400 - instr_width) / 2, (240 - instr_height) / 2, 0.5f, MENU_INFO_TITLE_COLOUR, "Press select to hide user-specific info.");
+				Draw_Text((400 - instr_width2) / 2, ((240 - instr_height) / 2) + 18, 0.5f, MENU_INFO_TITLE_COLOUR, "Press L + R to capture a screenshot.");
+				Draw_Text((400 - instr_width3) / 2, ((240 - instr_height) / 2) + 36, 0.5f, MENU_INFO_TITLE_COLOUR, "Press START + SELECT to use button tester.");
 				break;
 		}
 
@@ -438,6 +440,12 @@ void Menu_Main(void)
 
 		if (((kHeld & KEY_START) && (kDown & KEY_SELECT)) || ((kHeld & KEY_SELECT) && (kDown & KEY_START)))
 			MENU_STATE_CONTROLS = true;
+
+		if (KEY_DDOWN & KEY_A)
+		{
+			if (selection == 9)
+				longjmp(exitJmp, 1);
+		}
 
 		Menu_Controls();
 	}

@@ -189,7 +189,7 @@ int main(int argc, char *argv[])
 			
 	printf("\x1b[33;1m*\x1b[0m Kernel version: \x1b[33;1m%s\n", Kernel_GetVersion(0));
 	printf("\x1b[33;1m*\x1b[0m Firm version: \x1b[33;1m%s\n", Kernel_GetVersion(1));
-	printf("\x1b[33;1m*\x1b[0m System version: \x1b[33;1m%s\n\n", Kernel_GetVersion(3));
+	printf("\x1b[33;1m*\x1b[0m System version: \x1b[33;1m%s\n", Kernel_GetVersion(3));
 	printf("\x1b[33;1m*\x1b[0m Initial System version: \x1b[33;1m%s\n\n", Kernel_GetVersion(2));
 		
 	//=====================================================================//
