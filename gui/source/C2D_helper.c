@@ -58,3 +58,15 @@ bool Draw_Image(C2D_Image image, float x, float y)
 {
 	return C2D_DrawImageAt(image, x, y, 0.5f, NULL, 1.0f, 1.0f);
 }
+
+bool Draw_ImageScale(C2D_Image image, float x, float y, float scaleX, float scaleY)
+{
+	return C2D_DrawImageAt(image, x, y, 0.5f, NULL, scaleX, scaleY);
+}
+
+bool Draw_Image_Blend(C2D_Image image, float x, float y, Colour colour)
+{
+	C2D_ImageTint tint;
+	C2D_PlainImageTint(&tint, colour, 0.50f);
+	return C2D_DrawImageAt(image, x, y, 0.5f, &tint, 1.0f, 1.0f);
+}

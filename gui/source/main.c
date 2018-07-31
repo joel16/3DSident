@@ -8,10 +8,10 @@
 #include "fs.h"
 #include "menus.h"
 #include "sprites.h"
+#include "textures.h"
 #include "utils.h"
 
 static u32 cpu_time_limit = 0;
-static C2D_SpriteSheet spritesheet;
 
 static void Init_Services(void)
 {
@@ -52,14 +52,12 @@ static void Init_Services(void)
 	RENDER_TOP = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
 	RENDER_BOTTOM = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
 
-	spritesheet = C2D_SpriteSheetLoad("romfs:/res/drawable/sprites.t3x");
-	banner = C2D_SpriteSheetGetImage(spritesheet, sprites_icon_idx);
-	drive_icon = C2D_SpriteSheetGetImage(spritesheet, sprites_drive_idx);
+	Textures_Load();
 }
 
 static void Term_Services(void)
 {
-	C2D_SpriteSheetFree(spritesheet);
+	Textures_Free();
 
 	C2D_TextBufDelete(sizeBuf);
 	C2D_TextBufDelete(dynamicBuf);

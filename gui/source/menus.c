@@ -10,10 +10,12 @@
 #include "config.h"
 #include "hardware.h"
 #include "kernel.h"
+#include "menu_control.h"
 #include "misc.h"
 #include "screenshot.h"
 #include "storage.h"
 #include "system.h"
+#include "textures.h"
 #include "utils.h"
 #include "wifi.h"
 
@@ -389,6 +391,7 @@ void Menu_Main(void)
 			case 9:
 				Draw_Text((400 - instr_width) / 2, (240 - instr_height) / 2, 0.5f, MENU_INFO_TITLE_COLOUR, "Press select to hide user-specific info");
 				Draw_Text((400 - instr_width) / 2, ((240 - instr_height) / 2) + 18, 0.5f, MENU_INFO_TITLE_COLOUR, "  Press L + R to capture a screenshot  ");
+				Draw_Text((400 - instr_width) / 2, ((240 - instr_height) / 2) + 36, 0.5f, MENU_INFO_TITLE_COLOUR, "Press START + SELECT to use button test");
 				break;
 		}
 
@@ -433,7 +436,9 @@ void Menu_Main(void)
 		if (((kHeld & KEY_L) && (kDown & KEY_R)) || ((kHeld & KEY_R) && (kDown & KEY_L)))
 			Screenshot_Capture();
 
-		if (kDown & KEY_START)
-			longjmp(exitJmp, 1);
+		if (((kHeld & KEY_START) && (kDown & KEY_SELECT)) || ((kHeld & KEY_SELECT) && (kDown & KEY_START)))
+			MENU_STATE_CONTROLS = true;
+
+		Menu_Controls();
 	}
 }
