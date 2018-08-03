@@ -6,7 +6,7 @@ ctr_vercheck was originally created by wolfvak - It was initially intended to be
 
 # Features:
 - Current kernel, FIRM and system version detection. 
-- Display initial system version. (GUI exclusive)
+- Display initial system version.
 - Model detection with code name and hardware info (Retail/Devboard/Debugger/Capture unit)
 - Displays screen type (TN/IPS).
 - Displays region.
@@ -14,8 +14,7 @@ ctr_vercheck was originally created by wolfvak - It was initially intended to be
 - Displays MAC address.
 - Displays serial.
 - Displays SDMC and NAND CID
-- Displays NNID username, principal ID, persistent ID, transferable base ID, country and timezone. 
-- Displays Mii's name.
+- Displays NNID username, principal ID, persistent ID, transferable base ID, country and timezone.
 - Displays device ID.
 - Displays soap ID.
 - Battery charging status.
@@ -40,8 +39,8 @@ ctr_vercheck was originally created by wolfvak - It was initially intended to be
 - Display sound output mode. (GUI exclusive)
 - Displays if the console is a debug unit. (GUI exclusive)
 - Displays headphone/audio jack status. (GUI exclusive)
-- Card slot status and inserted card type (CTR/NAND). (GUI exclusive)
+- Card slot status and inserted card type (CTR/NAND).
 - Displays parental control pin,  email address and secret answer. (GUI exclusive)
 - Displays home menu ID.
 - Displays Wifi slot info (SSID, password and MAC address).
-- Using L + R triggers a screenshot in the GUI version.
+- Displays original/NAND local friend code seed.
