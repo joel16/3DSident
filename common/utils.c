@@ -40,6 +40,16 @@ void Utils_U16_To_U8(char *buf, const u16 *input, size_t bufsize)
 	buf[units] = 0;
 }
 
+void Utils_U8_To_U16(u16 *buf, const char *input, size_t bufsize)
+{
+	ssize_t units = utf8_to_utf16(buf, (const uint8_t*)input, bufsize);
+
+	if (units < 0)
+		units = 0;
+
+	buf[units] = 0;
+}
+
 char *Utils_ExtractBetween(const char *string, const char *str1, const char *str2)
 {
 	const char *i1 = strstr(string, str1);

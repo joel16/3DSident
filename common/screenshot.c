@@ -1,5 +1,4 @@
 #include <3ds.h>
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -9,7 +8,7 @@
 
 static int num = 0;
 
-static Result generateScreenshot(const char * path)
+static Result generateScreenshot(const char *path)
 {
 	int x = 0, y = 0;
 	Handle handle;
@@ -19,15 +18,15 @@ static Result generateScreenshot(const char * path)
 	Result ret = 0;
 
 	// Get top/bottom framebuffers
-	u8 * gfxBottom = gfxGetFramebuffer(GFX_BOTTOM, GFX_BOTTOM, NULL, NULL);
-	u8 * gfxTopLeft = gfxGetFramebuffer(GFX_TOP, GFX_LEFT, NULL, NULL);
+	u8 *gfxBottom = gfxGetFramebuffer(GFX_BOTTOM, GFX_BOTTOM, NULL, NULL);
+	u8 *gfxTopLeft = gfxGetFramebuffer(GFX_TOP, GFX_LEFT, NULL, NULL);
 
 	// Open file for writing screenshot
 	if (R_FAILED(ret = FSUSER_OpenFile(&handle, archive, fsMakePath(PATH_ASCII, path), (FS_OPEN_CREATE | FS_OPEN_WRITE), 0)))
 		return ret;
 
 	// Some
-	u8 * buf = (u8*)malloc(size + 576000);
+	u8 *buf = (u8*)malloc(size + 576000);
 	memset(buf, 0, size + 576000);
 	buf[size + 576000] = 0;
 
