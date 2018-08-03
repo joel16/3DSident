@@ -84,10 +84,10 @@ static void Menu_Battery(void)
 	ret = PTMU_GetAdapterState(&is_connected);
 	Menu_DrawItem(15, 156, "Adapter state:", R_FAILED(ret)? NULL : (is_connected? "connected" : "disconnected"));
 
-	if ((R_FAILED(ret = MCUHWC_GetFwVerHigh(&fw_ver_high))) && (R_FAILED(ret = MCUHWC_GetFwVerLow(&fw_ver_low))))
-		Menu_DrawItem(15, 174, "MCU firmware:", "0.0");
-	else
+	if ((R_SUCCEEDED(MCUHWC_GetFwVerHigh(&fw_ver_high))) && (R_SUCCEEDED(MCUHWC_GetFwVerLow(&fw_ver_low))))
 		Menu_DrawItem(15, 174, "MCU firmware:", "%u.%u", (fw_ver_high - 0x10), fw_ver_low);
+	else
+		Menu_DrawItem(15, 174, "MCU firmware:", "0.0");
 
 	Menu_DrawItem(15, 192, "Power-saving mode:", Config_IsPowerSaveEnabled()? "enabled" : "disabled");
 }
@@ -159,16 +159,17 @@ static void Menu_Misc(void)
 
 	u64 homemenuID = 0;
 	ret = APT_GetAppletInfo(APPID_HOMEMENU, &homemenuID, NULL, NULL, NULL, NULL);
-	Menu_DrawItem(15, 136, "Homemenu ID:", "%016llX", homemenuID);
+	Menu_DrawItem(15, 136, "Homemenu ID:", "%016llX", (R_FAILED(ret))? ret : homemenuID);
 
 	double wifi_signal_percent = (osGetWifiStrength() * 33.3333333333);
 	Menu_DrawItem(15, 156, "WiFi signal strength:", "%d (%.0lf%%)", osGetWifiStrength(), wifi_signal_percent);
 	
-	u32 ip = gethostid();
+	char hostname[128];
+	ret = gethostname(hostname, sizeof(hostname));
 	if (display_info)
-		Menu_DrawItem(15, 174, "IP:", "%lu.%lu.%lu.%lu", ip & 0xFF, (ip>>8)&0xFF, (ip>>16)&0xFF, (ip>>24)&0xFF);
+		Menu_DrawItem(15, 174, "IP:", hostname);
 	else
-		Menu_DrawItem(15, 174, "IP:", "%lu.%lu.%lu.%lu", 0, 0, 0, 0);
+		Menu_DrawItem(15, 174, "IP:", NULL);
 
 }
 
@@ -192,7 +193,7 @@ static void Menu_WiFi(void)
 		if (R_SUCCEEDED(ACI_GetPassphrase(passphrase)))
 			Menu_DrawItem(20, 62, "Pass:", "%s (%s)", display_info? passphrase : NULL, WiFi_GetSecurityMode());
 
-		if ((R_SUCCEEDED(CFG_GetConfigInfoBlk8(CFG_WIFI_SLOT_SIZE, CFG_WIFI_BLKID + 0, (u8*)&slotData))) && (slotData.set))
+		if ((R_SUCCEEDED(CFG_GetConfigInfoBlk8(CFG_WIFI_SLOT_SIZE, CFG_WIFI_BLKID, (u8*)&slotData))) && (slotData.set))
 		{
 			if (display_info)
 				Menu_DrawItem(20, 78, "Mac address:", "%02X:%02X:%02X:%02X:%02X:%02X", slotData.mac_addr[0], slotData.mac_addr[1], slotData.mac_addr[2], 
@@ -320,25 +321,25 @@ static void Menu_Storage(void)
 
 static int touchButton(touchPosition *touch, int selection)
 {
-	if (touch->px >= 15 && touch->px <= 300 && touch->py >= 37 && touch->py <= 56)
+	if (touch->px >= 16 && touch->px <= 304 && touch->py >= 16 && touch->py <= 35)
 		selection = 0;
-	else if (touch->px >= 15 && touch->px <= 300 && touch->py >= 56 && touch->py <= 73)
+	else if (touch->px >= 16 && touch->px <= 304 && touch->py >= 36 && touch->py <= 55)
 		selection = 1;
-	else if (touch->px >= 15 && touch->px <= 300 && touch->py >= 73 && touch->py <= 92)
+	else if (touch->px >= 16 && touch->px <= 304 && touch->py >= 56 && touch->py <= 75)
 		selection = 2;
-	else if (touch->px >= 15 && touch->px <= 300 && touch->py >= 92 && touch->py <= 110)
+	else if (touch->px >= 16 && touch->px <= 304 && touch->py >= 76 && touch->py <= 95)
 		selection = 3;
-	else if (touch->px >= 15 && touch->px <= 300 && touch->py >= 110 && touch->py <= 127)
+	else if (touch->px >= 16 && touch->px <= 304 && touch->py >= 96 && touch->py <= 115)
 		selection = 4;
-	else if (touch->px >= 15 && touch->px <= 300 && touch->py >= 127 && touch->py <= 144)
+	else if (touch->px >= 16 && touch->px <= 304 && touch->py >= 116 && touch->py <= 135)
 		selection = 5;
-	else if (touch->px >= 15 && touch->px <= 300 && touch->py >= 144 && touch->py <= 161)
+	else if (touch->px >= 16 && touch->px <= 304 && touch->py >= 136 && touch->py <= 155)
 		selection = 6;
-	else if (touch->px >= 15 && touch->px <= 300 && touch->py >= 161 && touch->py <= 178)
+	else if (touch->px >= 16 && touch->px <= 304 && touch->py >= 156 && touch->py <= 175)
 		selection = 7;
-	else if (touch->px >= 15 && touch->px <= 300 && touch->py >= 178 && touch->py <= 195)	
+	else if (touch->px >= 16 && touch->px <= 304 && touch->py >= 176 && touch->py <= 195)	
 		selection = 8;
-	else if (touch->px >= 15 && touch->px <= 300 && touch->py >= 195 && touch->py <= 212)	
+	else if (touch->px >= 16 && touch->px <= 304 && touch->py >= 196 && touch->py <= 215)	
 		selection = 9;
 	
 	return selection;

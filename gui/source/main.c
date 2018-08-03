@@ -24,8 +24,6 @@ static void Init_Services(void)
 	mcuHwcInit();
 	ptmuInit();
 	socInit((u32*)memalign(0x1000, 0x10000), 0x10000);
-
-	FS_OpenArchive(&archive, ARCHIVE_SDMC);
 	
 	romfsInit();
 	gfxInitDefault();
@@ -38,6 +36,8 @@ static void Init_Services(void)
 
 	APT_GetAppCpuTimeLimit(&cpu_time_limit);
 	APT_SetAppCpuTimeLimit(30);
+
+	FS_OpenArchive(&archive, ARCHIVE_SDMC);
 
 	staticBuf = C2D_TextBufNew(4096);
 	dynamicBuf = C2D_TextBufNew(4096);
@@ -57,13 +57,13 @@ static void Term_Services(void)
 	C2D_TextBufDelete(dynamicBuf);
 	C2D_TextBufDelete(staticBuf);
 
+	FS_CloseArchive(archive);
+
 	if (cpu_time_limit != UINT32_MAX)
 		APT_SetAppCpuTimeLimit(cpu_time_limit);
 
 	if (Utils_IsN3DS())
 		osSetSpeedupEnable(false);
-	
-	FS_CloseArchive(archive);
 	
 	socExit();
 	ptmuExit();
