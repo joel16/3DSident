@@ -11,7 +11,7 @@ char *Hardware_GetAudioJackStatus(void)
 	bool audio_jack = false;
 	static char status[0xD];
 
-	if (R_SUCCEEDED(FSUSER_CardSlotIsInserted(&audio_jack)))
+	if (R_SUCCEEDED(DSP_GetHeadphoneStatus(&audio_jack)))
 	{
 		snprintf(status, 0xD, audio_jack? "inserted" : "not inserted");
 		return status;
