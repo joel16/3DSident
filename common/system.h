@@ -53,6 +53,7 @@ const char *System_GetRunningHW(void);
 char *System_IsDebugUnit(void);
 char *System_GetScreenType(void);
 u64 System_GetLocalFriendCodeSeed(void);
+char *System_GetNANDLocalFriendCodeSeed(void);
 u8 *System_GetSerialNumber(void);
 u64 System_GetSoapId(void);
 

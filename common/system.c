@@ -1,6 +1,8 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
+#include "fs.h"
 #include "system.h"
 #include "utils.h"
 
@@ -201,6 +203,57 @@ u64 System_GetLocalFriendCodeSeed(void)
 		return seed;
 	
 	return 0;
+}
+
+char *System_GetNANDLocalFriendCodeSeed(void)
+{
+	FS_Archive nandArchive;
+	Handle handle;
+	u32 bytesread = 0;
+	char *buf = (char *)malloc(6);
+	static char out[0xB];
+
+	FS_OpenArchive(&nandArchive, ARCHIVE_NAND_CTR_FS);
+
+	if (FS_FileExists(nandArchive, "/rw/sys/LocalFriendCodeSeed_B"))
+	{
+		if (R_FAILED(FSUSER_OpenFile(&handle, nandArchive, fsMakePath(PATH_ASCII, "/rw/sys/LocalFriendCodeSeed_B"), FS_OPEN_READ, 0)))
+		{
+			FS_CloseArchive(nandArchive);
+			return NULL;
+		}
+	}
+	else if (FS_FileExists(nandArchive, "/rw/sys/LocalFriendCodeSeed_A"))
+	{
+		if (R_FAILED(FSUSER_OpenFile(&handle, nandArchive, fsMakePath(PATH_ASCII, "/rw/sys/LocalFriendCodeSeed_A"), FS_OPEN_READ, 0)))
+		{
+			FS_CloseArchive(nandArchive);
+			return NULL;
+		}
+	}
+	else
+	{
+		FS_CloseArchive(nandArchive);
+		return NULL;
+	}
+	
+	if (R_FAILED(FSFILE_Read(handle, &bytesread, 0x108, (u32 *)buf, 6)))
+	{
+		FS_CloseArchive(nandArchive);
+		return NULL;
+	}
+
+	if (R_FAILED(FSFILE_Close(handle)))
+	{
+		FS_CloseArchive(nandArchive);
+		return NULL;
+	}
+
+	buf[6] = '\0';
+	FS_CloseArchive(nandArchive);
+	snprintf(out, 0xB, "%02X%02X%02X%02X%02X", buf[0x4], buf[0x3], buf[0x2], buf[0x1], buf[0x0]);
+
+	return out;
 }
 
 u8 *System_GetSerialNumber(void)
