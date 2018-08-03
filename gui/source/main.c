@@ -16,13 +16,7 @@ static u32 cpu_time_limit = 0;
 static void Init_Services(void)
 {
 	aciInit();
-	
-	// Check if user is running from *hax.
-	//if (envIsHomebrew() && (R_FAILED(actInit())))
-	//	isHomebrew = envIsHomebrew();
-	
 	actInit();
-	
 	amAppInit();
 	amInit();
 	cfguInit();

@@ -19,13 +19,13 @@
 #include "utils.h"
 #include "wifi.h"
 
-#define DISTANCE_Y  18
+#define DISTANCE_Y  20
 #define MENU_Y_DIST 18
 #define MAX_ITEMS   9
 
-static bool displayInfo = false;
+static bool display_info = false;
 static int item_height = 0;
-static char kernerlVersion[100], systemVersion[100], firmVersion[100], initialVersion[0xB];
+static char kernel_version[100], system_version[100], firm_version[100], initial_version[0xB], nand_lfcs[0xB];
 static u32 sd_titles = 0, nand_titles = 0, tickets = 0;
 
 static void Menu_DrawItem(int x, int y, char *item_title, const char* text, ...)
@@ -44,24 +44,24 @@ static void Menu_DrawItem(int x, int y, char *item_title, const char* text, ...)
 
 static void Menu_Kernel(void)
 {
-	Menu_DrawItem(15, 102, "Kernel version:", kernerlVersion);
-	Menu_DrawItem(15, 120, "FIRM version:", firmVersion);
-	Menu_DrawItem(15, 136, "System version:", systemVersion);
-	Menu_DrawItem(15, 156, "Initial system version:", initialVersion);
-	Menu_DrawItem(15, 174, "SDMC CID:", displayInfo? Kernel_GetSDMCCID() : NULL);
-	Menu_DrawItem(15, 192, "NAND CID:", displayInfo? Kernel_GetNANDCID() : NULL);
-	Menu_DrawItem(15, 210, "Device ID:", "%llu", displayInfo? Kernel_GetDeviceId() : 0);
+	Menu_DrawItem(15, 102, "Kernel version:", kernel_version);
+	Menu_DrawItem(15, 120, "FIRM version:", firm_version);
+	Menu_DrawItem(15, 136, "System version:", system_version);
+	Menu_DrawItem(15, 156, "Initial system version:", initial_version);
+	Menu_DrawItem(15, 174, "SDMC CID:", display_info? Kernel_GetSDMCCID() : NULL);
+	Menu_DrawItem(15, 192, "NAND CID:", display_info? Kernel_GetNANDCID() : NULL);
+	Menu_DrawItem(15, 210, "Device ID:", "%llu", display_info? Kernel_GetDeviceId() : 0);
 }
 
 static void Menu_System(void)
 {
 	Menu_DrawItem(15, 102, "Model:", "%s (%s - %s)", System_GetModel(), System_GetRunningHW(), System_GetRegion());
 	Menu_DrawItem(15, 120, "Language:", System_GetLang());
-	Menu_DrawItem(15, 138, "ECS Device ID:", "%llu", displayInfo? System_GetSoapId() : 0);
-	Menu_DrawItem(15, 156, "Local friend code seed:", "%010llX", displayInfo? System_GetLocalFriendCodeSeed() : 0);
-	Menu_DrawItem(15, 174, "MAC Address:", displayInfo? System_GetMacAddress() : NULL);
-	Menu_DrawItem(15, 192, "Serial number:", displayInfo? System_GetSerialNumber() : NULL);
-	Menu_DrawItem(15, 210, "Screen type:", "%llu", System_GetScreenType());
+	Menu_DrawItem(15, 138, "ECS Device ID:", "%llu", display_info? System_GetSoapId() : 0);
+	Menu_DrawItem(15, 156, "Original local friend code seed:", "%010llX", display_info? System_GetLocalFriendCodeSeed() : 0);
+	Menu_DrawItem(15, 174, "NAND local friend code seed:", "%s", display_info? nand_lfcs : NULL);
+	Menu_DrawItem(15, 192, "MAC Address:", display_info? System_GetMacAddress() : NULL);
+	Menu_DrawItem(15, 210, "Serial number:", display_info? System_GetSerialNumber() : NULL);
 }
 
 static void Menu_Battery(void)
@@ -76,15 +76,18 @@ static void Menu_Battery(void)
 	ret = PTMU_GetBatteryChargeState(&battery_status);
 	Menu_DrawItem(15, 120, "Battery status:", R_FAILED(ret)? NULL : (battery_status? "charging" : "not charging"));
 	
-	ret = MCUHWC_GetBatteryVoltage(&battery_volt);
-	Menu_DrawItem(15, 136, "Battery voltage:", "%d (%.1f V)", R_FAILED(ret)? (0, 0) : (battery_volt, 5.0 * ((double)battery_volt / 256.0)));
+	if (R_FAILED(ret = MCUHWC_GetBatteryVoltage(&battery_volt)))
+		Menu_DrawItem(15, 136, "Battery voltage:", "%d (%.1f V)", 0, 0);
+	else
+		Menu_DrawItem(15, 136, "Battery voltage:", "%d (%.1f V)", battery_volt, 5.0 * ((double)battery_volt / 256.0));
 
 	ret = PTMU_GetAdapterState(&is_connected);
 	Menu_DrawItem(15, 156, "Adapter state:", R_FAILED(ret)? NULL : (is_connected? "connected" : "disconnected"));
 
-	ret = MCUHWC_GetFwVerHigh(&fw_ver_high);
-	ret = MCUHWC_GetFwVerLow(&fw_ver_low);
-	Menu_DrawItem(15, 174, "MCU firmware:", "%u.%u", R_FAILED(ret)? (0, 0) : ((fw_ver_high - 0x10), fw_ver_low));
+	if ((R_FAILED(ret = MCUHWC_GetFwVerHigh(&fw_ver_high))) && (R_FAILED(ret = MCUHWC_GetFwVerLow(&fw_ver_low))))
+		Menu_DrawItem(15, 174, "MCU firmware:", "0.0");
+	else
+		Menu_DrawItem(15, 174, "MCU firmware:", "%u.%u", (fw_ver_high - 0x10), fw_ver_low);
 
 	Menu_DrawItem(15, 192, "Power-saving mode:", Config_IsPowerSaveEnabled()? "enabled" : "disabled");
 }
@@ -99,19 +102,19 @@ static void Menu_NNID(void)
 	char country[0x3], name[0x16], nnid[0x11], timeZone[0x41];
 	
 	ret = ACTU_GetAccountDataBlock(nnid, 0x11, 0x8);
-	Menu_DrawItem(15, 102, "NNID:", R_FAILED(ret)? NULL : (displayInfo? nnid : NULL));
+	Menu_DrawItem(15, 102, "NNID:", R_FAILED(ret)? NULL : (display_info? nnid : NULL));
 
 	ret = ACTU_GetAccountDataBlock(&principalID, 0x4, 0xC);
-	Menu_DrawItem(15, 120, "Principal ID:", "%u", R_FAILED(ret)? 0 : (displayInfo? principalID : 0));
+	Menu_DrawItem(15, 120, "Principal ID:", "%u", R_FAILED(ret)? 0 : (display_info? principalID : 0));
 
-	Menu_DrawItem(15, 136, "Persistent ID:", "%u", R_FAILED(accountDataBlockRet)? 0 : (displayInfo? accountDataBlock.persistentID : 0));
-	Menu_DrawItem(15, 156, "Transferable ID Base:", "%llu", R_FAILED(accountDataBlockRet)? 0 : (displayInfo? accountDataBlock.transferableID : 0));
+	Menu_DrawItem(15, 136, "Persistent ID:", "%u", R_FAILED(accountDataBlockRet)? 0 : (display_info? accountDataBlock.persistentID : 0));
+	Menu_DrawItem(15, 156, "Transferable ID Base:", "%llu", R_FAILED(accountDataBlockRet)? 0 : (display_info? accountDataBlock.transferableID : 0));
 	
 	ret = ACTU_GetAccountDataBlock(country, 0x3, 0xB);
-	Menu_DrawItem(15, 174, "Country:", R_FAILED(ret)? NULL : (displayInfo? country : NULL));
+	Menu_DrawItem(15, 174, "Country:", R_FAILED(ret)? NULL : (display_info? country : NULL));
 	
 	ret = ACTU_GetAccountDataBlock(timeZone, 0x41, 0x1E);
-	Menu_DrawItem(15, 192, "Time Zone:", R_FAILED(ret)? NULL : (displayInfo? timeZone : NULL));
+	Menu_DrawItem(15, 192, "Time Zone:", R_FAILED(ret)? NULL : (display_info? timeZone : NULL));
 }
 
 static void Menu_Config(void)
@@ -120,38 +123,31 @@ static void Menu_Config(void)
 	wcstombs(username, Config_GetUsername(), sizeof(username));
 
 	Menu_DrawItem(15, 102, "Username: ", username);
-	Menu_DrawItem(15, 120, "Birthday:", displayInfo? Config_GetBirthday() : NULL);
+	Menu_DrawItem(15, 120, "Birthday:", display_info? Config_GetBirthday() : NULL);
 	Menu_DrawItem(15, 136, "EULA version:", Config_GetEulaVersion());
-	Menu_DrawItem(15, 156, "Parental control pin:", displayInfo? Config_GetParentalPin() : NULL);
-	Menu_DrawItem(15, 174, "Parental control e-mail:", displayInfo? Config_GetParentalEmail() : NULL);
-	Menu_DrawItem(15, 192, "Parental control answer:", displayInfo? Config_GetParentalSecretAnswer() : NULL);
+	Menu_DrawItem(15, 156, "Parental control pin:", display_info? Config_GetParentalPin() : NULL);
+	Menu_DrawItem(15, 174, "Parental control e-mail:", display_info? Config_GetParentalEmail() : NULL);
+	Menu_DrawItem(15, 192, "Parental control answer:", display_info? Config_GetParentalSecretAnswer() : NULL);
 }
 
 static void Menu_Hardware(void)
 {
 	Result ret = 0;
-	u8 volume = 0;
 
-	Menu_DrawItem(15, 102, "Headphone status:", Hardware_GetAudioJackStatus());
-	Menu_DrawItem(15, 120, "Card slot status:", Hardware_GetCardSlotStatus());
-	Menu_DrawItem(15, 136, "SDMC status:", Hardware_DetectSD());
+	Menu_DrawItem(15, 102, "Screen type:", System_GetScreenType());
+	Menu_DrawItem(15, 120, "Headphone status:", Hardware_GetAudioJackStatus());
+	Menu_DrawItem(15, 136, "Card slot status:", Hardware_GetCardSlotStatus());
+	Menu_DrawItem(15, 156, "SDMC status:", Hardware_DetectSD());
 
-	ret = HIDUSER_GetSoundVolume(&volume);
-	double vol_percent = (volume * 1.5873015873);
-	Menu_DrawItem(15, 156, "Volume slider state:", "%d (%.0lf%%)", R_FAILED(ret)? (0, 0) : (volume, vol_percent));
-
-	double _3dSliderPercent = (osGet3DSliderState() * 100.0);
-	Menu_DrawItem(15, 174, "3D slider state:", "%.1lf (%.0lf%%)", osGet3DSliderState(), _3dSliderPercent);
-
-	Menu_DrawItem(15, 192, "Sound output:", Config_GetSoundOutputMode());
+	Menu_DrawItem(15, 174, "Sound output:", Config_GetSoundOutputMode());
 
 	if (Utils_IsN3DS())
 	{
-		Menu_DrawItem(15, 210, "Brightness level:", "%s (auto-brightness mode %s)", Hardware_GetBrightness(GSPLCD_SCREEN_TOP), 
+		Menu_DrawItem(15, 192, "Brightness level:", "%s (auto-brightness mode %s)", Hardware_GetBrightness(GSPLCD_SCREEN_TOP), 
 			Config_IsAutoBrightnessEnabled()? "enabled" : "disabled");
 	}
 	else
-		Menu_DrawItem(15, 210, "Brightness level:", Hardware_GetBrightness(GSPLCD_SCREEN_TOP));
+		Menu_DrawItem(15, 192, "Brightness level:", Hardware_GetBrightness(GSPLCD_SCREEN_TOP));
 
 }
 
@@ -169,7 +165,11 @@ static void Menu_Misc(void)
 	Menu_DrawItem(15, 156, "WiFi signal strength:", "%d (%.0lf%%)", osGetWifiStrength(), wifi_signal_percent);
 	
 	u32 ip = gethostid();
-	Menu_DrawItem(15, 174, "IP:", "%lu.%lu.%lu.%lu", displayInfo? (0, 0, 0, 0) : ip & 0xFF, (ip>>8)&0xFF, (ip>>16)&0xFF, (ip>>24)&0xFF);
+	if (display_info)
+		Menu_DrawItem(15, 174, "IP:", "%lu.%lu.%lu.%lu", ip & 0xFF, (ip>>8)&0xFF, (ip>>16)&0xFF, (ip>>24)&0xFF);
+	else
+		Menu_DrawItem(15, 174, "IP:", "%lu.%lu.%lu.%lu", 0, 0, 0, 0);
+
 }
 
 static void Menu_WiFi(void)
@@ -181,7 +181,7 @@ static void Menu_WiFi(void)
 	
 	if (R_SUCCEEDED(ACI_LoadWiFiSlot(0)))
 	{
-		Draw_Rect(15, 27, 370, 70, STATUS_BAR_COLOUR);
+		Draw_Rect(15, 27, 370, 70, MENU_INFO_TITLE_COLOUR);
 		Draw_Rect(16, 28, 368, 68, MENU_BAR_COLOUR);
 		
 		Draw_Text(20, 30, 0.45f, MENU_INFO_DESC_COLOUR, "WiFi Slot 1:");
@@ -190,16 +190,21 @@ static void Menu_WiFi(void)
 			Menu_DrawItem(20, 46, "SSID:", ssid);
 		
 		if (R_SUCCEEDED(ACI_GetPassphrase(passphrase)))
-			Menu_DrawItem(20, 62, "Pass:", "%s (%s)", displayInfo? passphrase : NULL, WiFi_GetSecurityMode());
+			Menu_DrawItem(20, 62, "Pass:", "%s (%s)", display_info? passphrase : NULL, WiFi_GetSecurityMode());
 
 		if ((R_SUCCEEDED(CFG_GetConfigInfoBlk8(CFG_WIFI_SLOT_SIZE, CFG_WIFI_BLKID + 0, (u8*)&slotData))) && (slotData.set))
-			Menu_DrawItem(20, 78, "Mac address:", "%02X:%02X:%02X:%02X:%02X:%02X", displayInfo? (0, 0, 0, 0, 0, 0) : 
-				(slotData.mac_addr[0], slotData.mac_addr[1], slotData.mac_addr[2], slotData.mac_addr[3], slotData.mac_addr[4], slotData.mac_addr[5]));
+		{
+			if (display_info)
+				Menu_DrawItem(20, 78, "Mac address:", "%02X:%02X:%02X:%02X:%02X:%02X", slotData.mac_addr[0], slotData.mac_addr[1], slotData.mac_addr[2], 
+					slotData.mac_addr[3], slotData.mac_addr[4], slotData.mac_addr[5]);
+			else
+				Menu_DrawItem(20, 78, "Mac address:", NULL);
+		}
 	}
 	
 	if (R_SUCCEEDED(ACI_LoadWiFiSlot(1)))
 	{
-		Draw_Rect(15, 95, 370, 70, STATUS_BAR_COLOUR);
+		Draw_Rect(15, 95, 370, 70, MENU_INFO_TITLE_COLOUR);
 		Draw_Rect(16, 96, 368, 68, MENU_BAR_COLOUR);
 		
 		Draw_Text(20, 98, 0.45f, MENU_INFO_DESC_COLOUR, "WiFi Slot 2:");
@@ -208,16 +213,21 @@ static void Menu_WiFi(void)
 			Menu_DrawItem(20, 114, "SSID:", ssid);
 		
 		if (R_SUCCEEDED(ACI_GetPassphrase(passphrase)))
-			Menu_DrawItem(20, 130, "Pass:", "%s (%s)", displayInfo? passphrase : NULL, WiFi_GetSecurityMode());
+			Menu_DrawItem(20, 130, "Pass:", "%s (%s)", display_info? passphrase : NULL, WiFi_GetSecurityMode());
 
 		if ((R_SUCCEEDED(CFG_GetConfigInfoBlk8(CFG_WIFI_SLOT_SIZE, CFG_WIFI_BLKID + 1, (u8*)&slotData))) && (slotData.set))
-			Menu_DrawItem(20, 146, "Mac address:", "%02X:%02X:%02X:%02X:%02X:%02X", displayInfo? (0, 0, 0, 0, 0, 0) : 
-				(slotData.mac_addr[0], slotData.mac_addr[1], slotData.mac_addr[2], slotData.mac_addr[3], slotData.mac_addr[4], slotData.mac_addr[5]));
+		{
+			if (display_info)
+				Menu_DrawItem(20, 146, "Mac address:", "%02X:%02X:%02X:%02X:%02X:%02X", slotData.mac_addr[0], slotData.mac_addr[1], slotData.mac_addr[2], 
+					slotData.mac_addr[3], slotData.mac_addr[4], slotData.mac_addr[5]);
+			else
+				Menu_DrawItem(20, 146, "Mac address:", NULL);
+		}
 	}
 	
 	if (R_SUCCEEDED(ACI_LoadWiFiSlot(2)))
 	{
-		Draw_Rect(15, 163, 370, 70, STATUS_BAR_COLOUR);
+		Draw_Rect(15, 163, 370, 70, MENU_INFO_TITLE_COLOUR);
 		Draw_Rect(16, 164, 368, 68, MENU_BAR_COLOUR);
 		
 		Draw_Text(20, 166, 0.45f, MENU_INFO_DESC_COLOUR, "WiFi Slot 3:");
@@ -226,11 +236,16 @@ static void Menu_WiFi(void)
 			Menu_DrawItem(20, 182, "SSID:", ssid);
 		
 		if (R_SUCCEEDED(ACI_GetPassphrase(passphrase)))
-			Menu_DrawItem(20, 198, "Pass:", "%s (%s)", displayInfo? passphrase : NULL, WiFi_GetSecurityMode());
+			Menu_DrawItem(20, 198, "Pass:", "%s (%s)", display_info? passphrase : NULL, WiFi_GetSecurityMode());
 
 		if ((R_SUCCEEDED(CFG_GetConfigInfoBlk8(CFG_WIFI_SLOT_SIZE, CFG_WIFI_BLKID + 2, (u8*)&slotData))) && (slotData.set))
-			Menu_DrawItem(20, 214, "Mac address:", "%02X:%02X:%02X:%02X:%02X:%02X", displayInfo? (0, 0, 0, 0, 0, 0) : 
-				(slotData.mac_addr[0], slotData.mac_addr[1], slotData.mac_addr[2], slotData.mac_addr[3], slotData.mac_addr[4], slotData.mac_addr[5]));
+		{
+			if (display_info)
+				Menu_DrawItem(20, 214, "Mac address:", "%02X:%02X:%02X:%02X:%02X:%02X", slotData.mac_addr[0], slotData.mac_addr[1], slotData.mac_addr[2], 
+					slotData.mac_addr[3], slotData.mac_addr[4], slotData.mac_addr[5]);
+			else
+				Menu_DrawItem(20, 214, "Mac address:", NULL);
+		}
 	}
 }
 
@@ -260,7 +275,7 @@ static void Menu_Storage(void)
 
 	sdUsed = Storage_GetUsedStorage(SYSTEM_MEDIATYPE_SD);
 	sdTotal = Storage_GetTotalStorage(SYSTEM_MEDIATYPE_SD);
-	Draw_Rect(20, 105, 60, 10, STATUS_BAR_COLOUR);
+	Draw_Rect(20, 105, 60, 10, MENU_INFO_TITLE_COLOUR);
 	Draw_Rect(21, 106, 58, 8, BACKGROUND_COLOUR);
 	Draw_Rect(21, 106, (((double)sdUsed / (double)sdTotal) * 58.00), 8, MENU_SELECTOR_COLOUR);
 	Draw_Text(85, 50, 0.45f, MENU_INFO_DESC_COLOUR, "SD:");
@@ -271,7 +286,7 @@ static void Menu_Storage(void)
 
 	ctrUsed = Storage_GetUsedStorage(SYSTEM_MEDIATYPE_CTR_NAND);
 	ctrTotal = Storage_GetTotalStorage(SYSTEM_MEDIATYPE_CTR_NAND);
-	Draw_Rect(220, 105, 60, 10, STATUS_BAR_COLOUR);
+	Draw_Rect(220, 105, 60, 10, MENU_INFO_TITLE_COLOUR);
 	Draw_Rect(221, 106, 58, 8, BACKGROUND_COLOUR);
 	Draw_Rect(221, 106, (((double)ctrUsed / (double)ctrTotal) * 58.00), 8, MENU_SELECTOR_COLOUR);
 	Draw_Text(285, 50, 0.45f, MENU_INFO_DESC_COLOUR, "CTR Nand:");
@@ -282,7 +297,7 @@ static void Menu_Storage(void)
 
 	twlUsed = Storage_GetUsedStorage(SYSTEM_MEDIATYPE_TWL_NAND);
 	twlTotal = Storage_GetTotalStorage(SYSTEM_MEDIATYPE_TWL_NAND);
-	Draw_Rect(20, 200, 60, 10, STATUS_BAR_COLOUR);
+	Draw_Rect(20, 200, 60, 10, MENU_INFO_TITLE_COLOUR);
 	Draw_Rect(21, 201, 58, 8, BACKGROUND_COLOUR);
 	Draw_Rect(21, 201, (((double)twlUsed / (double)twlTotal) * 58.00), 8, MENU_SELECTOR_COLOUR);
 	Draw_Text(85, 145, 0.45f, MENU_INFO_DESC_COLOUR, "TWL Nand:");
@@ -293,7 +308,7 @@ static void Menu_Storage(void)
 
 	twlpUsed = Storage_GetUsedStorage(SYSTEM_MEDIATYPE_TWL_PHOTO);
 	twlpTotal = Storage_GetTotalStorage(SYSTEM_MEDIATYPE_TWL_PHOTO);
-	Draw_Rect(220, 200, 60, 10, STATUS_BAR_COLOUR);
+	Draw_Rect(220, 200, 60, 10, MENU_INFO_TITLE_COLOUR);
 	Draw_Rect(221, 201, 58, 8, BACKGROUND_COLOUR);
 	Draw_Rect(221, 201, (((double)twlpUsed / (double)twlpTotal) * 58.00), 8, MENU_SELECTOR_COLOUR);
 	Draw_Text(285, 145, 0.45f, MENU_INFO_DESC_COLOUR, "TWL Photo:");
@@ -332,13 +347,14 @@ static int touchButton(touchPosition *touch, int selection)
 void Menu_Main(void)
 {
 	int selection = 0;
-	displayInfo = true;
+	display_info = true;
 	touchPosition touch;
 
-	strcpy(kernerlVersion, Kernel_GetVersion(0));
-	strcpy(firmVersion, Kernel_GetVersion(1));
-	strcpy(initialVersion, Kernel_GetVersion(2));
-	strcpy(systemVersion, Kernel_GetVersion(3));
+	strcpy(kernel_version, Kernel_GetVersion(0));
+	strcpy(firm_version, Kernel_GetVersion(1));
+	strcpy(initial_version, Kernel_GetVersion(2));
+	strcpy(system_version, Kernel_GetVersion(3));
+	strcpy(nand_lfcs, System_GetNANDLocalFriendCodeSeed());
 
 	sd_titles = Misc_TitleCount(MEDIATYPE_SD);
 	nand_titles = Misc_TitleCount(MEDIATYPE_NAND);
@@ -399,19 +415,20 @@ void Menu_Main(void)
 
 		C2D_SceneBegin(RENDER_BOTTOM);
 
+		Draw_Rect(15, 15, 290, 210, MENU_INFO_TITLE_COLOUR);
 		Draw_Rect(16, 16, 288, 208, MENU_BAR_COLOUR);
 		Draw_Rect(16, 16 + (DISTANCE_Y * selection), 288, 18, MENU_SELECTOR_COLOUR);
 
-		Draw_Text(22, 18, 0.45f, selection == 0? ITEM_SELECTED_COLOUR : ITEM_COLOUR, "Kernel");
-		Draw_Text(22, 36, 0.45f, selection == 1? ITEM_SELECTED_COLOUR : ITEM_COLOUR, "System");
-		Draw_Text(22, 54, 0.45f, selection == 2? ITEM_SELECTED_COLOUR : ITEM_COLOUR, "Battery");
-		Draw_Text(22, 72, 0.45f, selection == 3? ITEM_SELECTED_COLOUR : ITEM_COLOUR, "NNID");
-		Draw_Text(22, 90, 0.45f, selection == 4? ITEM_SELECTED_COLOUR : ITEM_COLOUR, "Config");
-		Draw_Text(22, 108, 0.45f, selection == 5? ITEM_SELECTED_COLOUR : ITEM_COLOUR, "Hardware");
-		Draw_Text(22, 126, 0.45f, selection == 6? ITEM_SELECTED_COLOUR : ITEM_COLOUR, "WiFi");
-		Draw_Text(22, 144, 0.45f, selection == 7? ITEM_SELECTED_COLOUR : ITEM_COLOUR, "Storage");
-		Draw_Text(22, 162, 0.45f, selection == 8? ITEM_SELECTED_COLOUR : ITEM_COLOUR, "Miscellaneous");
-		Draw_Text(22, 180, 0.45f, selection == 9? ITEM_SELECTED_COLOUR : ITEM_COLOUR, "Exit");
+		Draw_Text(22, 18, 0.5f, selection == 0? ITEM_SELECTED_COLOUR : ITEM_COLOUR, "Kernel");
+		Draw_Text(22, 38, 0.5f, selection == 1? ITEM_SELECTED_COLOUR : ITEM_COLOUR, "System");
+		Draw_Text(22, 58, 0.5f, selection == 2? ITEM_SELECTED_COLOUR : ITEM_COLOUR, "Battery");
+		Draw_Text(22, 78, 0.5f, selection == 3? ITEM_SELECTED_COLOUR : ITEM_COLOUR, "NNID");
+		Draw_Text(22, 98, 0.5f, selection == 4? ITEM_SELECTED_COLOUR : ITEM_COLOUR, "Config");
+		Draw_Text(22, 118, 0.5f, selection == 5? ITEM_SELECTED_COLOUR : ITEM_COLOUR, "Hardware");
+		Draw_Text(22, 138, 0.5f, selection == 6? ITEM_SELECTED_COLOUR : ITEM_COLOUR, "WiFi");
+		Draw_Text(22, 158, 0.5f, selection == 7? ITEM_SELECTED_COLOUR : ITEM_COLOUR, "Storage");
+		Draw_Text(22, 178, 0.5f, selection == 8? ITEM_SELECTED_COLOUR : ITEM_COLOUR, "Miscellaneous");
+		Draw_Text(22, 198, 0.5f, selection == 9? ITEM_SELECTED_COLOUR : ITEM_COLOUR, "Exit");
 
 		Draw_EndFrame();
 
@@ -420,12 +437,12 @@ void Menu_Main(void)
 		u32 kDown = hidKeysDown();
 		u32 kHeld = hidKeysHeld();
 
+		selection = touchButton(&touch, selection);
+
 		if (kDown & KEY_DDOWN)
 			selection++;
 		else if (kDown & KEY_DUP)
 			selection--;
-
-		selection = touchButton(&touch, selection);
 
 		if (selection > MAX_ITEMS) 
 			selection = 0;
@@ -433,20 +450,20 @@ void Menu_Main(void)
 			selection = MAX_ITEMS;
 
 		if (kDown & KEY_SELECT)
-			displayInfo = !displayInfo;
-
-		if (((kHeld & KEY_L) && (kDown & KEY_R)) || ((kHeld & KEY_R) && (kDown & KEY_L)))
-			Screenshot_Capture();
+			display_info = !display_info;
 
 		if (((kHeld & KEY_START) && (kDown & KEY_SELECT)) || ((kHeld & KEY_SELECT) && (kDown & KEY_START)))
 			MENU_STATE_CONTROLS = true;
 
-		if (KEY_DDOWN & KEY_A)
+		Menu_Controls();
+
+		if (((kHeld & KEY_L) && (kDown & KEY_R)) || ((kHeld & KEY_R) && (kDown & KEY_L)))
+			Screenshot_Capture();
+
+		if (kDown & KEY_A)
 		{
 			if (selection == 9)
 				longjmp(exitJmp, 1);
 		}
-
-		Menu_Controls();
 	}
 }
