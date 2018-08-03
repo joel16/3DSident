@@ -5,18 +5,16 @@
 
 #include "ac.h"
 #include "actu.h"
-#include "fs.h"
 #include "hardware.h"
 #include "kernel.h"
 #include "misc.h"
-#include "screenshot.h"
 #include "storage.h"
 #include "system.h"
 #include "utils.h"
 #include "wifi.h"
 
-#define ANY_KEY (KEY_TOUCH | KEY_A | KEY_B | KEY_X | KEY_Y | KEY_START | \
-		KEY_UP | KEY_DOWN | KEY_LEFT | KEY_RIGHT  | KEY_ZL | KEY_ZR | \
+#define ANY_KEY (KEY_TOUCH | KEY_A | KEY_B | KEY_X | KEY_Y | KEY_START | KEY_R | \
+		KEY_UP | KEY_CPAD_DOWN | KEY_LEFT | KEY_RIGHT  | KEY_ZL | KEY_ZR | \
 		KEY_CSTICK_UP | KEY_CSTICK_DOWN | KEY_CSTICK_LEFT | KEY_CSTICK_RIGHT)
 
 static u32 cpu_time_limit = 0;
@@ -45,14 +43,10 @@ void Init_Services(void)
 
 	APT_GetAppCpuTimeLimit(&cpu_time_limit);
 	APT_SetAppCpuTimeLimit(30);
-
-	FS_OpenArchive(&archive, ARCHIVE_SDMC);
 }
 
 void Term_Services(void)
-{
-	FS_CloseArchive(archive);
-	
+{	
 	if (cpu_time_limit != UINT32_MAX)
 		APT_SetAppCpuTimeLimit(cpu_time_limit);
 
@@ -292,13 +286,8 @@ int main(int argc, char *argv[])
 		
 		gspWaitForVBlank();
 		hidScanInput();
-		u32 kDown = hidKeysDown();
-		u32 kHeld = hidKeysHeld();
 		
-		if (((kHeld & KEY_L) && (kDown & KEY_R)) || ((kHeld & KEY_R) && (kDown & KEY_L)))
-			Screenshot_Capture();
-		
-		else if (kDown & ANY_KEY)
+		if (hidKeysDown() & ANY_KEY)
 			break;
 		
 		gfxFlushBuffers();

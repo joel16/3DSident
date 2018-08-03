@@ -5,7 +5,6 @@
 #include "actu.h"
 #include "C2D_helper.h"
 #include "common.h"
-#include "fs.h"
 #include "menus.h"
 #include "sprites.h"
 #include "textures.h"
@@ -37,8 +36,6 @@ static void Init_Services(void)
 	APT_GetAppCpuTimeLimit(&cpu_time_limit);
 	APT_SetAppCpuTimeLimit(30);
 
-	FS_OpenArchive(&archive, ARCHIVE_SDMC);
-
 	staticBuf = C2D_TextBufNew(4096);
 	dynamicBuf = C2D_TextBufNew(4096);
 	sizeBuf = C2D_TextBufNew(4096);
@@ -56,8 +53,6 @@ static void Term_Services(void)
 	C2D_TextBufDelete(sizeBuf);
 	C2D_TextBufDelete(dynamicBuf);
 	C2D_TextBufDelete(staticBuf);
-
-	FS_CloseArchive(archive);
 
 	if (cpu_time_limit != UINT32_MAX)
 		APT_SetAppCpuTimeLimit(cpu_time_limit);
