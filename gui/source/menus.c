@@ -187,7 +187,7 @@ static void Menu_WiFi(void)
 		Draw_Text(20, 30, 0.45f, MENU_INFO_DESC_COLOUR, "WiFi Slot 1:");
 
 		if (R_SUCCEEDED(ACI_GetSSID(ssid)))
-			Menu_DrawItem(20, 46, 0.45f, "SSID:", ssid);
+			Menu_DrawItem(20, 46, 0.45f, "SSID:", "%s", ssid);
 		
 		if (R_SUCCEEDED(ACI_GetPassphrase(passphrase)))
 			Menu_DrawItem(20, 62, 0.45f, "Pass:", "%s (%s)", display_info? passphrase : NULL, WiFi_GetSecurityMode());
@@ -210,7 +210,7 @@ static void Menu_WiFi(void)
 		Draw_Text(20, 98, 0.45f, MENU_INFO_DESC_COLOUR, "WiFi Slot 2:");
 
 		if (R_SUCCEEDED(ACI_GetSSID(ssid)))
-			Menu_DrawItem(20, 114, 0.45f, "SSID:", ssid);
+			Menu_DrawItem(20, 114, 0.45f, "SSID:", "%s", ssid);
 		
 		if (R_SUCCEEDED(ACI_GetPassphrase(passphrase)))
 			Menu_DrawItem(20, 130, 0.45f, "Pass:", "%s (%s)", display_info? passphrase : NULL, WiFi_GetSecurityMode());
@@ -233,7 +233,7 @@ static void Menu_WiFi(void)
 		Draw_Text(20, 166, 0.45f, MENU_INFO_DESC_COLOUR, "WiFi Slot 3:");
 
 		if (R_SUCCEEDED(ACI_GetSSID(ssid)))
-			Menu_DrawItem(20, 182, 0.45f, "SSID:", ssid);
+			Menu_DrawItem(20, 182, 0.45f, "SSID:", "%s", ssid);
 		
 		if (R_SUCCEEDED(ACI_GetPassphrase(passphrase)))
 			Menu_DrawItem(20, 198, 0.45f, "Pass:", "%s (%s)", display_info? passphrase : NULL, WiFi_GetSecurityMode());
