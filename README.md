@@ -20,7 +20,8 @@ ctr_vercheck was originally created by wolfvak - It was initially intended to be
 - Battery charging status.
 - AC Adapter connection status.
 - Battery percentage (actual battery percentage using mcu::HWC).
-- Displays battery voltage (estimated) and unknown format.
+- Displays battery voltage (estimated).
+- Displays battery temperature.
 - Displays MCU firmware.
 - SD detection.
 - Displays SD free and total storage capacity.
@@ -44,3 +45,7 @@ ctr_vercheck was originally created by wolfvak - It was initially intended to be
 - Displays home menu ID.
 - Displays Wifi slot info (SSID, password and MAC address).
 - Displays original/NAND local friend code seed.
+
+# Credits:
+- **Preetisketch** for the logo/banner.
+- **devkitPro maintainers and contributors** for libctru, citro2d, devkitARM, and other packages used by this project.
