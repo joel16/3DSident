@@ -104,11 +104,16 @@ namespace System {
 
     const char *GetRunningHW(void) {
         const char *runningHW[] = {
-            "Retail",
-            "Devboard",
-            "Debugger",
-            "Capture",
             "unknown"
+            "product",
+            "TS board",
+            "KMC debugger",
+            "KMC capture",
+            "IS debugger",
+            "snake product",
+            "snake IS debugger",
+            "snake IS capture",
+            "snake KMC debugger"
         };
 
         return runningHW[OS_SharedConfig->running_hw];

@@ -49,3 +49,4 @@ ctr_vercheck was originally created by wolfvak - It was initially intended to be
 # Credits:
 - **Preetisketch** for the logo/banner.
 - **devkitPro maintainers and contributors** for libctru, citro2d, devkitARM, and other packages used by this project.
+- **3DBrew maintainers and contributors** for documenting various 3DS hardware/software API information used by this project.
