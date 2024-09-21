@@ -14,19 +14,19 @@ namespace Kernel {
         
         Handle handle;
         if (R_FAILED(ret = FSUSER_OpenFileDirectly(&handle, ARCHIVE_NAND_TWL_FS, fsMakePath(PATH_EMPTY, ""), fsMakePath(PATH_ASCII, "/sys/log/product.log"), FS_OPEN_READ, 0))) {
-            return nullptr;
+            return "unknown";
         }
 
         u64 size = 0;
         if (R_FAILED(ret = FSFILE_GetSize(handle, std::addressof(size)))) {
-            return nullptr;
+            return "unknown";
         }
 
         char *buf = new char[size + 1];
         u32 bytesRead = 0;
         
         if (R_FAILED(ret = FSFILE_Read(handle, std::addressof(bytesRead), 0, reinterpret_cast<u32 *>(buf), static_cast<u32>(size)))) {
-            return nullptr;
+            return "unknown";
         }
         
         buf[size] = '\0';
@@ -41,7 +41,7 @@ namespace Kernel {
         version.append(Utils::GetSubstring(buf, "nup:", " cup:"));
 
         if (R_FAILED(ret = FSFILE_Close(handle))) {
-            return nullptr;
+            return "unknown";
         }
 
         delete[] buf;
@@ -71,18 +71,9 @@ namespace Kernel {
             GET_VERSION_MINOR(osVersion),
             GET_VERSION_REVISION(osVersion)
         );
-        
-        if (R_FAILED(ret = osGetSystemVersionData(nver, cver))) {
-            std::snprintf(systemVersionString, 128, "0x%08liX", ret);
-        }
-        else {
-            std::snprintf(systemVersionString, 128, "%d.%d.%d-%d%s",
-                cver->mainver,
-                cver->minor,
-                cver->build,
-                nver->mainver,
-                System::GetFirmRegion()
-            );
+
+        if (R_FAILED(ret = osGetSystemVersionDataString(nver, cver, systemVersionString, sizeof(systemVersionString)))) {
+            std::snprintf(systemVersionString, 128, "unknown");
         }
 
         if (info == VERSION_INFO_KERNEL) {
@@ -100,7 +91,7 @@ namespace Kernel {
         u8 buf[16];
         
         if (R_FAILED(ret = FSUSER_GetSdmcCid(buf, 0x10))) {
-            return nullptr;
+            return "unknown";
         }
         
         static char cid[33];
@@ -117,7 +108,7 @@ namespace Kernel {
         u8 buf[16];
         
         if (R_FAILED(ret = FSUSER_GetNandCid(buf, 0x10))) {
-            return nullptr;
+            return "unknown";
         }
         
         static char cid[33];
