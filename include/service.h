@@ -59,26 +59,11 @@ typedef struct {
 } MiscInfo;
 
 typedef struct {
-    u64 sdUsed;
-    u64 sdTotal;
-    u64 ctrUsed;
-    u64 ctrTotal;
-    u64 twlUsed;
-    u64 twlTotal;
-    u64 twlpUsed;
-    u64 twlpTotal;
-    char sdFreeSize[16];
-    char sdUsedSize[16];
-    char sdTotalSize[16];
-    char ctrFreeSize[16];
-    char ctrUsedSize[16];
-    char ctrTotalSize[16];
-    char twlFreeSize[16];
-    char twlUsedSize[16];
-    char twlTotalSize[16];
-    char twlpFreeSize[16];
-    char twlpUsedSize[16];
-    char twlpTotalSize[16];
+    u64 usedSize[4];
+    u64 totalSize[4];
+    char freeSizeString[4][16];
+    char usedSizeString[4][16];
+    char totalSizeString[4][16];
 } StorageInfo;
 
 namespace MCUHWC {

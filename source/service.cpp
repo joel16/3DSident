@@ -107,34 +107,15 @@ namespace Service {
 
     StorageInfo GetStorageInfo(void) {
         StorageInfo info = { 0 };
-
-        info.sdUsed = Storage::GetUsedStorage(SYSTEM_MEDIATYPE_SD);
-        info.sdTotal = Storage::GetTotalStorage(SYSTEM_MEDIATYPE_SD);
-
-        info.ctrUsed = Storage::GetUsedStorage(SYSTEM_MEDIATYPE_CTR_NAND);
-        info.ctrTotal = Storage::GetTotalStorage(SYSTEM_MEDIATYPE_CTR_NAND);
-
-        info.twlUsed = Storage::GetUsedStorage(SYSTEM_MEDIATYPE_TWL_NAND);
-        info.twlTotal = Storage::GetTotalStorage(SYSTEM_MEDIATYPE_TWL_NAND);
-
-        info.twlpUsed = Storage::GetUsedStorage(SYSTEM_MEDIATYPE_TWL_PHOTO);
-        info.twlpTotal = Storage::GetTotalStorage(SYSTEM_MEDIATYPE_TWL_PHOTO);
         
-        Utils::GetSizeString(info.sdFreeSize, Storage::GetFreeStorage(SYSTEM_MEDIATYPE_SD));
-        Utils::GetSizeString(info.sdUsedSize, Storage::GetUsedStorage(SYSTEM_MEDIATYPE_SD));
-        Utils::GetSizeString(info.sdTotalSize, Storage::GetTotalStorage(SYSTEM_MEDIATYPE_SD));
-
-        Utils::GetSizeString(info.ctrFreeSize, Storage::GetFreeStorage(SYSTEM_MEDIATYPE_CTR_NAND));
-        Utils::GetSizeString(info.ctrUsedSize, Storage::GetUsedStorage(SYSTEM_MEDIATYPE_CTR_NAND));
-        Utils::GetSizeString(info.ctrTotalSize, Storage::GetTotalStorage(SYSTEM_MEDIATYPE_CTR_NAND));
-
-        Utils::GetSizeString(info.twlFreeSize, Storage::GetFreeStorage(SYSTEM_MEDIATYPE_TWL_NAND));
-        Utils::GetSizeString(info.twlUsedSize, Storage::GetUsedStorage(SYSTEM_MEDIATYPE_TWL_NAND));
-        Utils::GetSizeString(info.twlTotalSize, Storage::GetTotalStorage(SYSTEM_MEDIATYPE_TWL_NAND));
-
-        Utils::GetSizeString(info.twlpFreeSize, Storage::GetFreeStorage(SYSTEM_MEDIATYPE_TWL_PHOTO));
-        Utils::GetSizeString(info.twlpUsedSize, Storage::GetUsedStorage(SYSTEM_MEDIATYPE_TWL_PHOTO));
-        Utils::GetSizeString(info.twlpTotalSize, Storage::GetTotalStorage(SYSTEM_MEDIATYPE_TWL_PHOTO));
+        for (int i = 0; i < 4; i++) {
+            info.usedSize[i] = Storage::GetUsedStorage(static_cast<FS_SystemMediaType>(i));
+            info.totalSize[i] = Storage::GetTotalStorage(static_cast<FS_SystemMediaType>(i));
+            
+            Utils::GetSizeString(info.freeSizeString[i], Storage::GetFreeStorage(static_cast<FS_SystemMediaType>(i)));
+            Utils::GetSizeString(info.usedSizeString[i], Storage::GetUsedStorage(static_cast<FS_SystemMediaType>(i)));
+            Utils::GetSizeString(info.totalSizeString[i], Storage::GetTotalStorage(static_cast<FS_SystemMediaType>(i)));
+        }
 
         return info;
     }

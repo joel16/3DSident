@@ -81,6 +81,19 @@ namespace GUI {
         gfxExit();
         romfsExit();
     }
+    
+    static void Begin(u32 topScreenColour, u32 bottomScreenColour) {
+        C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+        C2D_TargetClear(c3dRenderTarget[TARGET_TOP], topScreenColour);
+        C2D_TargetClear(c3dRenderTarget[TARGET_BOTTOM], bottomScreenColour);
+        C2D_SceneBegin(c3dRenderTarget[TARGET_TOP]);
+    }
+
+    static void End(void) {
+        C2D_TextBufClear(guiDynamicBuf);
+        C2D_TextBufClear(guiSizeBuf);
+        C3D_FrameEnd(0);
+    }
 
     static void GetTextDimensions(float size, float *width, float *height, const char *text) {
         C2D_Text c2dText;
@@ -221,41 +234,41 @@ namespace GUI {
         // SD info
         C2D_DrawRectSolid(20, 105, guiTexSize, 60, 10, guiTitleColour);
         C2D_DrawRectSolid(21, 106, guiTexSize, 58, 8, guiBgcolour);
-        C2D_DrawRectSolid(21, 106, guiTexSize, ((static_cast<double>(info.sdUsed) / static_cast<double>(info.sdTotal)) * 58.f), 8, guiSelectorColour);
+        C2D_DrawRectSolid(21, 106, guiTexSize, ((static_cast<double>(info.usedSize[SYSTEM_MEDIATYPE_SD]) / static_cast<double>(info.totalSize[SYSTEM_MEDIATYPE_SD])) * 58.f), 8, guiSelectorColour);
         GUI::DrawItem(85, 50, "SD:", "");
-        GUI::DrawItem(85, 71, "Free:", info.sdFreeSize);
-        GUI::DrawItem(85, 87, "Used:", info.sdUsedSize);
-        GUI::DrawItem(85, 103, "Total:", info.sdTotalSize);
+        GUI::DrawItem(85, 71, "Free:", info.freeSizeString[SYSTEM_MEDIATYPE_SD]);
+        GUI::DrawItem(85, 87, "Used:", info.usedSizeString[SYSTEM_MEDIATYPE_SD]);
+        GUI::DrawItem(85, 103, "Total:", info.totalSizeString[SYSTEM_MEDIATYPE_SD]);
         GUI::DrawImage(driveIcon, 20, 40);
         
         // Nand info
         C2D_DrawRectSolid(220, 105, guiTexSize, 60, 10, guiTitleColour);
         C2D_DrawRectSolid(221, 106, guiTexSize, 58, 8, guiBgcolour);
-        C2D_DrawRectSolid(221, 106, guiTexSize, ((static_cast<double>(info.ctrUsed) / static_cast<double>(info.ctrTotal)) * 58.f), 8, guiSelectorColour);
+        C2D_DrawRectSolid(221, 106, guiTexSize, ((static_cast<double>(info.usedSize[SYSTEM_MEDIATYPE_CTR_NAND]) / static_cast<double>(info.totalSize[SYSTEM_MEDIATYPE_CTR_NAND])) * 58.f), 8, guiSelectorColour);
         GUI::DrawItem(285, 50, "CTR Nand:", "");
-        GUI::DrawItem(285, 71, "Free:", info.ctrFreeSize);
-        GUI::DrawItem(285, 87, "Used:", info.ctrUsedSize);
-        GUI::DrawItem(285, 103, "Total:", info.ctrTotalSize);
+        GUI::DrawItem(285, 71, "Free:", info.freeSizeString[SYSTEM_MEDIATYPE_CTR_NAND]);
+        GUI::DrawItem(285, 87, "Used:", info.usedSizeString[SYSTEM_MEDIATYPE_CTR_NAND]);
+        GUI::DrawItem(285, 103, "Total:", info.totalSizeString[SYSTEM_MEDIATYPE_CTR_NAND]);
         GUI::DrawImage(driveIcon, 220, 40);
         
         // TWL nand info
         C2D_DrawRectSolid(20, 200, guiTexSize, 60, 10, guiTitleColour);
         C2D_DrawRectSolid(21, 201, guiTexSize, 58, 8, guiBgcolour);
-        C2D_DrawRectSolid(21, 201, guiTexSize, ((static_cast<double>(info.twlUsed) / static_cast<double>(info.twlTotal)) * 58.f), 8, guiSelectorColour);
+        C2D_DrawRectSolid(21, 201, guiTexSize, ((static_cast<double>(info.usedSize[SYSTEM_MEDIATYPE_TWL_NAND]) / static_cast<double>(info.totalSize[SYSTEM_MEDIATYPE_TWL_NAND])) * 58.f), 8, guiSelectorColour);
         GUI::DrawItem(85, 145, "TWL Nand:", "");
-        GUI::DrawItem(85, 166, "Free:", info.twlFreeSize);
-        GUI::DrawItem(85, 182, "Used:", info.twlUsedSize);
-        GUI::DrawItem(85, 198, "Total:", info.twlTotalSize);
+        GUI::DrawItem(85, 166, "Free:", info.freeSizeString[SYSTEM_MEDIATYPE_TWL_NAND]);
+        GUI::DrawItem(85, 182, "Used:", info.usedSizeString[SYSTEM_MEDIATYPE_TWL_NAND]);
+        GUI::DrawItem(85, 198, "Total:", info.totalSizeString[SYSTEM_MEDIATYPE_TWL_NAND]);
         GUI::DrawImage(driveIcon, 20, 135);
 
         // TWL photo info
         C2D_DrawRectSolid(220, 200, guiTexSize, 60, 10, guiTitleColour);
         C2D_DrawRectSolid(221, 201, guiTexSize, 58, 8, guiBgcolour);
-        C2D_DrawRectSolid(221, 201, guiTexSize, ((static_cast<double>(info.twlpUsed) / static_cast<double>(info.twlpTotal)) * 58.f), 8, guiSelectorColour);
+        C2D_DrawRectSolid(221, 201, guiTexSize, ((static_cast<double>(info.usedSize[SYSTEM_MEDIATYPE_TWL_PHOTO]) / static_cast<double>(info.totalSize[SYSTEM_MEDIATYPE_TWL_PHOTO])) * 58.f), 8, guiSelectorColour);
         GUI::DrawItem(285, 145, "TWL Photo:", "");
-        GUI::DrawItem(285, 166, "Free:", info.twlpFreeSize);
-        GUI::DrawItem(285, 182, "Used:", info.twlpUsedSize);
-        GUI::DrawItem(285, 198, "Total:", info.twlpTotalSize);
+        GUI::DrawItem(285, 166, "Free:", info.freeSizeString[SYSTEM_MEDIATYPE_TWL_PHOTO]);
+        GUI::DrawItem(285, 182, "Used:", info.usedSizeString[SYSTEM_MEDIATYPE_TWL_PHOTO]);
+        GUI::DrawItem(285, 198, "Total:", info.totalSizeString[SYSTEM_MEDIATYPE_TWL_PHOTO]);
         GUI::DrawImage(driveIcon, 220, 135);
     }
 
@@ -301,11 +314,8 @@ namespace GUI {
                 touchX = touch.px;
                 touchY = touch.py;
             }
-            
-            C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
-            C2D_TargetClear(c3dRenderTarget[TARGET_TOP], C2D_Color32(60, 61, 63, 255));
-            C2D_TargetClear(c3dRenderTarget[TARGET_BOTTOM], C2D_Color32(94, 39, 80, 255));
-            C2D_SceneBegin(c3dRenderTarget[TARGET_TOP]);
+
+            GUI::Begin(C2D_Color32(60, 61, 63, 255), C2D_Color32(94, 39, 80, 255));
             
             C2D_DrawRectSolid(75, 30, guiTexSize, 250, 210, C2D_Color32(97, 101, 104, 255));
             C2D_DrawRectSolid(85, 40, guiTexSize, 230, 175, C2D_Color32(242, 241, 239, 255));
@@ -391,12 +401,8 @@ namespace GUI {
             }
             
             C2D_SceneBegin(c3dRenderTarget[TARGET_BOTTOM]);
-            
             GUI::DrawImage(cursor, touchX, touchY);
-            
-            C2D_TextBufClear(guiDynamicBuf);
-            C2D_TextBufClear(guiSizeBuf);
-            C3D_FrameEnd(0);
+            GUI::End();
         }
     }
 
@@ -437,10 +443,7 @@ namespace GUI {
         Service::Exit();
 
         while (aptMainLoop()) {
-            C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
-            C2D_TargetClear(c3dRenderTarget[TARGET_TOP], guiBgcolour);
-            C2D_TargetClear(c3dRenderTarget[TARGET_BOTTOM], guiBgcolour);
-            C2D_SceneBegin(c3dRenderTarget[TARGET_TOP]);
+            GUI::Begin(guiBgcolour, guiBgcolour);
 
             C2D_DrawRectSolid(0, 0, guiTexSize, 400, 20, guiStatusBarColour);
             GUI::DrawTextf(5, (20 - titleHeight) / 2, guiTexSize, guiTitleColour, "3DSident v%d.%d.%d", VERSION_MAJOR, VERSION_MINOR, VERSION_MICRO);
@@ -495,10 +498,7 @@ namespace GUI {
                 GUI::DrawText(40, 17 + ((guiItemDistance - guiItemHeight) / 2) + (guiItemDistance * i), guiTexSize, guiTitleColour, items[i]);
             }
             
-            C2D_TextBufClear(guiDynamicBuf);
-            C2D_TextBufClear(guiSizeBuf);
-            C3D_FrameEnd(0);
-
+            GUI::End();
             GUI::ButtonTester(buttonTestEnabled);
 
             hidScanInput();
