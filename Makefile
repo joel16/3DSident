@@ -38,7 +38,7 @@ DATA		:=	data
 INCLUDES	:=	include
 GRAPHICS	:=	res/drawable
 #GFXBUILD	:=	$(BUILD)
-#ICON		:=	res/drawable/icon.png
+ICON		:=	res/drawable/icon.png
 ROMFS		:=	romfs
 GFXBUILD	:=	$(ROMFS)/res/drawable
 
