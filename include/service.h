@@ -53,10 +53,11 @@ typedef struct {
 } HardwareInfo;
 
 typedef struct {
-    u32 sdTitleCount;
-    u32 nandTitleCount;
-    u32 ticketCount;
-} MiscInfo;
+    bool slot[3];
+    const char *ssid[3];
+    const char *passphrase[3];
+    const char *securityMode[3];
+} WifiInfo;
 
 typedef struct {
     u64 usedSize[4];
@@ -66,6 +67,18 @@ typedef struct {
     char totalSizeString[4][16];
 } StorageInfo;
 
+typedef struct {
+    u32 sdTitleCount;
+    u32 nandTitleCount;
+    u32 ticketCount;
+} MiscInfo;
+
+namespace ACI {
+    Result GetSSID(char *ssid);
+    Result GetSecurityMode(acSecurityMode *mode);
+    Result GetPassphrase(char *passphrase);
+}
+
 namespace MCUHWC {
     Result GetBatteryTemperature(u8 *temp);
 }
@@ -73,11 +86,11 @@ namespace MCUHWC {
 namespace Service {
     void Init(void);
     void Exit(void);
-    
     KernelInfo GetKernelInfo(void);
-	SystemInfo GetSystemInfo(void);
+    SystemInfo GetSystemInfo(void);
     ConfigInfo GetConfigInfo(void);
     HardwareInfo GetHardwareInfo(void);
+    WifiInfo GetWifiInfo(void);
     StorageInfo GetStorageInfo(void);
     MiscInfo GetMiscInfo(void);
 }

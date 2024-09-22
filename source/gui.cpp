@@ -228,6 +228,22 @@ namespace GUI {
         }
     }
 
+    static void WifiInfoPage(const WifiInfo &info, bool &displayInfo) {
+        const u32 slotDistance = 68;
+        C2D_DrawRectSolid(0, 20, guiTexSize, 400, 220, guiBgcolour);
+
+        for (int i = 0; i < 3; i++) {
+            if (info.slot[i]) {
+                C2D_DrawRectSolid(15, 27 + (i * slotDistance), guiTexSize, 370, 70, guiTitleColour);
+                C2D_DrawRectSolid(16, 28 + (i * slotDistance), guiTexSize, 368, 68, guiStatusBarColour);
+                GUI::DrawTextf(20, 30 + (i * slotDistance), guiTexSize, guiTitleColour, "WiFi Slot %d:", i + 1);
+                GUI::DrawTextf(20, 46 + (i * slotDistance), guiTexSize, guiTitleColour, "SSID: %s", info.ssid[i]);
+                GUI::DrawTextf(20, 62 + (i * slotDistance), guiTexSize, guiTitleColour, "Pass: %s (%s)",
+                    displayInfo? info.passphrase[i] : "", info.securityMode[i]);
+            }
+        }
+    }
+
     static void StorageInfoPage(const StorageInfo &info) {
         C2D_DrawRectSolid(0, 20, guiTexSize, 400, 220, guiBgcolour);
 
@@ -430,6 +446,7 @@ namespace GUI {
         SystemInfo systemInfo = { 0 };
         ConfigInfo configInfo = { 0 };
         HardwareInfo hardwareInfo = { 0 };
+        WifiInfo wifiInfo = { 0 };
         StorageInfo storageInfo = { 0 };
         MiscInfo miscInfo = { 0 };
 
@@ -438,6 +455,7 @@ namespace GUI {
         systemInfo = Service::GetSystemInfo();
         configInfo = Service::GetConfigInfo();
         hardwareInfo = Service::GetHardwareInfo();
+        wifiInfo = Service::GetWifiInfo();
         storageInfo = Service::GetStorageInfo();
         miscInfo = Service::GetMiscInfo();
         Service::Exit();
@@ -468,6 +486,10 @@ namespace GUI {
 
                 case HARDWARE_INFO_PAGE:
                     GUI::HardwareInfoPage(hardwareInfo, isNew3DS);
+                    break;
+
+                case WIFI_INFO_PAGE:
+                    GUI::WifiInfoPage(wifiInfo, displayInfo);
                     break;
 
                 case STORAGE_INFO_PAGE:

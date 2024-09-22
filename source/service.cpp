@@ -8,6 +8,57 @@
 #include "storage.h"
 #include "system.h"
 #include "utils.h"
+#include "wifi.h"
+
+namespace ACI {
+    Result GetSSID(char *ssid) {
+        Result ret = 0;
+        u32 *cmdbuf = getThreadCommandBuffer();
+        
+        cmdbuf[0] = IPC_MakeHeader(0x40F,0,0); // 0x040F0000
+        
+        u32* staticbufs = getThreadStaticBuffers();
+        staticbufs[0] = IPC_Desc_StaticBuffer(32, 0); // SSID length is 32
+        staticbufs[1] = reinterpret_cast<u32>(ssid);
+        
+        if (R_FAILED(ret = svcSendSyncRequest(*acGetSessionHandle()))) {
+            return ret;
+        }
+
+        return static_cast<Result>(cmdbuf[1]);
+    }
+
+    Result GetSecurityMode(acSecurityMode *mode) {
+        Result ret = 0;
+        u32 *cmdbuf = getThreadCommandBuffer();
+        
+        cmdbuf[0] = IPC_MakeHeader(0x413,0,0); // 0x04130000
+        
+        if (R_FAILED(ret = svcSendSyncRequest(*acGetSessionHandle()))) {
+            return ret;
+        }
+        
+        *mode = static_cast<acSecurityMode>(cmdbuf[2]);
+        return static_cast<Result>(cmdbuf[1]);
+    }
+
+    Result GetPassphrase(char *passphrase) {
+        Result ret = 0;
+        u32 *cmdbuf = getThreadCommandBuffer();
+        
+        cmdbuf[0] = IPC_MakeHeader(0x415,0,0); // 0x04150000
+        
+        u32* staticbufs = getThreadStaticBuffers();
+        staticbufs[0] = IPC_Desc_StaticBuffer(64, 0); // SSID length is 64
+        staticbufs[1] = reinterpret_cast<u32>(passphrase);
+        
+        if (R_FAILED(ret = svcSendSyncRequest(*acGetSessionHandle()))) {
+            return ret;
+        }
+
+        return static_cast<Result>(cmdbuf[1]);   
+    }
+}
 
 namespace MCUHWC {
     Result GetBatteryTemperature(u8 *temp) {
@@ -105,13 +156,25 @@ namespace Service {
         return info;
     }
 
+    WifiInfo GetWifiInfo(void) {
+        WifiInfo info = { 0 };
+
+        for (int i = 0; i < 3; i++) {
+            info.slot[i] = Wifi::GetSlot(i);
+            info.ssid[i] = Wifi::GetSSID();
+            info.passphrase[i] = Wifi::GetPassphrase();
+            info.securityMode[i] = Wifi::GetSecurityMode();
+        }
+
+        return info;
+    }
+
     StorageInfo GetStorageInfo(void) {
         StorageInfo info = { 0 };
         
         for (int i = 0; i < 4; i++) {
             info.usedSize[i] = Storage::GetUsedStorage(static_cast<FS_SystemMediaType>(i));
             info.totalSize[i] = Storage::GetTotalStorage(static_cast<FS_SystemMediaType>(i));
-            
             Utils::GetSizeString(info.freeSizeString[i], Storage::GetFreeStorage(static_cast<FS_SystemMediaType>(i)));
             Utils::GetSizeString(info.usedSizeString[i], Storage::GetUsedStorage(static_cast<FS_SystemMediaType>(i)));
             Utils::GetSizeString(info.totalSizeString[i], Storage::GetTotalStorage(static_cast<FS_SystemMediaType>(i)));
