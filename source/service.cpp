@@ -4,6 +4,7 @@
 #include "hardware.h"
 #include "kernel.h"
 #include "misc.h"
+#include "nnid.h"
 #include "service.h"
 #include "storage.h"
 #include "system.h"
@@ -56,7 +57,58 @@ namespace ACI {
             return ret;
         }
 
-        return static_cast<Result>(cmdbuf[1]);   
+        return static_cast<Result>(cmdbuf[1]);
+    }
+}
+
+namespace ACTU {
+    static Handle actHandle;
+    static int actRefCount;
+    
+    Result Init(void) {
+        Result ret = 0;
+        
+        if (AtomicPostIncrement(&actRefCount)) {
+            return 0;
+        }
+        
+        ret = srvGetServiceHandle(&actHandle, "act:u");
+        
+        if (R_FAILED(ret)) {
+            ret = srvGetServiceHandle(&actHandle, "act:a");
+        }
+        
+        if (R_FAILED(ret)) {
+            AtomicDecrement(&actRefCount);
+        }
+        
+        return ret;
+    }
+
+    void Exit(void) {
+        if (AtomicDecrement(&actRefCount)) {
+            return;
+        }
+        
+        svcCloseHandle(actHandle);
+    }
+
+    Result GetAccountDataBlock(u8 slot, u32 size, u32 blkId, void *out) {
+        Result ret = 0;
+        u32 *cmdbuf = getThreadCommandBuffer();
+        
+        cmdbuf[0] = IPC_MakeHeader(0x6,3,2); // 0x00600C2
+        cmdbuf[1] = slot;
+        cmdbuf[2] = size;
+        cmdbuf[3] = blkId;
+        cmdbuf[4] = IPC_Desc_Buffer(size,IPC_BUFFER_W);
+        cmdbuf[5] = reinterpret_cast<u32>(out);
+        
+        if (R_FAILED(ret = svcSendSyncRequest(actHandle))) {
+            return ret;
+        }
+        
+        return static_cast<Result>(cmdbuf[1]);
     }
 }
 
@@ -78,15 +130,17 @@ namespace MCUHWC {
 
 namespace Service {
     void Init(void) {
-        amInit();
         acInit();
+        ACTU::Init();
+        amInit();
         cfguInit();
     }
 
     void Exit(void) {
-        acExit();
         cfguExit();
         amExit();
+        ACTU::Exit();
+        acExit();
     }
 
     KernelInfo GetKernelInfo(void) {
@@ -112,6 +166,17 @@ namespace Service {
         info.serialNumber = System::GetSerialNumber();
         return info;
 	}
+    
+    NNIDInfo GetNNIDInfo(void) {
+        NNIDInfo info = { 0 };
+        info.persistentID = NNID::GetPersistentId();
+        info.transferableIdBase = NNID::GetTransferableIdBase();
+        info.accountId = NNID::GetAccountId();
+        info.countryName = NNID::GetCountryName();
+        info.principalID = NNID::GetPrincipalId();
+        info.nfsPassword = NNID::GetNfsPassword();
+        return info;
+    }
 
     ConfigInfo GetConfigInfo(void) {
         ConfigInfo info = { 0 };

@@ -2,12 +2,6 @@
 
 #include <3ds.h>
 
-struct Birthday {
-    u16 year; 
-    u8 month; 
-    u8 day;
-};
-
 typedef struct {
     const char *kernelVersion;
     const char *firmVersion;
@@ -29,12 +23,12 @@ typedef struct {
 } SystemInfo;
 
 typedef struct {
-    u32 principalID;
     u32 persistentID;
-    u64 transferableID;
-    char country[0x3];
-    char nnid[0x11];
-    char timezone[0x41];
+    u64 transferableIdBase;
+    const char *accountId;
+    const char * countryName;
+    u32 principalID;
+    const char *nfsPassword;
 } NNIDInfo;
 
 typedef struct {
@@ -79,6 +73,10 @@ namespace ACI {
     Result GetPassphrase(char *passphrase);
 }
 
+namespace ACTU {
+    Result GetAccountDataBlock(u8 slot, u32 size, u32 blkId, void *out);
+}
+
 namespace MCUHWC {
     Result GetBatteryTemperature(u8 *temp);
 }
@@ -88,6 +86,7 @@ namespace Service {
     void Exit(void);
     KernelInfo GetKernelInfo(void);
     SystemInfo GetSystemInfo(void);
+    NNIDInfo GetNNIDInfo(void);
     ConfigInfo GetConfigInfo(void);
     HardwareInfo GetHardwareInfo(void);
     WifiInfo GetWifiInfo(void);

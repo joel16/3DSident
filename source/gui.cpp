@@ -202,6 +202,15 @@ namespace GUI {
         GUI::DrawItem(7, "Power-saving mode:", Config::GetPowersaveStatus());
     }
 
+    static void NNIDInfoPage(const NNIDInfo &info, bool &displayInfo) {
+        GUI::DrawItemf(1, "Persistent ID:", "%u", displayInfo? info.persistentID : 0);
+        GUI::DrawItemf(2, "Transferable ID Base:", "%llu", displayInfo? info.transferableIdBase : 0);
+        GUI::DrawItem(3, "Account ID:", info.accountId);
+        GUI::DrawItem(4, "Country:", displayInfo? info.countryName : "");
+        GUI::DrawItemf(5, "Principal ID:", "%u", displayInfo? info.principalID : 0);
+        GUI::DrawItem(6, "NFS Password:", displayInfo? info.nfsPassword : "");
+    }
+
     static void ConfigInfoPage(const ConfigInfo &info, bool &displayInfo) {
         GUI::DrawItem(1, "Username:", info.username);
         GUI::DrawItem(2, "Birthday:", displayInfo? info.birthday : "");
@@ -444,6 +453,7 @@ namespace GUI {
         
         KernelInfo kernelInfo = { 0 };
         SystemInfo systemInfo = { 0 };
+        NNIDInfo nnidInfo = { 0 };
         ConfigInfo configInfo = { 0 };
         HardwareInfo hardwareInfo = { 0 };
         WifiInfo wifiInfo = { 0 };
@@ -453,6 +463,7 @@ namespace GUI {
         Service::Init();
         kernelInfo = Service::GetKernelInfo();
         systemInfo = Service::GetSystemInfo();
+        nnidInfo = Service::GetNNIDInfo();
         configInfo = Service::GetConfigInfo();
         hardwareInfo = Service::GetHardwareInfo();
         wifiInfo = Service::GetWifiInfo();
@@ -478,6 +489,10 @@ namespace GUI {
 
                 case BATTERY_INFO_PAGE:
                     GUI::BatteryInfoPage();
+                    break;
+
+                case NNID_INFO_PAGE:
+                    GUI::NNIDInfoPage(nnidInfo, displayInfo);
                     break;
 
                 case CONFIG_INFO_PAGE:
