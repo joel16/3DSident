@@ -2,6 +2,7 @@
 #include <citro2d.h>
 #include <cstdarg>
 #include <cstdio>
+#include <malloc.h>
 
 #include "config.h"
 #include "gui.h"
@@ -65,9 +66,11 @@ namespace GUI {
         mcuHwcInit();
 #endif
         ptmuInit();
+        socInit((u32*)memalign(0x1000, 0x10000), 0x10000);
     }
 
     void Exit(void) {
+        socExit();
         ptmuExit();
 #if !defined BUILD_CITRA
         mcuHwcExit();
@@ -330,7 +333,7 @@ namespace GUI {
             
             HIDUSER_GetSoundVolume(std::addressof(volume));
             
-            if (((kHeld & KEY_ZL) && (kDown & KEY_ZR)) || ((kHeld & KEY_ZR) && (kDown & KEY_ZL))) {
+            if (((kHeld & KEY_L) && (kDown & KEY_R)) || ((kHeld & KEY_R) && (kDown & KEY_L))) {
                 enabled = false;
             }
             
@@ -362,7 +365,7 @@ namespace GUI {
             C2D_DrawRectSolid(115, 122, guiTexSize, 190, 5, guiButtonTesterSliderBorder);
             C2D_DrawRectSolid(115, 122, guiTexSize, ((_3dSliderPercent / 100) * 190), 5, guiButtonTesterSlider);
             
-            GUI::DrawText(90, 138, 0.45f, guiButtonTesterText, "Press ZL + ZR to return.");
+            GUI::DrawText(90, 138, 0.45f, guiButtonTesterText, "Press L + R to return.");
             
             GUI::DrawImage(btnHome, 180, 215);
 
@@ -517,7 +520,7 @@ namespace GUI {
 
                 case EXIT_PAGE:
                     GUI::DrawItem(1, "Press select to hide user-specific info.", "");
-                    GUI::DrawItem(2, "Press ZL + ZR to use button tester.", "");
+                    GUI::DrawItem(2, "Press L + R to use button tester.", "");
                     break;
 
                 default:
@@ -560,11 +563,11 @@ namespace GUI {
                 displayInfo = !displayInfo;
             }
 
-            if (((kHeld & KEY_ZL) && (kDown & KEY_ZR)) || ((kHeld & KEY_ZR) && (kDown & KEY_ZL))) {
+            if (((kHeld & KEY_L) && (kDown & KEY_R)) || ((kHeld & KEY_R) && (kDown & KEY_L))) {
                 buttonTestEnabled = true;
             }
 
-            if (kDown & KEY_START) {
+            if ((kDown & KEY_START) || ((kDown & KEY_A) && (selection == EXIT_PAGE))) {
                 break;
             }
         }

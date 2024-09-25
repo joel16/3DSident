@@ -132,6 +132,7 @@ namespace Service {
     void Init(void) {
         acInit();
         ACTU::Init();
+        amAppInit();
         amInit();
         cfguInit();
     }
