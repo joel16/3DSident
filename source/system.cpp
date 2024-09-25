@@ -104,7 +104,7 @@ namespace System {
 
     const char *GetRunningHW(void) {
         const char *runningHW[] = {
-            "unknown"
+            "unknown",
             "product",
             "TS board",
             "KMC debugger",
@@ -116,7 +116,7 @@ namespace System {
             "snake KMC debugger"
         };
 
-        return runningHW[OS_SharedConfig->running_hw - 1];
+        return runningHW[(OS_SharedConfig->running_hw) - 1];
     }
 
     const char *IsDebugUnit(void) {
