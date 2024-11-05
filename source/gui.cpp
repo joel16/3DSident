@@ -305,7 +305,7 @@ namespace GUI {
         GUI::DrawItemf(2, "Installed tickets:", "%lu", info.ticketCount);
 
         u8 wifiStrength = osGetWifiStrength();
-        GUI::DrawItemf(3, "WiFi signal strength:", "%lu", "%d (%.0lf%%)", wifiStrength, static_cast<float>(wifiStrength * 33.33));
+        GUI::DrawItemf(3, "WiFi signal strength:", "%d (%.0lf%%)", wifiStrength, static_cast<float>(wifiStrength * 33.33));
         
         char hostname[128];
         gethostname(hostname, sizeof(hostname));
