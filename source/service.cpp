@@ -134,11 +134,9 @@ namespace Service {
         ACTU::Init();
         amAppInit();
         amInit();
-        cfguInit();
     }
 
     void Exit(void) {
-        cfguExit();
         amExit();
         ACTU::Exit();
         acExit();

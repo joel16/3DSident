@@ -4,7 +4,6 @@
 #include "utils.h"
 
 namespace Config {
-
     struct UsernameBlock {
         u16 username[10];
         u32 zero;
@@ -25,7 +24,8 @@ namespace Config {
     struct ParentalControlBlock {
         u8 unk[13];
         u8 pin[4];
-        u16 secretAnswer[32];
+        u16 secretAnswer[64];
+        u8 padding[2];
     };
     
     struct BacklightControlBlock {
@@ -40,9 +40,9 @@ namespace Config {
             return "unknown";
         }
 
-        static char username[10];
-        Utils::UTF16ToUTF8(reinterpret_cast<u8 *>(username), usernameBlock.username, 10);
-        return username;
+        static u8 username[10];
+        Utils::UTF16ToUTF8(username, usernameBlock.username, 10);
+        return reinterpret_cast<const char *>(username);
     }
 
     const char *GetBirthday(void) {
@@ -73,7 +73,7 @@ namespace Config {
         std::snprintf(version, 6, "%1X.%02X", eulaVersionBlock.major, eulaVersionBlock.minor);
         return version;
     }
-
+    
     const char *GetParentalPin(void) {
         ParentalControlBlock parentalControlBlock;
         
@@ -100,17 +100,17 @@ namespace Config {
     }
 
     const char *GetParentalSecretAnswer(void) {
-        u8 data[0x94]; // block 0x00100001 is of size 0x94
+        ParentalControlBlock parentalControlBlock;
 
-        if (R_FAILED(CFG_GetConfigInfoBlk8(0x94, 0x00100001, data))) {
+        if (R_FAILED(CFG_GetConfigInfoBlk8(sizeof(ParentalControlBlock), 0x00100001, std::addressof(parentalControlBlock)))) {
             return "unknown";
         }
 
-        static char out[0x21];
-        Utils::UTF16ToUTF8(reinterpret_cast<u8 *>(out), reinterpret_cast<u16 *>(data + 16), 0x21);
-        return out + 1;
+        static u8 out[128];
+        Utils::UTF16ToUTF8(out, parentalControlBlock.secretAnswer, 128);
+        return reinterpret_cast<const char *>(out);
     }
-
+    
     const char *GetPowersaveStatus(void) {
         BacklightControlBlock backlightControlBlock;
         

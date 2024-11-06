@@ -66,11 +66,13 @@ namespace GUI {
         mcuHwcInit();
 #endif
         ptmuInit();
+        cfguInit();
         socInit((u32*)memalign(0x1000, 0x10000), 0x10000);
     }
 
     void Exit(void) {
         socExit();
+        cfguExit();
         ptmuExit();
 #if !defined BUILD_CITRA
         mcuHwcExit();
