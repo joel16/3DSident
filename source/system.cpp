@@ -116,7 +116,7 @@ namespace System {
             "snake KMC debugger"
         };
 
-        return runningHW[(OS_SharedConfig->running_hw) - 1];
+        return runningHW[OS_SharedConfig->running_hw];
     }
 
     const char *IsDebugUnit(void) {
