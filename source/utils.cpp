@@ -1,5 +1,4 @@
 #include <3ds.h>
-#include <cstdio>
 
 #include "utils.h"
 
@@ -27,16 +26,15 @@ namespace Utils {
         
         std::sprintf(string, "%.*f %s", (i == 0) ? 0 : 2, double_size, units[i]);
     }
-
-    std::string GetSubstring(const std::string &text, const std::string &start, const std::string &end) {
-        std::string::size_type posA = text.find(start);
-
-        if (posA != std::string::npos) {
-            posA += start.length();
-            std::string::size_type posB = text.find(end, posA);
+    
+    std::string GetSubstring(const std::string& str, const std::string& str1, const std::string& str2) {
+        size_t pos1 = str.find(str1);
+        if (pos1 != std::string::npos) {
+            size_t pos2 = str.find(str2, pos1 + str1.length());
             
-            if (posB != std::string::npos) {
-                return text.substr(posA, posB - posA);
+            if (pos2 != std::string::npos) {
+                size_t length = pos2 - (pos1 + str1.length());
+                return str.substr(pos1 + str1.length(), length);
             }
         }
         

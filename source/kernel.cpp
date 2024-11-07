@@ -1,4 +1,5 @@
 #include <3ds.h>
+#include <cstring>
 
 #include "fs.h"
 #include "kernel.h"
@@ -10,7 +11,9 @@ namespace Kernel {
         Result ret = 0;
         
         FS_Archive archive;
-        FS::OpenArchive(std::addressof(archive), ARCHIVE_NAND_TWL_FS);
+        if (R_FAILED(ret = FS::OpenArchive(std::addressof(archive), ARCHIVE_NAND_TWL_FS))) {
+            return "unknown";
+        }
         
         Handle handle;
         if (R_FAILED(ret = FSUSER_OpenFileDirectly(&handle, ARCHIVE_NAND_TWL_FS, fsMakePath(PATH_EMPTY, ""), fsMakePath(PATH_ASCII, "/sys/log/product.log"), FS_OPEN_READ, 0))) {
@@ -30,15 +33,17 @@ namespace Kernel {
         }
         
         buf[size] = '\0';
-
-        std::string version = Utils::GetSubstring(buf, "cup:", " preInstall:");
-
-        if (version.length() == 0) {
-            version = Utils::GetSubstring(buf, "cup:", ",");
+        
+        // New 3DS/2DS only
+        static char version[11];
+        std::strcpy(version, Utils::GetSubstring(buf, "cup:", " preInstall:").c_str());
+        
+        if (std::strlen(version) == 0) {
+            std::strcpy(version, Utils::GetSubstring(buf, "cup:", ",").c_str());
         }
-
-        version.append("-");
-        version.append(Utils::GetSubstring(buf, "nup:", " cup:"));
+        
+        std::strcat(version, "-");
+        std::strcat(version, Utils::GetSubstring(buf, "nup:", " cup:").c_str());
 
         if (R_FAILED(ret = FSFILE_Close(handle))) {
             return "unknown";
@@ -46,7 +51,7 @@ namespace Kernel {
 
         delete[] buf;
         FS::CloseArchive(archive);
-        return version.c_str();
+        return version;
     }
 
     const char *GetVersion(VersionInfo info) {
