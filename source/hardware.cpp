@@ -5,6 +5,12 @@
 #define REG_LCD_BOTTOM_SCREEN (u32)0x202A00
 
 namespace Hardware {
+    struct AutoBrightnessBlock {
+        u32 unk1;
+        bool autoBrightnessEnabled;
+        u8 unk2[3];
+    };
+
     Result GetScreenType(gspLcdScreenType& top, gspLcdScreenType& bottom) {
         Result ret = 0;
         u8 vendors = 0;
@@ -130,14 +136,14 @@ namespace Hardware {
         gspExit();
         return brightness;
     }
-
+    
     const char *GetAutoBrightnessStatus(void) {
-        u8 data[0x8];
+        AutoBrightnessBlock autoBrightnessBlock;
         
-        if (R_FAILED(CFGU_GetConfigInfoBlk2(sizeof(data), 0x00050009, data))) {
+        if (R_FAILED(CFG_GetConfigInfoBlk8(sizeof(AutoBrightnessBlock), 0x00050009, std::addressof(autoBrightnessBlock)))) {
             return "unknown";
         }
         
-        return data[0x4] & 0xFF? "enabled" : "disabled";
+        return autoBrightnessBlock.autoBrightnessEnabled? "enabled" : "disabled";
     }
 }
