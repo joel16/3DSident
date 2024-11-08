@@ -20,6 +20,7 @@ typedef struct {
     u64 localFriendCodeSeed;
     const char *macAddress;
     u8 *serialNumber;
+    int checkDigit;
 } SystemInfo;
 
 typedef struct {

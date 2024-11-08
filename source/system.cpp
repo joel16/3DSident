@@ -135,13 +135,31 @@ namespace System {
     }
     
     u8 *GetSerialNumber(void) {
-        static u8 serial[0xF];
+        static u8 serial[15];
         
         if (R_FAILED(CFGI_SecureInfoGetSerialNumber(serial))) {
             return nullptr;
         }
         
         return serial;
+    }
+    
+    int GetCheckDigit(const u8* serialNumber) {
+        int oddSum = 0;
+        int evenSum = 0;
+        
+        for (size_t i = 2; i < 10; ++i) {
+            int digit = serialNumber[i] - '0';
+            if (i % 2 == 0) {
+                oddSum += digit;
+            }
+            else {
+                evenSum += digit;
+            }
+        }
+        
+        int checkDigit = ((3 * evenSum) + oddSum) % 10;
+        return (checkDigit == 0) ? checkDigit : 10 - checkDigit;
     }
 
     u64 GetDeviceId(void) {

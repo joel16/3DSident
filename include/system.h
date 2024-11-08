@@ -11,5 +11,6 @@ namespace System {
     const char *IsDebugUnit(void);
     u64 GetLocalFriendCodeSeed(void);
     u8 *GetSerialNumber(void);
+    int GetCheckDigit(const u8* serialNumber);
     u64 GetDeviceId(void);
 }

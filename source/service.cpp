@@ -163,8 +163,9 @@ namespace Service {
         info.localFriendCodeSeed = System::GetLocalFriendCodeSeed();
         info.macAddress = System::GetMacAddress();
         info.serialNumber = System::GetSerialNumber();
+        info.checkDigit =  System::GetCheckDigit(info.serialNumber);
         return info;
-	}
+    }
     
     NNIDInfo GetNNIDInfo(void) {
         NNIDInfo info = { 0 };
