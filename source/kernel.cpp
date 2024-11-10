@@ -125,7 +125,7 @@ namespace Kernel {
         return cid;
     }
 
-    u64 GetDeviceId(void) {
+    u32 GetDeviceId(void) {
         Result ret = 0;
         u32 id = 0;
 

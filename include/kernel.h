@@ -11,5 +11,5 @@ namespace Kernel {
     const char *GetVersion(VersionInfo info);
     const char *GetSdmcCid(void);
     const char *GetNandCid(void);
-    u64 GetDeviceId(void);
+    u32 GetDeviceId(void);
 }

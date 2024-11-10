@@ -170,7 +170,7 @@ namespace GUI {
         GUI::DrawItemf(4, "Initial system version:", info.initialVersion);
         GUI::DrawItemf(5, "SDMC CID:", displayInfo? info.sdmcCid : "");
         GUI::DrawItemf(6, "NAND CID:", displayInfo? info.nandCid : "");
-        GUI::DrawItemf(7, "Device ID:", "%lu", displayInfo? info.deviceId : 0);
+        GUI::DrawItemf(7, "Device ID:", "%llu", displayInfo? info.deviceId : 0);
     }
 
     static void SystemInfoPage(const SystemInfo &info, bool &displayInfo) {
