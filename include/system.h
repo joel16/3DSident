@@ -12,5 +12,5 @@ namespace System {
     u64 GetLocalFriendCodeSeed(void);
     u8 *GetSerialNumber(void);
     int GetCheckDigit(const u8* serialNumber);
-    u64 GetDeviceId(void);
+    u64 GetSoapId(void);
 }

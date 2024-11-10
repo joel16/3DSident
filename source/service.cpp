@@ -132,7 +132,6 @@ namespace Service {
     void Init(void) {
         acInit();
         ACTU::Init();
-        amAppInit();
         amInit();
     }
 
@@ -164,6 +163,7 @@ namespace Service {
         info.macAddress = System::GetMacAddress();
         info.serialNumber = System::GetSerialNumber();
         info.checkDigit =  System::GetCheckDigit(info.serialNumber);
+        info.soapId = System::GetSoapId();
         return info;
     }
     

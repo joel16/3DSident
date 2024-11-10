@@ -21,6 +21,7 @@ typedef struct {
     const char *macAddress;
     u8 *serialNumber;
     int checkDigit;
+    u64 soapId;
 } SystemInfo;
 
 typedef struct {

@@ -162,7 +162,7 @@ namespace System {
         return (checkDigit == 0) ? checkDigit : 10 - checkDigit;
     }
 
-    u64 GetDeviceId(void) {
+    u64 GetSoapId(void) {
         Result ret = 0;
         u32 id = 0;
 

@@ -180,6 +180,7 @@ namespace GUI {
         GUI::DrawItemf(4, "NAND local friend code seed:", "%010llX", displayInfo? info.localFriendCodeSeed : 0);
         GUI::DrawItemf(5, "MAC Address:", displayInfo? info.macAddress : "");
         GUI::DrawItemf(6, "Serial number:", "%s %d", displayInfo? reinterpret_cast<const char *>(info.serialNumber) : "", displayInfo? info.checkDigit : 0);
+        GUI::DrawItemf(7, "ECS Device ID:", "%llu", displayInfo? info.soapId : 0);
     }
 
     static void BatteryInfoPage(void) {
