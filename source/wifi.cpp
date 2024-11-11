@@ -4,21 +4,11 @@
 #include "service.h"
 
 namespace Wifi {
-    bool GetSlot(u32 slot) {
-        Result ret = 0;
-
-        if (R_FAILED(ret = ACI_LoadNetworkSetting(slot))) {
-            return false;
-        }
-
-        return true;
-    }
-
     const char *GetSSID(void) {
         Result ret = 0;
         static char ssid[32];
         
-        if (R_FAILED(ret = ACI::GetSSID(ssid))) {
+        if (R_FAILED(ret = ACI_GetNetworkWirelessEssidSecuritySsid(ssid))) {
             return "unknown";
         }
         

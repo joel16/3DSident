@@ -50,9 +50,9 @@ typedef struct {
 
 typedef struct {
     bool slot[3];
-    const char *ssid[3];
-    const char *passphrase[3];
-    const char *securityMode[3];
+    char ssid[3][32];
+    char passphrase[3][64];
+    char securityMode[3][12];
 } WifiInfo;
 
 typedef struct {

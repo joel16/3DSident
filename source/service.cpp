@@ -1,4 +1,5 @@
 #include <3ds.h>
+#include <cstring>
 
 #include "config.h"
 #include "hardware.h"
@@ -12,23 +13,6 @@
 #include "wifi.h"
 
 namespace ACI {
-    Result GetSSID(char *ssid) {
-        Result ret = 0;
-        u32 *cmdbuf = getThreadCommandBuffer();
-        
-        cmdbuf[0] = IPC_MakeHeader(0x40F,0,0); // 0x040F0000
-        
-        u32* staticbufs = getThreadStaticBuffers();
-        staticbufs[0] = IPC_Desc_StaticBuffer(32, 0); // SSID length is 32
-        staticbufs[1] = reinterpret_cast<u32>(ssid);
-        
-        if (R_FAILED(ret = svcSendSyncRequest(*acGetSessionHandle()))) {
-            return ret;
-        }
-
-        return static_cast<Result>(cmdbuf[1]);
-    }
-
     Result GetSecurityMode(acSecurityMode *mode) {
         Result ret = 0;
         u32 *cmdbuf = getThreadCommandBuffer();
@@ -50,7 +34,7 @@ namespace ACI {
         cmdbuf[0] = IPC_MakeHeader(0x415,0,0); // 0x04150000
         
         u32* staticbufs = getThreadStaticBuffers();
-        staticbufs[0] = IPC_Desc_StaticBuffer(64, 0); // SSID length is 64
+        staticbufs[0] = IPC_Desc_StaticBuffer(64, 0); // Password length is 64
         staticbufs[1] = reinterpret_cast<u32>(passphrase);
         
         if (R_FAILED(ret = svcSendSyncRequest(*acGetSessionHandle()))) {
@@ -68,25 +52,25 @@ namespace ACTU {
     Result Init(void) {
         Result ret = 0;
         
-        if (AtomicPostIncrement(&actRefCount)) {
+        if (AtomicPostIncrement(std::addressof(actRefCount))) {
             return 0;
         }
         
-        ret = srvGetServiceHandle(&actHandle, "act:u");
+        ret = srvGetServiceHandle(std::addressof(actHandle), "act:u");
         
         if (R_FAILED(ret)) {
-            ret = srvGetServiceHandle(&actHandle, "act:a");
+            ret = srvGetServiceHandle(std::addressof(actHandle), "act:a");
         }
         
         if (R_FAILED(ret)) {
-            AtomicDecrement(&actRefCount);
+            AtomicDecrement(std::addressof(actRefCount));
         }
         
         return ret;
     }
 
     void Exit(void) {
-        if (AtomicDecrement(&actRefCount)) {
+        if (AtomicDecrement(std::addressof(actRefCount))) {
             return;
         }
         
@@ -224,11 +208,13 @@ namespace Service {
     WifiInfo GetWifiInfo(void) {
         WifiInfo info = { 0 };
 
-        for (int i = 0; i < 3; i++) {
-            info.slot[i] = Wifi::GetSlot(i);
-            info.ssid[i] = Wifi::GetSSID();
-            info.passphrase[i] = Wifi::GetPassphrase();
-            info.securityMode[i] = Wifi::GetSecurityMode();
+        for (u32 i = 0; i < 3; i++) {
+            if (R_SUCCEEDED(ACI_LoadNetworkSetting(i))) {
+                info.slot[i] = true;
+                std::strncpy(info.ssid[i], Wifi::GetSSID(), 32);
+                std::strncpy(info.passphrase[i], Wifi::GetPassphrase(), 64);
+                std::strncpy(info.securityMode[i], Wifi::GetSecurityMode(), 12);
+            }
         }
 
         return info;
