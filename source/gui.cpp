@@ -198,7 +198,8 @@ namespace GUI {
         GUI::DrawItemf(3, "Battery voltage:", "%d (%.1f V)", voltage, 5.f * (static_cast<float>(voltage) / 256.f));
 
         ret = MCUHWC::GetBatteryTemperature(std::addressof(temp));
-        GUI::DrawItemf(4, "Battery temperature:", "%d", R_FAILED(ret)? 0 : (temp));
+        GUI::DrawItemf(4, "Battery temperature:", "%d °C (%d °F)", 
+            R_FAILED(ret)? 0 : (temp), R_FAILED(ret)? 0 : static_cast<u8>((temp * 9) / 5 + 32));
 
         ret = PTMU_GetAdapterState(std::addressof(connected));
         GUI::DrawItemf(5, "Adapter state:", R_FAILED(ret)? "unknown" : (connected? "connected" : "disconnected"));
