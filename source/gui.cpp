@@ -68,7 +68,7 @@ namespace GUI {
         ptmuInit();
         cfguInit();
         dspInit();
-        socInit((u32*)memalign(0x1000, 0x10000), 0x10000);
+        socInit(static_cast<u32 *>(memalign(0x1000, 0x10000)), 0x10000);
     }
 
     void Exit(void) {
@@ -214,10 +214,11 @@ namespace GUI {
     static void NNIDInfoPage(const NNIDInfo &info, bool &displayInfo) {
         GUI::DrawItemf(1, "Persistent ID:", "%u", displayInfo? info.persistentID : 0);
         GUI::DrawItemf(2, "Transferable ID Base:", "%llu", displayInfo? info.transferableIdBase : 0);
-        GUI::DrawItem(3, "Account ID:", info.accountId);
-        GUI::DrawItem(4, "Country:", displayInfo? info.countryName : "");
-        GUI::DrawItemf(5, "Principal ID:", "%u", displayInfo? info.principalID : 0);
-        GUI::DrawItem(6, "NFS Password:", displayInfo? info.nfsPassword : "");
+        GUI::DrawItemf(3, "Principal ID:", "%u", displayInfo? info.principalID : 0);
+        // The following are not functioning 
+        // GUI::DrawItem(4, "Account ID:", info.accountId);
+        // GUI::DrawItem(5, "Country:", displayInfo? info.countryName : "");
+        // GUI::DrawItem(6, "NFS Password:", displayInfo? info.nfsPassword : "");
     }
 
     static void ConfigInfoPage(const ConfigInfo &info, bool &displayInfo) {
