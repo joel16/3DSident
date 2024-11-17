@@ -46,6 +46,10 @@ VERSION_MAJOR	:=	0
 VERSION_MINOR	:=	9
 VERSION_MICRO	:=	0
 
+APP_TITLE	:=	3DSident
+APP_DESCRIPTION	:=	Identity tool for the Nintendo 3DS
+APP_AUTHOR	:=	Joel16
+
 #---------------------------------------------------------------------------------
 # options for code generation
 #---------------------------------------------------------------------------------
