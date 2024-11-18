@@ -7,6 +7,7 @@
 #include "config.h"
 #include "gui.h"
 #include "hardware.h"
+#include "log.h"
 #include "service.h"
 #include "textures.h"
 #include "utils.h"
@@ -60,6 +61,7 @@ namespace GUI {
         guiSizeBuf = C2D_TextBufNew(4096);
 
         Textures::Init();
+        Log::Open();
 
         // Real time services
 #if !defined BUILD_CITRA
@@ -79,6 +81,7 @@ namespace GUI {
 #if !defined BUILD_CITRA
         mcuHwcExit();
 #endif
+        Log::Close();
         Textures::Exit();
         C2D_TextBufDelete(guiSizeBuf);
         C2D_TextBufDelete(guiDynamicBuf);
@@ -440,25 +443,16 @@ namespace GUI {
 
         float titleHeight = 0.f;
         GUI::GetTextDimensions(guiTexSize, nullptr, &titleHeight, "3DSident v0.0.0");
-        
-        KernelInfo kernelInfo = { 0 };
-        SystemInfo systemInfo = { 0 };
-        NNIDInfo nnidInfo = { 0 };
-        ConfigInfo configInfo = { 0 };
-        HardwareInfo hardwareInfo = { 0 };
-        WifiInfo wifiInfo = { 0 };
-        StorageInfo storageInfo = { 0 };
-        MiscInfo miscInfo = { 0 };
 
         Service::Init();
-        kernelInfo = Service::GetKernelInfo();
-        systemInfo = Service::GetSystemInfo();
-        nnidInfo = Service::GetNNIDInfo();
-        configInfo = Service::GetConfigInfo();
-        hardwareInfo = Service::GetHardwareInfo();
-        wifiInfo = Service::GetWifiInfo();
-        storageInfo = Service::GetStorageInfo();
-        miscInfo = Service::GetMiscInfo();
+        KernelInfo kernelInfo = Service::GetKernelInfo();
+        SystemInfo systemInfo = Service::GetSystemInfo();
+        NNIDInfo nnidInfo = Service::GetNNIDInfo();
+        ConfigInfo configInfo = Service::GetConfigInfo();
+        HardwareInfo hardwareInfo = Service::GetHardwareInfo();
+        WifiInfo wifiInfo = Service::GetWifiInfo();
+        StorageInfo storageInfo = Service::GetStorageInfo();
+        MiscInfo miscInfo = Service::GetMiscInfo();
         Service::Exit();
 
         while (aptMainLoop()) {

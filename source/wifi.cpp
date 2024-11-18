@@ -1,6 +1,7 @@
 #include <3ds.h>
 #include <memory>
 
+#include "log.h"
 #include "service.h"
 
 namespace Wifi {
@@ -9,6 +10,7 @@ namespace Wifi {
         static char ssid[32];
         
         if (R_FAILED(ret = ACI_GetNetworkWirelessEssidSecuritySsid(ssid))) {
+            Log::Error("%s failed: 0x%x\n", __func__, ret);
             return "unknown";
         }
         
@@ -20,6 +22,7 @@ namespace Wifi {
         static char passphrase[64];
         
         if (R_FAILED(ret = ACI::GetPassphrase(passphrase))) {
+            Log::Error("%s failed: 0x%x\n", __func__, ret);
             return "unknown";
         }
         
@@ -42,6 +45,7 @@ namespace Wifi {
         };
 
         if (R_FAILED(ret = ACI::GetSecurityMode(std::addressof(mode)))) {
+            Log::Error("%s failed: 0x%x\n", __func__, ret);
             return "unknown";
         }
 

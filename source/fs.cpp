@@ -20,4 +20,18 @@ namespace FS {
 
         return 0;
     }
+
+    bool FileExists(FS_Archive archive, const char *path) {
+        Handle handle;
+        
+        if (R_FAILED(FSUSER_OpenFile(&handle, archive, fsMakePath(PATH_ASCII, path), FS_OPEN_READ, 0))) {
+            return false;
+        }
+        
+        if (R_FAILED(FSFILE_Close(handle))) {
+            return false;
+        }
+        
+        return true;
+    }
 }

@@ -1,6 +1,7 @@
 #include <3ds.h>
 #include <cstdio>
 
+#include "log.h"
 #include "utils.h"
 
 namespace Config {
@@ -34,9 +35,11 @@ namespace Config {
     };
     
     const char *GetUsername(void) {
+        Result ret = 0;
         UsernameBlock usernameBlock;
         
-        if (R_FAILED(CFGU_GetConfigInfoBlk2(sizeof(UsernameBlock), 0x000A0000, std::addressof(usernameBlock)))) {
+        if (R_FAILED(ret = CFGU_GetConfigInfoBlk2(sizeof(UsernameBlock), 0x000A0000, std::addressof(usernameBlock)))) {
+            Log::Error("%s failed: 0x%x\n", __func__, ret);
             return "unknown";
         }
 
@@ -46,9 +49,11 @@ namespace Config {
     }
 
     const char *GetBirthday(void) {
+        Result ret = 0;
         BirthdayBlock birthdayBlock;
 
-        if (R_FAILED(CFGU_GetConfigInfoBlk2(sizeof(BirthdayBlock), 0x000A0001, std::addressof(birthdayBlock)))) {
+        if (R_FAILED(ret = CFGU_GetConfigInfoBlk2(sizeof(BirthdayBlock), 0x000A0001, std::addressof(birthdayBlock)))) {
+            Log::Error("%s failed: 0x%x\n", __func__, ret);
             return "unknown";
         }
         
@@ -63,9 +68,11 @@ namespace Config {
     }
     
     const char *GetEulaVersion(void) {
+        Result ret = 0;
         EulaVersionBlock eulaVersionBlock;
 
-        if (R_FAILED(CFGU_GetConfigInfoBlk2(sizeof(EulaVersionBlock), 0x000D0000, std::addressof(eulaVersionBlock)))) {
+        if (R_FAILED(ret = CFGU_GetConfigInfoBlk2(sizeof(EulaVersionBlock), 0x000D0000, std::addressof(eulaVersionBlock)))) {
+            Log::Error("%s failed: 0x%x\n", __func__, ret);
             return "unknown";
         }
 
@@ -75,9 +82,11 @@ namespace Config {
     }
     
     const char *GetParentalPin(void) {
+        Result ret = 0;
         ParentalControlBlock parentalControlBlock;
         
-        if (R_FAILED(CFG_GetConfigInfoBlk8(sizeof(ParentalControlBlock), 0x00100001, std::addressof(parentalControlBlock)))) {
+        if (R_FAILED(ret = CFG_GetConfigInfoBlk8(sizeof(ParentalControlBlock), 0x00100001, std::addressof(parentalControlBlock)))) {
+            Log::Error("%s failed: 0x%x\n", __func__, ret);
             return "unknown";
         }
         
@@ -88,9 +97,11 @@ namespace Config {
     }
     
     const char *GetParentalEmail(void) {
+        Result ret = 0;
         u8 data[0x200];
 
-        if (R_FAILED(CFGU_GetConfigInfoBlk2(sizeof(data), 0x000C0002, data))) {
+        if (R_FAILED(ret = CFGU_GetConfigInfoBlk2(sizeof(data), 0x000C0002, data))) {
+            Log::Error("%s failed: 0x%x\n", __func__, ret);
             return "unknown";
         }
 
@@ -100,9 +111,11 @@ namespace Config {
     }
 
     const char *GetParentalSecretAnswer(void) {
+        Result ret = 0;
         ParentalControlBlock parentalControlBlock;
 
-        if (R_FAILED(CFG_GetConfigInfoBlk8(sizeof(ParentalControlBlock), 0x00100001, std::addressof(parentalControlBlock)))) {
+        if (R_FAILED(ret = CFG_GetConfigInfoBlk8(sizeof(ParentalControlBlock), 0x00100001, std::addressof(parentalControlBlock)))) {
+            Log::Error("%s failed: 0x%x\n", __func__, ret);
             return "unknown";
         }
 
@@ -112,9 +125,11 @@ namespace Config {
     }
     
     const char *GetPowersaveStatus(void) {
+        Result ret = 0;
         BacklightControlBlock backlightControlBlock;
         
-        if (R_FAILED(CFG_GetConfigInfoBlk8(sizeof(BacklightControlBlock), 0x00050001, std::addressof(backlightControlBlock)))) {
+        if (R_FAILED(ret = CFG_GetConfigInfoBlk8(sizeof(BacklightControlBlock), 0x00050001, std::addressof(backlightControlBlock)))) {
+            Log::Error("%s failed: 0x%x\n", __func__, ret);
             return "unknown";
         }
 

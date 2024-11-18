@@ -1,12 +1,15 @@
 #include <3ds.h>
 #include <memory>
 
+#include "log.h"
+
 namespace Storage {
     static FS_ArchiveResource GetResource(FS_SystemMediaType mediaType) {
         Result ret = 0;
         FS_ArchiveResource resource = {0};
 
         if (R_FAILED(ret = FSUSER_GetArchiveResource(std::addressof(resource), mediaType))) {
+            Log::Error("%s(%d) failed: 0x%x\n", __func__, mediaType, ret);
             return resource;
         }
 

@@ -2,10 +2,12 @@
 #include <cstdio>
 #include <memory>
 
+#include "log.h"
 #include "system.h"
 
 namespace System {
     const char *GetModel(void) {
+        Result ret = 0;
         const char *models[] = {
             "OLD 3DS - CTR",
             "OLD 3DS XL - SPR",
@@ -16,7 +18,8 @@ namespace System {
         };
 
         u8 model = 0;
-        if (R_FAILED(CFGU_GetSystemModel(std::addressof(model)))) {
+        if (R_FAILED(ret = CFGU_GetSystemModel(std::addressof(model)))) {
+            Log::Error("%s failed: 0x%x\n", __func__, ret);
             return "unknown";
         }
         
@@ -24,6 +27,7 @@ namespace System {
     }
 
     const char *GetRegion(void) {
+        Result ret = 0;
         const char *regions[] = {
             "JPN",
             "USA",
@@ -35,7 +39,8 @@ namespace System {
         };
         
         u8 region = 0;
-        if (R_FAILED(CFGU_SecureInfoGetRegion(std::addressof(region)))) {
+        if (R_FAILED(ret = CFGU_SecureInfoGetRegion(std::addressof(region)))) {
+            Log::Error("%s failed: 0x%x\n", __func__, ret);
             return "unknown";
         }
 
@@ -43,6 +48,7 @@ namespace System {
     }
 
     const char *GetFirmRegion(void) {
+        Result ret = 0;
         const char *regions[] = {
             "J",
             "U",
@@ -54,7 +60,8 @@ namespace System {
         };
 
         u8 region = 0;
-        if (R_FAILED(CFGU_SecureInfoGetRegion(std::addressof(region)))) {
+        if (R_FAILED(ret = CFGU_SecureInfoGetRegion(std::addressof(region)))) {
+            Log::Error("%s failed: 0x%x\n", __func__, ret);
             return "unknown";
         }
 
@@ -62,9 +69,11 @@ namespace System {
     }
 
     bool IsCoppacsSupported(void) {
+        Result ret = 0;
         u8 isCoppacs = 0;
 
-        if (R_FAILED(CFGU_GetRegionCanadaUSA(std::addressof(isCoppacs)))) {
+        if (R_FAILED(ret = CFGU_GetRegionCanadaUSA(std::addressof(isCoppacs)))) {
+            Log::Error("%s failed: 0x%x\n", __func__, ret);
             return false;
         }
 
@@ -72,6 +81,7 @@ namespace System {
     }
 
     const char *GetLanguage(void) {
+        Result ret = 0;
         const char *languages[] = {
             "Japanese",
             "English",
@@ -88,7 +98,8 @@ namespace System {
         };
 
         u8 language = 0;
-        if (R_FAILED(CFGU_GetSystemLanguage(std::addressof(language)))) {
+        if (R_FAILED(ret = CFGU_GetSystemLanguage(std::addressof(language)))) {
+            Log::Error("%s failed: 0x%x\n", __func__, ret);
             return "unknown";
         }
 
@@ -128,6 +139,7 @@ namespace System {
         u64 seed = 0;
 
         if (R_FAILED(ret = CFGI_GetLocalFriendCodeSeed(std::addressof(seed)))) {
+            Log::Error("%s failed: 0x%x\n", __func__, ret);
             return ret;
         }
 
@@ -135,9 +147,11 @@ namespace System {
     }
     
     u8 *GetSerialNumber(void) {
+        Result ret = 0;
         static u8 serial[15];
         
-        if (R_FAILED(CFGI_SecureInfoGetSerialNumber(serial))) {
+        if (R_FAILED(ret = CFGI_SecureInfoGetSerialNumber(serial))) {
+            Log::Error("%s failed: 0x%x\n", __func__, ret);
             return nullptr;
         }
         
@@ -167,6 +181,7 @@ namespace System {
         u32 id = 0;
 
         if (R_FAILED(ret = AM_GetDeviceId(std::addressof(id)))) {
+            Log::Error("%s failed: 0x%x\n", __func__, ret);
             return ret;
         }
         

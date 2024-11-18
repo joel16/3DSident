@@ -3,6 +3,7 @@
 
 #include "fs.h"
 #include "kernel.h"
+#include "log.h"
 #include "system.h"
 #include "utils.h"
 
@@ -12,16 +13,19 @@ namespace Kernel {
         
         FS_Archive archive;
         if (R_FAILED(ret = FS::OpenArchive(std::addressof(archive), ARCHIVE_NAND_TWL_FS))) {
+            Log::Error("%s(FS::OpenArchive) failed: 0x%x\n", __func__, ret);
             return "unknown";
         }
         
         Handle handle;
         if (R_FAILED(ret = FSUSER_OpenFileDirectly(&handle, ARCHIVE_NAND_TWL_FS, fsMakePath(PATH_EMPTY, ""), fsMakePath(PATH_ASCII, "/sys/log/product.log"), FS_OPEN_READ, 0))) {
+            Log::Error("%s(FSUSER_OpenFileDirectly) failed: 0x%x\n", __func__, ret);
             return "unknown";
         }
 
         u64 size = 0;
         if (R_FAILED(ret = FSFILE_GetSize(handle, std::addressof(size)))) {
+            Log::Error("%s(FSFILE_GetSize) failed: 0x%x\n", __func__, ret);
             return "unknown";
         }
 
@@ -29,6 +33,7 @@ namespace Kernel {
         u32 bytesRead = 0;
         
         if (R_FAILED(ret = FSFILE_Read(handle, std::addressof(bytesRead), 0, reinterpret_cast<u32 *>(buf), static_cast<u32>(size)))) {
+            Log::Error("%s(FSFILE_Read) failed: 0x%x\n", __func__, ret);
             return "unknown";
         }
         
@@ -46,6 +51,7 @@ namespace Kernel {
         std::strcat(version, Utils::GetSubstring(buf, "nup:", " cup:").c_str());
 
         if (R_FAILED(ret = FSFILE_Close(handle))) {
+            Log::Error("%s(FSFILE_Close) failed: 0x%x\n", __func__, ret);
             return "unknown";
         }
 
@@ -78,6 +84,7 @@ namespace Kernel {
         );
 
         if (R_FAILED(ret = osGetSystemVersionDataString(nver, cver, systemVersionString, sizeof(systemVersionString)))) {
+            Log::Error("%s failed: 0x%x\n", __func__, ret);
             std::snprintf(systemVersionString, 128, "unknown");
         }
 
@@ -96,6 +103,7 @@ namespace Kernel {
         u8 buf[16];
         
         if (R_FAILED(ret = FSUSER_GetSdmcCid(buf, 0x10))) {
+            Log::Error("%s failed: 0x%x\n", __func__, ret);
             return "unknown";
         }
         
@@ -113,6 +121,7 @@ namespace Kernel {
         u8 buf[16];
         
         if (R_FAILED(ret = FSUSER_GetNandCid(buf, 0x10))) {
+            Log::Error("%s failed: 0x%x\n", __func__, ret);
             return "unknown";
         }
         
@@ -130,6 +139,7 @@ namespace Kernel {
         u32 id = 0;
 
         if (R_FAILED(ret = AM_GetDeviceId(std::addressof(id)))) {
+            Log::Error("%s failed: 0x%x\n", __func__, ret);
             return ret;
         }
         

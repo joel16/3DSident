@@ -1,4 +1,5 @@
 #include "hardware.h"
+#include "log.h"
 #include "utils.h"
 
 #define REG_LCD_TOP_SCREEN    (u32)0x202200
@@ -22,10 +23,12 @@ namespace Hardware {
         }
 
         if (R_FAILED(ret = gspLcdInit())) {
+            Log::Error("%s(gspLcdInit) failed: 0x%x\n", __func__, ret);
             return ret;
         }
 
         if (R_FAILED(ret = GSPLCD_GetVendors(&vendors))) {
+            Log::Error("%s(GSPLCD_GetVendors) failed: 0x%x\n", __func__, ret);
             return ret;
         }
 
@@ -105,6 +108,7 @@ namespace Hardware {
     }
 
     const char *GetSoundOutputMode(void) {
+        Result ret = 0;
         u8 data;
         const char *mode[] =  {
             "Mono",
@@ -112,7 +116,8 @@ namespace Hardware {
             "Surround"
         };
         
-        if (R_FAILED(CFGU_GetConfigInfoBlk2(sizeof(data), 0x00070001, std::addressof(data)))) {
+        if (R_FAILED(ret = CFGU_GetConfigInfoBlk2(sizeof(data), 0x00070001, std::addressof(data)))) {
+            Log::Error("%s failed: 0x%x\n", __func__, ret);
             return "unknown";
         }
 
