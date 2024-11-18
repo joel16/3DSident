@@ -125,11 +125,9 @@ namespace Config {
     }
     
     const char *GetPowersaveStatus(void) {
-        Result ret = 0;
         BacklightControlBlock backlightControlBlock;
         
-        if (R_FAILED(ret = CFG_GetConfigInfoBlk8(sizeof(BacklightControlBlock), 0x00050001, std::addressof(backlightControlBlock)))) {
-            Log::Error("%s failed: 0x%x\n", __func__, ret);
+        if (R_FAILED(CFG_GetConfigInfoBlk8(sizeof(BacklightControlBlock), 0x00050001, std::addressof(backlightControlBlock)))) {
             return "unknown";
         }
 

@@ -69,6 +69,28 @@ typedef struct {
     u32 ticketCount;
 } MiscInfo;
 
+typedef struct {
+    u8 consoleInfo;
+    u8 pmicVendorCode;
+    u8 batteryVendorCode;
+    u8 mgicVersionMajor;
+    u8 mgicVersionMinor;
+    u8 rcomp;
+    u8 ntcRead;
+    u8 unk1;
+    u8 unk2;
+    u8 systemModel;
+    u8 redPowerLedMode;
+    u8 bluePowerLedIntensity;
+    u8 unk3;
+    u8 rgbLedRedIntensity;
+    u8 rgbLedGreenIntensity;
+    u8 rgbLedBlueIntensity;
+    u8 unk4;
+    u8 wifiLedBrightness;
+    u8 rawButtonState;
+} SystemStateInfo;
+
 namespace ACI {
     Result GetSSID(char *ssid);
     Result GetSecurityMode(acSecurityMode *mode);
@@ -94,4 +116,5 @@ namespace Service {
     WifiInfo GetWifiInfo(void);
     StorageInfo GetStorageInfo(void);
     MiscInfo GetMiscInfo(void);
+    SystemStateInfo GetSystemStateInfo(void);
 }
