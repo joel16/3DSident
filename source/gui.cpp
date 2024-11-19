@@ -186,32 +186,33 @@ namespace GUI {
         GUI::DrawItemf(7, "ECS Device ID:", "%llu", displayInfo? info.soapId : 0);
     }
 
-    static void BatteryInfoPage(void) {
+    static void BatteryInfoPage(const SystemStateInfo &info) {
         Result ret = 0;
         u8 percentage = 0, status = 0, voltage = 0, fwVerHigh = 0, fwVerLow = 0, temp = 0;
         bool connected = false;
 
         ret = MCUHWC_GetBatteryLevel(std::addressof(percentage));
-        GUI::DrawItemf(1, "Battery percentage:", "%3d%%", R_FAILED(ret)? 0 : (percentage));
-
-        ret = PTMU_GetBatteryChargeState(std::addressof(status));
-        GUI::DrawItem(2, "Battery status:", R_FAILED(ret)? "unknown" : (status? "charging" : "not charging"));
+        Result chargeResult = PTMU_GetBatteryChargeState(std::addressof(status));
+        GUI::DrawItemf(1, "Battery percentage:", "%3d%% (%s)", R_FAILED(ret)? 0 : (percentage),
+            R_FAILED(chargeResult)? "unknown" : (status? "charging" : "not charging"));
 
         ret = MCUHWC_GetBatteryVoltage(std::addressof(voltage));
-        GUI::DrawItemf(3, "Battery voltage:", "%d (%.1f V)", voltage, 5.f * (static_cast<float>(voltage) / 256.f));
+        GUI::DrawItemf(2, "Battery voltage:", "%d (%.1f V)", voltage, 5.f * (static_cast<float>(voltage) / 256.f));
 
         ret = MCUHWC::GetBatteryTemperature(std::addressof(temp));
-        GUI::DrawItemf(4, "Battery temperature:", "%d °C (%d °F)", 
+        GUI::DrawItemf(3, "Battery temperature:", "%d °C (%d °F)", 
             R_FAILED(ret)? 0 : (temp), R_FAILED(ret)? 0 : static_cast<u8>((temp * 9) / 5 + 32));
 
         ret = PTMU_GetAdapterState(std::addressof(connected));
-        GUI::DrawItemf(5, "Adapter state:", R_FAILED(ret)? "unknown" : (connected? "connected" : "disconnected"));
+        GUI::DrawItemf(4, "Adapter state:", R_FAILED(ret)? "unknown" : (connected? "connected" : "disconnected"));
 
-        ret = MCUHWC_GetFwVerHigh(std::addressof(fwVerHigh));
-        ret = MCUHWC_GetFwVerLow(std::addressof(fwVerLow));
-        GUI::DrawItemf(6, "MCU firmware:", "%u.%u", (fwVerHigh - 0x10), fwVerLow);
-        
-        GUI::DrawItem(7, "Power-saving mode:", Config::GetPowersaveStatus());
+        MCUHWC_GetFwVerHigh(std::addressof(fwVerHigh));
+        MCUHWC_GetFwVerLow(std::addressof(fwVerLow));
+        GUI::DrawItemf(5, "MCU firmware:", "%u.%u", (fwVerHigh - 0x10), fwVerLow);
+
+        GUI::DrawItemf(6, "PMIC vendor code:", "%x", info.pmicVendorCode);
+
+        GUI::DrawItemf(7, "Battery vendor code:", "%x", info.batteryVendorCode);
     }
 
     static void NNIDInfoPage(const NNIDInfo &info, bool &displayInfo) {
@@ -231,6 +232,7 @@ namespace GUI {
         GUI::DrawItem(4, "Parental control pin:", displayInfo? info.parentalPin : "");
         GUI::DrawItem(5, "Parental control email:", displayInfo? info.parentalEmail : "");
         GUI::DrawItem(6, "Parental control answer:", displayInfo? info.parentalSecretAnswer : "");
+        GUI::DrawItem(7, "Power-saving mode:", Config::GetPowersaveStatus());
     }
 
     static void HardwareInfoPage(const HardwareInfo &info, bool &isNew3DS) {
@@ -455,6 +457,7 @@ namespace GUI {
         WifiInfo wifiInfo = Service::GetWifiInfo();
         StorageInfo storageInfo = Service::GetStorageInfo();
         MiscInfo miscInfo = Service::GetMiscInfo();
+        SystemStateInfo systemStateInfo = Service::GetSystemStateInfo();
         Service::Exit();
 
         while (aptMainLoop()) {
@@ -474,7 +477,7 @@ namespace GUI {
                     break;
 
                 case BATTERY_INFO_PAGE:
-                    GUI::BatteryInfoPage();
+                    GUI::BatteryInfoPage(systemStateInfo);
                     break;
 
                 case NNID_INFO_PAGE:
