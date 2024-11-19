@@ -7,3 +7,4 @@ build/
 romfs/
 *.3dsx
 *.smdh
+*.cia
