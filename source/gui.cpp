@@ -368,6 +368,7 @@ namespace GUI {
             HIDUSER_GetSoundVolume(std::addressof(volume));
             
             if (((kHeld & KEY_L) && (kDown & KEY_R)) || ((kHeld & KEY_R) && (kDown & KEY_L))) {
+                aptSetHomeAllowed(true);
                 enabled = false;
             }
             
@@ -546,6 +547,7 @@ namespace GUI {
             }
 
             if (((kHeld & KEY_L) && (kDown & KEY_R)) || ((kHeld & KEY_R) && (kDown & KEY_L))) {
+                aptSetHomeAllowed(false);
                 buttonTestEnabled = true;
             }
 
