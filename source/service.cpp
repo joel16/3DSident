@@ -144,6 +144,7 @@ namespace Service {
         info.region = System::GetRegion();
         info.language = System::GetLanguage();
         info.localFriendCodeSeed = System::GetLocalFriendCodeSeed();
+        info.nandLocalFriendCodeSeed = System::GetNandLocalFriendCodeSeed();
         info.macAddress = System::GetMacAddress();
         info.serialNumber = System::GetSerialNumber();
         info.checkDigit =  System::GetCheckDigit(info.serialNumber);

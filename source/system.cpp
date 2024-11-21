@@ -2,6 +2,7 @@
 #include <cstdio>
 #include <memory>
 
+#include "fs.h"
 #include "log.h"
 #include "system.h"
 
@@ -144,6 +145,51 @@ namespace System {
         }
 
         return seed;
+    }
+
+    const char *GetNandLocalFriendCodeSeed(void) {
+        Result ret = 0;
+        Handle handle;
+        u32 bytesread = 0;
+        FS_Archive nandArchive;
+        char buf[7];
+        static char out[11];
+
+        FS::OpenArchive(std::addressof(nandArchive), ARCHIVE_NAND_CTR_FS);
+        
+        if (FS::FileExists(nandArchive, "/rw/sys/LocalFriendCodeSeed_B")) {
+            if (R_FAILED(ret = FSUSER_OpenFile(std::addressof(handle), nandArchive, fsMakePath(PATH_ASCII, "/rw/sys/LocalFriendCodeSeed_B"), FS_OPEN_READ, 0))) {
+                FS::CloseArchive(nandArchive);
+                return "";
+            }
+        }
+        else if (FS::FileExists(nandArchive, "/rw/sys/LocalFriendCodeSeed_A")) {
+            if (R_FAILED(ret = FSUSER_OpenFile(std::addressof(handle), nandArchive, fsMakePath(PATH_ASCII, "/rw/sys/LocalFriendCodeSeed_A"), FS_OPEN_READ, 0))) {
+                FS::CloseArchive(nandArchive);
+                return "";
+            }
+        }
+        else {
+            FS::CloseArchive(nandArchive);
+            return "LocalFriendCodeSeed not found";
+        }
+        
+        if (R_FAILED(ret = FSFILE_Read(handle, std::addressof(bytesread), 0x108, reinterpret_cast<u32 *>(buf), 6))) {
+            Log::Error("%s(FSFILE_Read) failed: 0x%x\n", __func__, ret);
+            FS::CloseArchive(nandArchive);
+            return "unknown";
+        }
+        
+        if (R_FAILED(ret = FSFILE_Close(handle))) {
+            Log::Error("%s(FSFILE_Close) failed: 0x%x\n", __func__, ret);
+            FS::CloseArchive(nandArchive);
+            return "unknown";
+        }
+
+        FS::CloseArchive(nandArchive);
+        buf[6] = '\0';
+        snprintf(out, 11, "%02X%02X%02X%02X%02X", buf[4], buf[3], buf[2], buf[1], buf[0]);
+        return out;
     }
     
     u8 *GetSerialNumber(void) {

@@ -10,6 +10,7 @@ namespace System {
     const char *GetRunningHW(void);
     const char *IsDebugUnit(void);
     u64 GetLocalFriendCodeSeed(void);
+    const char *GetNandLocalFriendCodeSeed(void);
     u8 *GetSerialNumber(void);
     int GetCheckDigit(const u8* serialNumber);
     u64 GetSoapId(void);

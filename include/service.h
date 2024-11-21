@@ -18,6 +18,7 @@ typedef struct {
     const char *region;
     const char *language;
     u64 localFriendCodeSeed;
+    const char *nandLocalFriendCodeSeed;
     const char *macAddress;
     u8 *serialNumber;
     int checkDigit;
