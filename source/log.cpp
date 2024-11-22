@@ -6,7 +6,7 @@
 
 namespace Log {
     static FS_Archive sdmcArchive;
-    static Handle handle;
+    static Handle handle = 0;
     static u64 offset = 0;
 
     Result Open(void) {
@@ -44,7 +44,12 @@ namespace Log {
         return 0;
     }
 
-    void Error(const char *data, ...) {        
+    void Error(const char *data, ...) {
+        // File handle was not open for writing
+        if (!handle) {
+            return;
+        }
+
         char buf[256];
         va_list args;
         va_start(args, data);

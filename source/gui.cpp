@@ -61,8 +61,9 @@ namespace GUI {
         guiSizeBuf = C2D_TextBufNew(4096);
 
         Textures::Init();
+#if defined BUILD_DEBUG
         Log::Open();
-
+#endif
         // Real time services
 #if !defined BUILD_CITRA
         mcuHwcInit();
@@ -81,7 +82,9 @@ namespace GUI {
 #if !defined BUILD_CITRA
         mcuHwcExit();
 #endif
+#if defined BUILD_DEBUG
         Log::Close();
+#endif
         Textures::Exit();
         C2D_TextBufDelete(guiSizeBuf);
         C2D_TextBufDelete(guiDynamicBuf);
