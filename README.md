@@ -42,9 +42,10 @@ ctr_vercheck was originally created by wolfvak - It was initially intended to be
 - Displays headphone/audio jack status. (GUI exclusive)
 - Card slot status and inserted card type (CTR/NAND).
 - Displays parental control pin,  email address and secret answer. (GUI exclusive)
-- Displays home menu ID.
-- Displays Wifi slot info (SSID, password and MAC address).
+- Displays Wifi slot info (SSID, password, security type).
 - Displays original/NAND local friend code seed.
+- Displays PMIC vendor code and battery vendor code.
+- Incorporates a button tester that checks for home button input, 3d and volume slider levels etc.
 
 # Credits:
 - **Preetisketch** for the logo/banner.
