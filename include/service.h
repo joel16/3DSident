@@ -68,6 +68,7 @@ typedef struct {
     u32 sdTitleCount;
     u32 nandTitleCount;
     u32 ticketCount;
+    const char *manufacturingDate;
 } MiscInfo;
 
 typedef struct {

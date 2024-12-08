@@ -316,15 +316,16 @@ namespace GUI {
     }
 
     static void MiscInfoPage(const MiscInfo &info, bool &displayInfo) {
-        GUI::DrawItemf(1, "Installed titles:", "SD: %lu (NAND: %lu)", info.sdTitleCount, info.nandTitleCount);
-        GUI::DrawItemf(2, "Installed tickets:", "%lu", info.ticketCount);
+        GUI::DrawItem(1, "Manufacturing date:", info.manufacturingDate);
+        GUI::DrawItemf(2, "Installed titles:", "SD: %lu (NAND: %lu)", info.sdTitleCount, info.nandTitleCount);
+        GUI::DrawItemf(3, "Installed tickets:", "%lu", info.ticketCount);
 
         u8 wifiStrength = osGetWifiStrength();
-        GUI::DrawItemf(3, "WiFi signal strength:", "%d (%.0lf%%)", wifiStrength, static_cast<float>(wifiStrength * 33.33));
+        GUI::DrawItemf(4, "WiFi signal strength:", "%d (%.0lf%%)", wifiStrength, static_cast<float>(wifiStrength * 33.33));
         
         char hostname[128];
         gethostname(hostname, sizeof(hostname));
-        GUI::DrawItem(4, "IP:", displayInfo? hostname : "");
+        GUI::DrawItem(5, "IP:", displayInfo? hostname : "");
     }
 
     static void DrawControllerImage(int keys, C2D_Image button, int defaultX, int defaultY, int keyLeft, int keyRight, int keyUp, int keyDown) {
