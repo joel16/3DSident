@@ -44,7 +44,7 @@ GFXBUILD	:=	$(ROMFS)/res/drawable
 
 VERSION_MAJOR	:=	0
 VERSION_MINOR	:=	9
-VERSION_MICRO	:=	1
+VERSION_MICRO	:=	2
 
 APP_TITLE	:=	3DSident
 APP_DESCRIPTION	:=	Identity tool for the Nintendo 3DS
