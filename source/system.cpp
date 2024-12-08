@@ -222,8 +222,8 @@ namespace System {
             }
         }
         
-        int total = ((3 * evenSum) + oddSum) % 10;
-        return total == 0 ? 0 : 10 - total;
+        int checkDigit = ((3 * evenSum) + oddSum) % 10;
+        return checkDigit == 0 ? 0 : 10 - checkDigit;
     }
 
     u64 GetSoapId(void) {
