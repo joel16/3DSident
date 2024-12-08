@@ -205,21 +205,25 @@ namespace System {
     }
     
     int GetCheckDigit(const u8* serialNumber) {
-        int oddSum = 0;
-        int evenSum = 0;
+        int oddSum = 0, evenSum = 0, index = 1;
         
-        for (size_t i = 2; i < 10; ++i) {
-            int digit = serialNumber[i] - '0';
-            if (i % 2 == 0) {
-                oddSum += digit;
-            }
-            else {
-                evenSum += digit;
+        for (int i = 0; serialNumber[i] != '\0'; i++) {
+            if (isdigit(serialNumber[i])) {
+                int digit = serialNumber[i] - '0';
+                
+                if (index % 2 == 0) {
+                    evenSum += digit;
+                }
+                else {
+                    oddSum += digit;
+                }
+
+                index++;
             }
         }
         
-        int checkDigit = ((3 * evenSum) + oddSum) % 10;
-        return (checkDigit == 0) ? checkDigit : 10 - checkDigit;
+        int total = ((3 * evenSum) + oddSum) % 10;
+        return total == 0 ? 0 : 10 - total;
     }
 
     u64 GetSoapId(void) {
