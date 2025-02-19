@@ -175,7 +175,6 @@ namespace Service {
         info.accountId = NNID::GetAccountId();
         info.countryName = NNID::GetCountryName();
         info.principalID = NNID::GetPrincipalId();
-        info.nfsPassword = NNID::GetNfsPassword();
         info.status = NNID::IsServerAccountDeleted();
         return info;
     }

@@ -66,18 +66,6 @@ namespace NNID {
         return principalId;
     }
 
-    const char *GetNfsPassword(void) {
-        Result ret = 0;
-        static char nfsPassword[0x101];
-
-        if (R_FAILED(ret = ACTU::GetAccountInfo(defaultSlot, sizeof(nfsPassword), 0x25, nfsPassword))) {
-            Log::Error("%s failed: 0x%x\n", __func__, ret);
-            return "unknown";
-        }
-
-        return nfsPassword;
-    }
-
     const char *IsServerAccountDeleted(void) {
         Result ret = 0;
         u8 accountDeleted;

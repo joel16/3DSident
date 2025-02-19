@@ -31,7 +31,6 @@ typedef struct {
     const char *accountId;
     const char * countryName;
     u32 principalID;
-    const char *nfsPassword;
     const char *status;
 } NNIDInfo;
 
