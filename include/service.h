@@ -32,6 +32,7 @@ typedef struct {
     const char * countryName;
     u32 principalID;
     const char *nfsPassword;
+    const char *status;
 } NNIDInfo;
 
 typedef struct {
@@ -100,7 +101,8 @@ namespace ACI {
 }
 
 namespace ACTU {
-    Result GetAccountDataBlock(u8 slot, u32 size, u32 blkId, void *out);
+    Result Initialize(u32 sdkVersion, u32 memSize, Handle handle);
+    Result GetAccountInfo(u8 slot, u32 size, u32 blkId, void *out);
 }
 
 namespace MCUHWC {

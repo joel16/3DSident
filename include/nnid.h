@@ -7,4 +7,5 @@ namespace NNID {
     const char *GetCountryName(void);
     u32 GetPrincipalId(void);
     const char *GetNfsPassword(void);
+    const char *IsServerAccountDeleted(void);
 }

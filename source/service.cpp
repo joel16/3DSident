@@ -59,10 +59,6 @@ namespace ACTU {
         ret = srvGetServiceHandle(std::addressof(actHandle), "act:u");
         
         if (R_FAILED(ret)) {
-            ret = srvGetServiceHandle(std::addressof(actHandle), "act:a");
-        }
-        
-        if (R_FAILED(ret)) {
             AtomicDecrement(std::addressof(actRefCount));
         }
         
@@ -76,8 +72,27 @@ namespace ACTU {
         
         svcCloseHandle(actHandle);
     }
+    
+    Result Initialize(u32 sdkVersion, u32 memSize, Handle handle) {
+        Result ret = 0;
+        u32 *cmdbuf = getThreadCommandBuffer();
+        
+        cmdbuf[0] = IPC_MakeHeader(0x1,2,4); // 0x00010084
+        cmdbuf[1] = sdkVersion;
+        cmdbuf[2] = memSize;
+        cmdbuf[3] = 0x20;
+        cmdbuf[4] = 0x0;
+        cmdbuf[5] = 0x0;
+        cmdbuf[6] = handle;
+        
+        if ((ret = svcSendSyncRequest(actHandle)) != 0) {
+            return ret;
+        }
+        
+        return static_cast<Result>(cmdbuf[1]);
+    }
 
-    Result GetAccountDataBlock(u8 slot, u32 size, u32 blkId, void *out) {
+    Result GetAccountInfo(u8 slot, u32 size, u32 blkId, void *out) {
         Result ret = 0;
         u32 *cmdbuf = getThreadCommandBuffer();
         
@@ -116,6 +131,7 @@ namespace Service {
     void Init(void) {
         acInit();
         ACTU::Init();
+        ACTU::Initialize(0xB0002F0, 0, 0);
         amInit();
     }
 
@@ -160,6 +176,7 @@ namespace Service {
         info.countryName = NNID::GetCountryName();
         info.principalID = NNID::GetPrincipalId();
         info.nfsPassword = NNID::GetNfsPassword();
+        info.status = NNID::IsServerAccountDeleted();
         return info;
     }
 

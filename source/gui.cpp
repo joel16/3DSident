@@ -222,10 +222,9 @@ namespace GUI {
         GUI::DrawItemf(1, "Persistent ID:", "%u", displayInfo? info.persistentID : 0);
         GUI::DrawItemf(2, "Transferable ID Base:", "%llu", displayInfo? info.transferableIdBase : 0);
         GUI::DrawItemf(3, "Principal ID:", "%u", displayInfo? info.principalID : 0);
-        // The following are not functioning 
-        // GUI::DrawItem(4, "Account ID:", info.accountId);
-        // GUI::DrawItem(5, "Country:", displayInfo? info.countryName : "");
-        // GUI::DrawItem(6, "NFS Password:", displayInfo? info.nfsPassword : "");
+        GUI::DrawItemf(4, "Account ID:", "%s (%s)", info.accountId, info.status);
+        GUI::DrawItem(5, "Country:", displayInfo? info.countryName : "");
+        //GUI::DrawItem(6, "NFS Password:", displayInfo? info.nfsPassword : "");
     }
 
     static void ConfigInfoPage(const ConfigInfo &info, bool &displayInfo) {
