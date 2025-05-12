@@ -99,11 +99,6 @@ namespace ACI {
     Result GetPassphrase(char *passphrase);
 }
 
-namespace ACTU {
-    Result Initialize(u32 sdkVersion, u32 memSize, Handle handle);
-    Result GetAccountInfo(u8 slot, u32 size, u32 blkId, void *out);
-}
-
 namespace MCUHWC {
     Result GetBatteryTemperature(u8 *temp);
 }

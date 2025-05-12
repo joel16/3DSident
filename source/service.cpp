@@ -45,72 +45,6 @@ namespace ACI {
     }
 }
 
-namespace ACTU {
-    static Handle actHandle;
-    static int actRefCount;
-    
-    Result Init(void) {
-        Result ret = 0;
-        
-        if (AtomicPostIncrement(std::addressof(actRefCount))) {
-            return 0;
-        }
-        
-        ret = srvGetServiceHandle(std::addressof(actHandle), "act:u");
-        
-        if (R_FAILED(ret)) {
-            AtomicDecrement(std::addressof(actRefCount));
-        }
-        
-        return ret;
-    }
-
-    void Exit(void) {
-        if (AtomicDecrement(std::addressof(actRefCount))) {
-            return;
-        }
-        
-        svcCloseHandle(actHandle);
-    }
-    
-    Result Initialize(u32 sdkVersion, u32 memSize, Handle handle) {
-        Result ret = 0;
-        u32 *cmdbuf = getThreadCommandBuffer();
-        
-        cmdbuf[0] = IPC_MakeHeader(0x1,2,4); // 0x00010084
-        cmdbuf[1] = sdkVersion;
-        cmdbuf[2] = memSize;
-        cmdbuf[3] = 0x20;
-        cmdbuf[4] = 0x0;
-        cmdbuf[5] = 0x0;
-        cmdbuf[6] = handle;
-        
-        if ((ret = svcSendSyncRequest(actHandle)) != 0) {
-            return ret;
-        }
-        
-        return static_cast<Result>(cmdbuf[1]);
-    }
-
-    Result GetAccountInfo(u8 slot, u32 size, u32 blkId, void *out) {
-        Result ret = 0;
-        u32 *cmdbuf = getThreadCommandBuffer();
-        
-        cmdbuf[0] = IPC_MakeHeader(0x6,3,2); // 0x00600C2
-        cmdbuf[1] = slot;
-        cmdbuf[2] = size;
-        cmdbuf[3] = blkId;
-        cmdbuf[4] = IPC_Desc_Buffer(size,IPC_BUFFER_W);
-        cmdbuf[5] = reinterpret_cast<u32>(out);
-        
-        if (R_FAILED(ret = svcSendSyncRequest(actHandle))) {
-            return ret;
-        }
-        
-        return static_cast<Result>(cmdbuf[1]);
-    }
-}
-
 namespace MCUHWC {
     Result GetBatteryTemperature(u8 *temp) {
         Result ret = 0;
@@ -130,14 +64,14 @@ namespace MCUHWC {
 namespace Service {
     void Init(void) {
         acInit();
-        ACTU::Init();
-        ACTU::Initialize(0xB0002F0, 0, 0);
+        actInit(true);
+        ACT_Initialize(0xB0002F0, 0, 0);
         amInit();
     }
 
     void Exit(void) {
         amExit();
-        ACTU::Exit();
+        actExit();
         acExit();
     }
 
