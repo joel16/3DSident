@@ -419,10 +419,13 @@ namespace GUI {
             kHeld & KEY_Y? GUI::DrawImageBlend(btnY, 330, 80, guiSelectorColour) : GUI::DrawImage(btnY, 330, 80);
             kHeld & KEY_START? GUI::DrawImageBlend(btnStartSelect, 330, 140, guiSelectorColour) : GUI::DrawImage(btnStartSelect, 330, 140);
             kHeld & KEY_SELECT? GUI::DrawImageBlend(btnStartSelect, 330, 165, guiSelectorColour) : GUI::DrawImage(btnStartSelect, 330, 165);
+            kHeld & (KEY_CPAD_LEFT | KEY_CPAD_RIGHT | KEY_CPAD_UP | KEY_CPAD_DOWN) ?
+                GUI::DrawImageBlend(btnCpad, 8 + (circlePad.dx/30), 55 + (circlePad.dy/-30), guiSelectorColour) : GUI::DrawImage(btnCpad, 8 + (circlePad.dx/30), 55 + (circlePad.dy/-30));
+            //need to check max c-stick values for below; assumed 150 in every direction, like the circle pad
+            kHeld & (KEY_CSTICK_LEFT | KEY_CSTICK_RIGHT | KEY_CSTICK_UP | KEY_CSTICK_DOWN) ? 
+                GUI::DrawImageBlend(btnCstick, 300 + (cStick.dx/30), 35 + (cStick.dy/-30), guiSelectorColour) : GUI::DrawImage(btnCstick, 300 + (cStick.dx/30), 35 + (cStick.dy/-30));
             
-            GUI::DrawControllerImage(kHeld, btnCpad, 8, 55, KEY_CPAD_LEFT, KEY_CPAD_RIGHT, KEY_CPAD_UP, KEY_CPAD_DOWN);
             GUI::DrawControllerImage(kHeld, btnDpad, 5, 110, KEY_DLEFT, KEY_DRIGHT, KEY_DUP, KEY_DDOWN);
-            GUI::DrawControllerImage(kHeld, btnCstick, 330, 35, KEY_CSTICK_LEFT, KEY_CSTICK_RIGHT, KEY_CSTICK_UP, KEY_CSTICK_DOWN);
             
             C2D_SceneBegin(c3dRenderTarget[TARGET_BOTTOM]);
             GUI::DrawImage(cursor, touchX, touchY);
