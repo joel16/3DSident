@@ -159,14 +159,14 @@ namespace GUI {
         va_end(args);
     }
 
-    static bool DrawImage(C2D_Image image, float x, float y) {
-        return C2D_DrawImageAt(image, x, y, guiTexSize, nullptr, 1.f, 1.f);
+    static bool DrawImage(C2D_Image image, float x, float y, float scaleX = 1.f, float scaleY = 1.f) {
+        return C2D_DrawImageAt(image, x, y, guiTexSize, nullptr, scaleX, scaleY);
     }
 
-    static bool DrawImageBlend(C2D_Image image, float x, float y, u32 colour) {
+    static bool DrawImageBlend(C2D_Image image, float x, float y, u32 colour, float scaleX = 1.f, float scaleY = 1.f) {
         C2D_ImageTint tint;
         C2D_PlainImageTint(std::addressof(tint), colour, 0.5f);
-        return C2D_DrawImageAt(image, x, y, guiTexSize, std::addressof(tint), 1.f, 1.f);
+        return C2D_DrawImageAt(image, x, y, guiTexSize, std::addressof(tint), scaleX, scaleY);
     }
 
     static void KernelInfoPage(const KernelInfo &info, bool &displayInfo) {
@@ -425,7 +425,11 @@ namespace GUI {
             kHeld & (KEY_CSTICK_LEFT | KEY_CSTICK_RIGHT | KEY_CSTICK_UP | KEY_CSTICK_DOWN) ? 
                 GUI::DrawImageBlend(btnCstick, 300 + (cStick.dx/30), 35 + (cStick.dy/-30), guiSelectorColour) : GUI::DrawImage(btnCstick, 300 + (cStick.dx/30), 35 + (cStick.dy/-30));
             
-            GUI::DrawControllerImage(kHeld, btnDpad, 5, 110, KEY_DLEFT, KEY_DRIGHT, KEY_DUP, KEY_DDOWN);
+            kHeld & KEY_DLEFT? GUI::DrawImageBlend(btnDpadh, 9, 129, guiSelectorColour) : GUI::DrawImage(btnDpadh, 9, 129);
+            kHeld & KEY_DRIGHT? GUI::DrawImageBlend(btnDpadh, 34, 129, guiSelectorColour, -1.f) : GUI::DrawImage(btnDpadh, 34, 129, -1.f);
+            kHeld & KEY_DUP? GUI::DrawImageBlend(btnDpadv, 25, 113, guiSelectorColour) : GUI::DrawImage(btnDpadv, 25, 113);
+            kHeld & KEY_DDOWN? GUI::DrawImageBlend(btnDpadv, 25, 138, guiSelectorColour, 1.f, -1.f) : GUI::DrawImage(btnDpadv, 25, 138, 1.f, -1.f);
+            //GUI::DrawControllerImage(kHeld, btnDpad, 5, 110, KEY_DLEFT, KEY_DRIGHT, KEY_DUP, KEY_DDOWN);
             
             C2D_SceneBegin(c3dRenderTarget[TARGET_BOTTOM]);
             GUI::DrawImage(cursor, touchX, touchY);
