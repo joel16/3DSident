@@ -326,30 +326,6 @@ namespace GUI {
         GUI::DrawItem(5, "IP:", displayInfo? hostname : "");
     }
 
-    static void DrawControllerImage(int keys, C2D_Image button, int defaultX, int defaultY, int keyLeft, int keyRight, int keyUp, int keyDown) {
-        int x = defaultX, y = defaultY;
-        
-        if (keys & keyLeft) {
-            x -= 5;
-        }
-        else if (keys & keyRight) {
-            x += 5;
-        }
-        else if (keys & keyUp) {
-            y -= 5;
-        }
-        else if (keys & keyDown) {
-            y += 5;
-        }
-        
-        if (keys & (keyLeft | keyRight | keyUp | keyDown)) {
-            GUI::DrawImageBlend(button, x, y, guiSelectorColour);
-        }
-        else {
-            GUI::DrawImage(button, x, y);
-        }
-    }
-
     void ButtonTester(bool &enabled) {
         circlePosition circlePad, cStick;
         touchPosition touch;
@@ -429,7 +405,7 @@ namespace GUI {
             kHeld & KEY_DRIGHT? GUI::DrawImageBlend(btnDpadh, 34, 129, guiSelectorColour, -1.f) : GUI::DrawImage(btnDpadh, 34, 129, -1.f);
             kHeld & KEY_DUP? GUI::DrawImageBlend(btnDpadv, 25, 113, guiSelectorColour) : GUI::DrawImage(btnDpadv, 25, 113);
             kHeld & KEY_DDOWN? GUI::DrawImageBlend(btnDpadv, 25, 138, guiSelectorColour, 1.f, -1.f) : GUI::DrawImage(btnDpadv, 25, 138, 1.f, -1.f);
-            //GUI::DrawControllerImage(kHeld, btnDpad, 5, 110, KEY_DLEFT, KEY_DRIGHT, KEY_DUP, KEY_DDOWN);
+
             
             C2D_SceneBegin(c3dRenderTarget[TARGET_BOTTOM]);
             GUI::DrawImage(cursor, touchX, touchY);
