@@ -159,14 +159,14 @@ namespace GUI {
         va_end(args);
     }
 
-    static bool DrawImage(C2D_Image image, float x, float y) {
-        return C2D_DrawImageAt(image, x, y, guiTexSize, nullptr, 1.f, 1.f);
+    static bool DrawImage(C2D_Image image, float x, float y, float scaleX = 1.f, float scaleY = 1.f) {
+        return C2D_DrawImageAt(image, x, y, guiTexSize, nullptr, scaleX, scaleY);
     }
 
-    static bool DrawImageBlend(C2D_Image image, float x, float y, u32 colour) {
+    static bool DrawImageBlend(C2D_Image image, float x, float y, u32 colour, float scaleX = 1.f, float scaleY = 1.f) {
         C2D_ImageTint tint;
         C2D_PlainImageTint(std::addressof(tint), colour, 0.5f);
-        return C2D_DrawImageAt(image, x, y, guiTexSize, std::addressof(tint), 1.f, 1.f);
+        return C2D_DrawImageAt(image, x, y, guiTexSize, std::addressof(tint), scaleX, scaleY);
     }
 
     static void KernelInfoPage(const KernelInfo &info, bool &displayInfo) {
@@ -326,30 +326,6 @@ namespace GUI {
         GUI::DrawItem(5, "IP:", displayInfo? hostname : "");
     }
 
-    static void DrawControllerImage(int keys, C2D_Image button, int defaultX, int defaultY, int keyLeft, int keyRight, int keyUp, int keyDown) {
-        int x = defaultX, y = defaultY;
-        
-        if (keys & keyLeft) {
-            x -= 5;
-        }
-        else if (keys & keyRight) {
-            x += 5;
-        }
-        else if (keys & keyUp) {
-            y -= 5;
-        }
-        else if (keys & keyDown) {
-            y += 5;
-        }
-        
-        if (keys & (keyLeft | keyRight | keyUp | keyDown)) {
-            GUI::DrawImageBlend(button, x, y, guiSelectorColour);
-        }
-        else {
-            GUI::DrawImage(button, x, y);
-        }
-    }
-
     void ButtonTester(bool &enabled) {
         circlePosition circlePad, cStick;
         touchPosition touch;
@@ -419,10 +395,16 @@ namespace GUI {
             kHeld & KEY_Y? GUI::DrawImageBlend(btnY, 330, 80, guiSelectorColour) : GUI::DrawImage(btnY, 330, 80);
             kHeld & KEY_START? GUI::DrawImageBlend(btnStartSelect, 330, 140, guiSelectorColour) : GUI::DrawImage(btnStartSelect, 330, 140);
             kHeld & KEY_SELECT? GUI::DrawImageBlend(btnStartSelect, 330, 165, guiSelectorColour) : GUI::DrawImage(btnStartSelect, 330, 165);
+            kHeld & (KEY_CPAD_LEFT | KEY_CPAD_RIGHT | KEY_CPAD_UP | KEY_CPAD_DOWN) ?
+                GUI::DrawImageBlend(btnCpad, 8 + (circlePad.dx/30), 55 + (circlePad.dy/-30), guiSelectorColour) : GUI::DrawImage(btnCpad, 8 + (circlePad.dx/30), 55 + (circlePad.dy/-30));
+            kHeld & (KEY_CSTICK_LEFT | KEY_CSTICK_RIGHT | KEY_CSTICK_UP | KEY_CSTICK_DOWN) ? 
+                GUI::DrawImageBlend(btnCstick, 330 + (cStick.dx/30), 35 + (cStick.dy/-30), guiSelectorColour) : GUI::DrawImage(btnCstick, 330 + (cStick.dx/30), 35 + (cStick.dy/-30));
             
-            GUI::DrawControllerImage(kHeld, btnCpad, 8, 55, KEY_CPAD_LEFT, KEY_CPAD_RIGHT, KEY_CPAD_UP, KEY_CPAD_DOWN);
-            GUI::DrawControllerImage(kHeld, btnDpad, 5, 110, KEY_DLEFT, KEY_DRIGHT, KEY_DUP, KEY_DDOWN);
-            GUI::DrawControllerImage(kHeld, btnCstick, 330, 35, KEY_CSTICK_LEFT, KEY_CSTICK_RIGHT, KEY_CSTICK_UP, KEY_CSTICK_DOWN);
+            kHeld & KEY_DLEFT? GUI::DrawImageBlend(btnDpadh, 9, 129, guiSelectorColour) : GUI::DrawImage(btnDpadh, 9, 129);
+            kHeld & KEY_DRIGHT? GUI::DrawImageBlend(btnDpadh, 34, 129, guiSelectorColour, -1.f) : GUI::DrawImage(btnDpadh, 34, 129, -1.f);
+            kHeld & KEY_DUP? GUI::DrawImageBlend(btnDpadv, 25, 113, guiSelectorColour) : GUI::DrawImage(btnDpadv, 25, 113);
+            kHeld & KEY_DDOWN? GUI::DrawImageBlend(btnDpadv, 25, 138, guiSelectorColour, 1.f, -1.f) : GUI::DrawImage(btnDpadv, 25, 138, 1.f, -1.f);
+
             
             C2D_SceneBegin(c3dRenderTarget[TARGET_BOTTOM]);
             GUI::DrawImage(cursor, touchX, touchY);

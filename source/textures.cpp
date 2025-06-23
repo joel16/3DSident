@@ -2,7 +2,7 @@
 #include "textures.h"
 
 C2D_Image banner, driveIcon, menuIcon[10], btnA, btnB, btnX, btnY, btnStartSelect, btnL, btnR,
-    btnZL, btnZR, btnDpad, btnCpad, btnCstick, btnHome, cursor, volumeIcon;
+    btnZL, btnZR, btnDpadh, btnDpadv, btnCpad, btnCstick, btnHome, cursor, volumeIcon;
 
 namespace Textures {
     static C2D_SpriteSheet spritesheet;
@@ -35,7 +35,8 @@ namespace Textures {
         btnR = C2D_SpriteSheetGetImage(spritesheet, sprites_R_idx);
         btnZL = C2D_SpriteSheetGetImage(spritesheet, sprites_ZL_idx);
         btnZR = C2D_SpriteSheetGetImage(spritesheet, sprites_ZR_idx);
-        btnDpad = C2D_SpriteSheetGetImage(spritesheet, sprites_D_pad_idx);
+        btnDpadh = C2D_SpriteSheetGetImage(spritesheet, sprites_D_pad_h_idx);
+        btnDpadv = C2D_SpriteSheetGetImage(spritesheet, sprites_D_pad_v_idx);
         btnCpad = C2D_SpriteSheetGetImage(spritesheet, sprites_circle_pad_idx);
         btnCstick = C2D_SpriteSheetGetImage(spritesheet, sprites_C_stick_idx);
         btnHome = C2D_SpriteSheetGetImage(spritesheet, sprites_home_idx);
