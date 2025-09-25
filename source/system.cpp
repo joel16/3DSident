@@ -155,7 +155,9 @@ namespace System {
         char buf[7];
         static char out[11];
 
-        FS::OpenArchive(std::addressof(nandArchive), ARCHIVE_NAND_CTR_FS);
+        ret = FS::OpenArchive(std::addressof(nandArchive), ARCHIVE_NAND_CTR_FS);
+        if (R_FAILED(ret))
+            return "";
         
         if (FS::FileExists(nandArchive, "/rw/sys/LocalFriendCodeSeed_B")) {
             if (R_FAILED(ret = FSUSER_OpenFile(std::addressof(handle), nandArchive, fsMakePath(PATH_ASCII, "/rw/sys/LocalFriendCodeSeed_B"), FS_OPEN_READ, 0))) {
