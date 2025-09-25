@@ -65,9 +65,6 @@ namespace GUI {
         Log::Open();
 #endif
         // Real time services
-#if !defined BUILD_CITRA
-        mcuHwcInit();
-#endif
         ptmuInit();
         cfguInit();
         dspInit();
@@ -79,9 +76,6 @@ namespace GUI {
         dspExit();
         cfguExit();
         ptmuExit();
-#if !defined BUILD_CITRA
-        mcuHwcExit();
-#endif
 #if defined BUILD_DEBUG
         Log::Close();
 #endif
@@ -190,6 +184,7 @@ namespace GUI {
     }
 
     static void BatteryInfoPage(const SystemStateInfo &info) {
+        mcuHwcInit();
         Result ret = 0;
         u8 percentage = 0, status = 0, voltage = 0, fwVerHigh = 0, fwVerLow = 0, temp = 0;
         bool connected = false;
@@ -216,6 +211,7 @@ namespace GUI {
         GUI::DrawItemf(6, "PMIC vendor code:", "%x", info.pmicVendorCode);
 
         GUI::DrawItemf(7, "Battery vendor code:", "%x", info.batteryVendorCode);
+        mcuHwcExit();
     }
 
     static void NNIDInfoPage(const NNIDInfo &info, bool &displayInfo) {

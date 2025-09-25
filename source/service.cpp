@@ -187,12 +187,15 @@ namespace Service {
     }
 
     SystemStateInfo GetSystemStateInfo(void) {
+        mcuHwcInit();
         SystemStateInfo info = { 0 };
 
         if (R_FAILED(MCUHWC_ReadRegister(0x7F, std::addressof(info), sizeof(SystemStateInfo)))) {
+            mcuHwcExit();
             return info;
         }
 
+        mcuHwcExit();
         return info;
     }
 }
