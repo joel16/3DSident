@@ -47,6 +47,7 @@ ctr_vercheck was originally created by wolfvak - It was initially intended to be
 - Displays PMIC vendor code and battery vendor code.
 - Incorporates a button tester that checks for home button input, 3d and volume slider levels etc.
 - Displays manufacturing date.
+- Displays SD card cluster size.
 
 # Credits:
 - **Preetisketch** for the logo/banner.
