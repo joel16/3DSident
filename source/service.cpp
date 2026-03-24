@@ -183,6 +183,8 @@ namespace Service {
             Utils::GetSizeString(info.totalSizeString[i], Storage::GetTotalStorage(static_cast<FS_SystemMediaType>(i)));
         }
 
+        Utils::GetSizeString(info.clusterSizeString, Storage::GetClusterSize());
+
         return info;
     }
 

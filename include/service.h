@@ -62,6 +62,7 @@ typedef struct {
     char freeSizeString[4][16];
     char usedSizeString[4][16];
     char totalSizeString[4][16];
+    char clusterSizeString[16];
 } StorageInfo;
 
 typedef struct {

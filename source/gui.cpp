@@ -267,46 +267,47 @@ namespace GUI {
 
     static void StorageInfoPage(const StorageInfo &info) {
         C2D_DrawRectSolid(0, 20, guiTexSize, 400, 220, guiBgcolour);
+        GUI::DrawItem(15, 30, "SD cluster size:", info.clusterSizeString);
 
         // SD info
-        C2D_DrawRectSolid(20, 105, guiTexSize, 60, 10, guiTitleColour);
-        C2D_DrawRectSolid(21, 106, guiTexSize, 58, 8, guiBgcolour);
-        C2D_DrawRectSolid(21, 106, guiTexSize, ((static_cast<double>(info.usedSize[SYSTEM_MEDIATYPE_SD]) / static_cast<double>(info.totalSize[SYSTEM_MEDIATYPE_SD])) * 58.f), 8, guiSelectorColour);
-        GUI::DrawItem(85, 50, "SD:", "");
-        GUI::DrawItem(85, 71, "Free:", info.freeSizeString[SYSTEM_MEDIATYPE_SD]);
-        GUI::DrawItem(85, 87, "Used:", info.usedSizeString[SYSTEM_MEDIATYPE_SD]);
-        GUI::DrawItem(85, 103, "Total:", info.totalSizeString[SYSTEM_MEDIATYPE_SD]);
-        GUI::DrawImage(driveIcon, 20, 40);
+        C2D_DrawRectSolid(15, 115, guiTexSize, 60, 10, guiTitleColour);
+        C2D_DrawRectSolid(16, 116, guiTexSize, 58, 8, guiBgcolour);
+        C2D_DrawRectSolid(16, 116, guiTexSize, ((static_cast<double>(info.usedSize[SYSTEM_MEDIATYPE_SD]) / static_cast<double>(info.totalSize[SYSTEM_MEDIATYPE_SD])) * 58.f), 8, guiSelectorColour);
+        GUI::DrawItem(80, 60, "SD:", "");
+        GUI::DrawItem(80, 81, "Free:", info.freeSizeString[SYSTEM_MEDIATYPE_SD]);
+        GUI::DrawItem(80, 97, "Used:", info.usedSizeString[SYSTEM_MEDIATYPE_SD]);
+        GUI::DrawItem(80, 113, "Total:", info.totalSizeString[SYSTEM_MEDIATYPE_SD]);
+        GUI::DrawImage(driveIcon, 15, 50);
         
         // Nand info
-        C2D_DrawRectSolid(220, 105, guiTexSize, 60, 10, guiTitleColour);
-        C2D_DrawRectSolid(221, 106, guiTexSize, 58, 8, guiBgcolour);
-        C2D_DrawRectSolid(221, 106, guiTexSize, ((static_cast<double>(info.usedSize[SYSTEM_MEDIATYPE_CTR_NAND]) / static_cast<double>(info.totalSize[SYSTEM_MEDIATYPE_CTR_NAND])) * 58.f), 8, guiSelectorColour);
-        GUI::DrawItem(285, 50, "CTR Nand:", "");
-        GUI::DrawItem(285, 71, "Free:", info.freeSizeString[SYSTEM_MEDIATYPE_CTR_NAND]);
-        GUI::DrawItem(285, 87, "Used:", info.usedSizeString[SYSTEM_MEDIATYPE_CTR_NAND]);
-        GUI::DrawItem(285, 103, "Total:", info.totalSizeString[SYSTEM_MEDIATYPE_CTR_NAND]);
-        GUI::DrawImage(driveIcon, 220, 40);
+        C2D_DrawRectSolid(215, 115, guiTexSize, 60, 10, guiTitleColour);
+        C2D_DrawRectSolid(216, 116, guiTexSize, 58, 8, guiBgcolour);
+        C2D_DrawRectSolid(216, 116, guiTexSize, ((static_cast<double>(info.usedSize[SYSTEM_MEDIATYPE_CTR_NAND]) / static_cast<double>(info.totalSize[SYSTEM_MEDIATYPE_CTR_NAND])) * 58.f), 8, guiSelectorColour);
+        GUI::DrawItem(280, 60, "CTR Nand:", "");
+        GUI::DrawItem(280, 81, "Free:", info.freeSizeString[SYSTEM_MEDIATYPE_CTR_NAND]);
+        GUI::DrawItem(280, 97, "Used:", info.usedSizeString[SYSTEM_MEDIATYPE_CTR_NAND]);
+        GUI::DrawItem(280, 113, "Total:", info.totalSizeString[SYSTEM_MEDIATYPE_CTR_NAND]);
+        GUI::DrawImage(driveIcon, 215, 50);
         
         // TWL nand info
-        C2D_DrawRectSolid(20, 200, guiTexSize, 60, 10, guiTitleColour);
-        C2D_DrawRectSolid(21, 201, guiTexSize, 58, 8, guiBgcolour);
-        C2D_DrawRectSolid(21, 201, guiTexSize, ((static_cast<double>(info.usedSize[SYSTEM_MEDIATYPE_TWL_NAND]) / static_cast<double>(info.totalSize[SYSTEM_MEDIATYPE_TWL_NAND])) * 58.f), 8, guiSelectorColour);
-        GUI::DrawItem(85, 145, "TWL Nand:", "");
-        GUI::DrawItem(85, 166, "Free:", info.freeSizeString[SYSTEM_MEDIATYPE_TWL_NAND]);
-        GUI::DrawItem(85, 182, "Used:", info.usedSizeString[SYSTEM_MEDIATYPE_TWL_NAND]);
-        GUI::DrawItem(85, 198, "Total:", info.totalSizeString[SYSTEM_MEDIATYPE_TWL_NAND]);
-        GUI::DrawImage(driveIcon, 20, 135);
+        C2D_DrawRectSolid(15, 210, guiTexSize, 60, 10, guiTitleColour);
+        C2D_DrawRectSolid(16, 211, guiTexSize, 58, 8, guiBgcolour);
+        C2D_DrawRectSolid(16, 211, guiTexSize, ((static_cast<double>(info.usedSize[SYSTEM_MEDIATYPE_TWL_NAND]) / static_cast<double>(info.totalSize[SYSTEM_MEDIATYPE_TWL_NAND])) * 58.f), 8, guiSelectorColour);
+        GUI::DrawItem(80, 155, "TWL Nand:", "");
+        GUI::DrawItem(80, 176, "Free:", info.freeSizeString[SYSTEM_MEDIATYPE_TWL_NAND]);
+        GUI::DrawItem(80, 192, "Used:", info.usedSizeString[SYSTEM_MEDIATYPE_TWL_NAND]);
+        GUI::DrawItem(80, 208, "Total:", info.totalSizeString[SYSTEM_MEDIATYPE_TWL_NAND]);
+        GUI::DrawImage(driveIcon, 15, 145);
 
         // TWL photo info
-        C2D_DrawRectSolid(220, 200, guiTexSize, 60, 10, guiTitleColour);
-        C2D_DrawRectSolid(221, 201, guiTexSize, 58, 8, guiBgcolour);
-        C2D_DrawRectSolid(221, 201, guiTexSize, ((static_cast<double>(info.usedSize[SYSTEM_MEDIATYPE_TWL_PHOTO]) / static_cast<double>(info.totalSize[SYSTEM_MEDIATYPE_TWL_PHOTO])) * 58.f), 8, guiSelectorColour);
-        GUI::DrawItem(285, 145, "TWL Photo:", "");
-        GUI::DrawItem(285, 166, "Free:", info.freeSizeString[SYSTEM_MEDIATYPE_TWL_PHOTO]);
-        GUI::DrawItem(285, 182, "Used:", info.usedSizeString[SYSTEM_MEDIATYPE_TWL_PHOTO]);
-        GUI::DrawItem(285, 198, "Total:", info.totalSizeString[SYSTEM_MEDIATYPE_TWL_PHOTO]);
-        GUI::DrawImage(driveIcon, 220, 135);
+        C2D_DrawRectSolid(215, 210, guiTexSize, 60, 10, guiTitleColour);
+        C2D_DrawRectSolid(216, 211, guiTexSize, 58, 8, guiBgcolour);
+        C2D_DrawRectSolid(216, 211, guiTexSize, ((static_cast<double>(info.usedSize[SYSTEM_MEDIATYPE_TWL_PHOTO]) / static_cast<double>(info.totalSize[SYSTEM_MEDIATYPE_TWL_PHOTO])) * 58.f), 8, guiSelectorColour);
+        GUI::DrawItem(280, 155, "TWL Photo:", "");
+        GUI::DrawItem(280, 176, "Free:", info.freeSizeString[SYSTEM_MEDIATYPE_TWL_PHOTO]);
+        GUI::DrawItem(280, 192, "Used:", info.usedSizeString[SYSTEM_MEDIATYPE_TWL_PHOTO]);
+        GUI::DrawItem(280, 208, "Total:", info.totalSizeString[SYSTEM_MEDIATYPE_TWL_PHOTO]);
+        GUI::DrawImage(driveIcon, 215, 145);
     }
 
     static void MiscInfoPage(const MiscInfo &info, bool &displayInfo) {

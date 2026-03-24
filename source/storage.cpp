@@ -29,4 +29,9 @@ namespace Storage {
     u64 GetUsedStorage(FS_SystemMediaType mediaType) {
         return Storage::GetTotalStorage(mediaType) - Storage::GetFreeStorage(mediaType);
     }
+
+    u64 GetClusterSize(void) {
+        FS_ArchiveResource resource = Storage::GetResource(SYSTEM_MEDIATYPE_SD);
+        return static_cast<u64>(resource.clusterSize);
+    }
 }
