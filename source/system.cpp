@@ -156,8 +156,9 @@ namespace System {
         static char out[11];
 
         ret = FS::OpenArchive(std::addressof(nandArchive), ARCHIVE_NAND_CTR_FS);
-        if (R_FAILED(ret))
+        if (R_FAILED(ret)) {
             return "";
+        }
         
         if (FS::FileExists(nandArchive, "/rw/sys/LocalFriendCodeSeed_B")) {
             if (R_FAILED(ret = FSUSER_OpenFile(std::addressof(handle), nandArchive, fsMakePath(PATH_ASCII, "/rw/sys/LocalFriendCodeSeed_B"), FS_OPEN_READ, 0))) {
@@ -232,7 +233,7 @@ namespace System {
         Result ret = 0;
         u32 id = 0;
 
-        if (R_FAILED(ret = AM_GetDeviceId(std::addressof(id)))) {
+        if (R_FAILED(ret = AM_GetDeviceId(nullptr, std::addressof(id)))) {
             Log::Error("%s failed: 0x%x\n", __func__, ret);
             return ret;
         }
