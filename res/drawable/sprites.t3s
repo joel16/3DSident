@@ -1,4 +1,4 @@
---atlas -f rgba8888 -z auto
+--atlas -f etc1a4 -z auto
 A.png
 B.png
 C_stick.png

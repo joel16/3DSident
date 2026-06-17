@@ -43,12 +43,15 @@ namespace Misc {
         Handle handle;
         if (R_FAILED(ret = FSUSER_OpenFileDirectly(&handle, ARCHIVE_NAND_TWL_FS, fsMakePath(PATH_EMPTY, ""), fsMakePath(PATH_ASCII, "/sys/log/inspect.log"), FS_OPEN_READ, 0))) {
             Log::Error("%s(FSUSER_OpenFileDirectly) failed: 0x%x\n", __func__, ret);
+            FS::CloseArchive(archive);
             return "unknown";
         }
 
         u64 size = 0;
         if (R_FAILED(ret = FSFILE_GetSize(handle, std::addressof(size)))) {
             Log::Error("%s(FSFILE_GetSize) failed: 0x%x\n", __func__, ret);
+            FSFILE_Close(handle);
+            FS::CloseArchive(archive);
             return "unknown";
         }
 
@@ -58,6 +61,8 @@ namespace Misc {
         if (R_FAILED(ret = FSFILE_Read(handle, std::addressof(bytesRead), 0, reinterpret_cast<u32 *>(buf), static_cast<u32>(size)))) {
             Log::Error("%s(FSFILE_Read) failed: 0x%x\n", __func__, ret);
             delete[] buf;
+            FSFILE_Close(handle);
+            FS::CloseArchive(archive);
             return "unknown";
         }
         
@@ -70,6 +75,7 @@ namespace Misc {
         if (R_FAILED(ret = FSFILE_Close(handle))) {
             Log::Error("%s(FSFILE_Close) failed: 0x%x\n", __func__, ret);
             delete[] buf;
+            FS::CloseArchive(archive);
             return "unknown";
         }
 

@@ -137,6 +137,8 @@ namespace System {
         return runningHW[hw];
     }
 
+
+
     u64 GetLocalFriendCodeSeed(void) {
         Result ret = 0;
         u64 seed = 0;

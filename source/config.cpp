@@ -62,6 +62,9 @@ namespace Config {
             "July", "August", "September", "October", "November", "December"
         };
 
+        if (birthdayBlock.month < 1 || birthdayBlock.month > 12)
+            return "unknown";
+
         static char date[15];
         std::snprintf(date, 15, "%s %02d", months[birthdayBlock.month - 1], birthdayBlock.day);
         return date;

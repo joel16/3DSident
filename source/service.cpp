@@ -145,6 +145,7 @@ namespace Service {
         }
 
         info.soundOutputMode = Hardware::GetSoundOutputMode();
+        info.autoBrightnessStatus = Hardware::GetAutoBrightnessStatus();
         return info;
     }
 
@@ -198,6 +199,9 @@ namespace Service {
             mcuHwcExit();
             return info;
         }
+
+        MCUHWC_GetFwVerHigh(std::addressof(info.mcuFwVerHigh));
+        MCUHWC_GetFwVerLow(std::addressof(info.mcuFwVerLow));
 
         mcuHwcExit();
         return info;

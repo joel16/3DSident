@@ -65,7 +65,7 @@ ICON_FLAGS	:=	nosavebackups,visible
 ARCH	:=	-march=armv6k -mtune=mpcore -mfloat-abi=hard -mtp=soft
 
 CFLAGS	:=	-g -Wall -O2 -mword-relocations \
-			-ffunction-sections \
+			-ffunction-sections -fdata-sections \
 			-DVERSION_MAJOR=$(VERSION_MAJOR) -DVERSION_MINOR=$(VERSION_MINOR) -DVERSION_MICRO=$(VERSION_MICRO) \
 			$(ARCH)
 
@@ -74,7 +74,7 @@ CFLAGS	+=	$(INCLUDE) -D__3DS__
 CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions -std=gnu++20
 
 ASFLAGS	:=	-g $(ARCH)
-LDFLAGS	=	-specs=3dsx.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
+LDFLAGS	=	-specs=3dsx.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map) -Wl,--gc-sections
 
 LIBS	:= -lcitro2d -lcitro3d -lctru -lm
 
