@@ -42,14 +42,12 @@ namespace Kernel {
         
         // New 3DS/2DS only
         static char version[11];
-        std::strcpy(version, Utils::GetSubstring(buf, "cup:", " preInstall:").c_str());
-        
-        if (std::strlen(version) == 0) {
-            std::strcpy(version, Utils::GetSubstring(buf, "cup:", ",").c_str());
+        std::string cup = Utils::GetSubstring(buf, "cup:", " preInstall:");
+        if (cup.empty()) {
+            cup = Utils::GetSubstring(buf, "cup:", ",");
         }
-        
-        std::strcat(version, "-");
-        std::strcat(version, Utils::GetSubstring(buf, "nup:", " cup:").c_str());
+        std::string nup = Utils::GetSubstring(buf, "nup:", " cup:");
+        std::snprintf(version, sizeof(version), "%s-%s", cup.c_str(), nup.c_str());
 
         if (R_FAILED(ret = FSFILE_Close(handle))) {
             Log::Error("%s(FSFILE_Close) failed: 0x%x\n", __func__, ret);
