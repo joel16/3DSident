@@ -34,7 +34,7 @@ namespace GUI {
     };
 
     static C3D_RenderTarget *c3dRenderTarget[TARGET_MAX];
-    static C2D_TextBuf guiStaticBuf, guiDynamicBuf, guiSizeBuf;
+    static C2D_TextBuf guiDynamicBuf, guiSizeBuf;
     static u32 *socBuffer = nullptr;
 
     static const u32 guiBgcolour = C2D_Color32(62, 62, 62, 255);
@@ -57,7 +57,6 @@ namespace GUI {
         c3dRenderTarget[TARGET_TOP] = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
         c3dRenderTarget[TARGET_BOTTOM] = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
 
-        guiStaticBuf  = C2D_TextBufNew(4096);
         guiDynamicBuf  = C2D_TextBufNew(4096);
         guiSizeBuf = C2D_TextBufNew(4096);
 
@@ -86,7 +85,6 @@ namespace GUI {
         Textures::Exit();
         C2D_TextBufDelete(guiSizeBuf);
         C2D_TextBufDelete(guiDynamicBuf);
-        C2D_TextBufDelete(guiStaticBuf);
         C2D_Fini();
         C3D_Fini();
         gfxExit();
