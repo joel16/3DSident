@@ -274,7 +274,8 @@ namespace GUI {
         // SD info
         C2D_DrawRectSolid(15, 115, guiTexSize, 60, 10, guiTitleColour);
         C2D_DrawRectSolid(16, 116, guiTexSize, 58, 8, guiBgcolour);
-        C2D_DrawRectSolid(16, 116, guiTexSize, ((static_cast<double>(info.usedSize[SYSTEM_MEDIATYPE_SD]) / static_cast<double>(info.totalSize[SYSTEM_MEDIATYPE_SD])) * 58.f), 8, guiSelectorColour);
+        if (info.totalSize[SYSTEM_MEDIATYPE_SD] > 0)
+            C2D_DrawRectSolid(16, 116, guiTexSize, (float)((static_cast<double>(info.usedSize[SYSTEM_MEDIATYPE_SD]) / static_cast<double>(info.totalSize[SYSTEM_MEDIATYPE_SD])) * 58.0), 8, guiSelectorColour);
         GUI::DrawItem(80, 60, "SD:", "");
         GUI::DrawItem(80, 81, "Free:", info.freeSizeString[SYSTEM_MEDIATYPE_SD]);
         GUI::DrawItem(80, 97, "Used:", info.usedSizeString[SYSTEM_MEDIATYPE_SD]);
@@ -284,7 +285,8 @@ namespace GUI {
         // Nand info
         C2D_DrawRectSolid(215, 115, guiTexSize, 60, 10, guiTitleColour);
         C2D_DrawRectSolid(216, 116, guiTexSize, 58, 8, guiBgcolour);
-        C2D_DrawRectSolid(216, 116, guiTexSize, ((static_cast<double>(info.usedSize[SYSTEM_MEDIATYPE_CTR_NAND]) / static_cast<double>(info.totalSize[SYSTEM_MEDIATYPE_CTR_NAND])) * 58.f), 8, guiSelectorColour);
+        if (info.totalSize[SYSTEM_MEDIATYPE_CTR_NAND] > 0)
+            C2D_DrawRectSolid(216, 116, guiTexSize, (float)((static_cast<double>(info.usedSize[SYSTEM_MEDIATYPE_CTR_NAND]) / static_cast<double>(info.totalSize[SYSTEM_MEDIATYPE_CTR_NAND])) * 58.0), 8, guiSelectorColour);
         GUI::DrawItem(280, 60, "CTR Nand:", "");
         GUI::DrawItem(280, 81, "Free:", info.freeSizeString[SYSTEM_MEDIATYPE_CTR_NAND]);
         GUI::DrawItem(280, 97, "Used:", info.usedSizeString[SYSTEM_MEDIATYPE_CTR_NAND]);
@@ -294,7 +296,8 @@ namespace GUI {
         // TWL nand info
         C2D_DrawRectSolid(15, 210, guiTexSize, 60, 10, guiTitleColour);
         C2D_DrawRectSolid(16, 211, guiTexSize, 58, 8, guiBgcolour);
-        C2D_DrawRectSolid(16, 211, guiTexSize, ((static_cast<double>(info.usedSize[SYSTEM_MEDIATYPE_TWL_NAND]) / static_cast<double>(info.totalSize[SYSTEM_MEDIATYPE_TWL_NAND])) * 58.f), 8, guiSelectorColour);
+        if (info.totalSize[SYSTEM_MEDIATYPE_TWL_NAND] > 0)
+            C2D_DrawRectSolid(16, 211, guiTexSize, (float)((static_cast<double>(info.usedSize[SYSTEM_MEDIATYPE_TWL_NAND]) / static_cast<double>(info.totalSize[SYSTEM_MEDIATYPE_TWL_NAND])) * 58.0), 8, guiSelectorColour);
         GUI::DrawItem(80, 155, "TWL Nand:", "");
         GUI::DrawItem(80, 176, "Free:", info.freeSizeString[SYSTEM_MEDIATYPE_TWL_NAND]);
         GUI::DrawItem(80, 192, "Used:", info.usedSizeString[SYSTEM_MEDIATYPE_TWL_NAND]);
@@ -304,7 +307,8 @@ namespace GUI {
         // TWL photo info
         C2D_DrawRectSolid(215, 210, guiTexSize, 60, 10, guiTitleColour);
         C2D_DrawRectSolid(216, 211, guiTexSize, 58, 8, guiBgcolour);
-        C2D_DrawRectSolid(216, 211, guiTexSize, ((static_cast<double>(info.usedSize[SYSTEM_MEDIATYPE_TWL_PHOTO]) / static_cast<double>(info.totalSize[SYSTEM_MEDIATYPE_TWL_PHOTO])) * 58.f), 8, guiSelectorColour);
+        if (info.totalSize[SYSTEM_MEDIATYPE_TWL_PHOTO] > 0)
+            C2D_DrawRectSolid(216, 211, guiTexSize, (float)((static_cast<double>(info.usedSize[SYSTEM_MEDIATYPE_TWL_PHOTO]) / static_cast<double>(info.totalSize[SYSTEM_MEDIATYPE_TWL_PHOTO])) * 58.0), 8, guiSelectorColour);
         GUI::DrawItem(280, 155, "TWL Photo:", "");
         GUI::DrawItem(280, 176, "Free:", info.freeSizeString[SYSTEM_MEDIATYPE_TWL_PHOTO]);
         GUI::DrawItem(280, 192, "Used:", info.usedSizeString[SYSTEM_MEDIATYPE_TWL_PHOTO]);
