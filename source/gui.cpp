@@ -179,7 +179,9 @@ namespace GUI {
         GUI::DrawItemf(3, "Original local friend code seed:", "%010llX", displayInfo? info.localFriendCodeSeed : 0);
         GUI::DrawItemf(4, "NAND local friend code seed:", "%s", displayInfo? info.nandLocalFriendCodeSeed : "");
         GUI::DrawItemf(5, "MAC Address:", displayInfo? info.macAddress : "");
-        GUI::DrawItemf(6, "Serial number:", "%s %d", displayInfo? reinterpret_cast<const char *>(info.serialNumber) : "", displayInfo? info.checkDigit : 0);
+        GUI::DrawItemf(6, "Serial number:", "%s %d",
+            (displayInfo && info.serialNumber != nullptr) ? reinterpret_cast<const char *>(info.serialNumber) : "",
+            (displayInfo && info.serialNumber != nullptr) ? info.checkDigit : 0);
         GUI::DrawItemf(7, "ECS Device ID:", "%llu", displayInfo? info.soapId : 0);
     }
 

@@ -97,7 +97,7 @@ namespace Service {
         info.nandLocalFriendCodeSeed = System::GetNandLocalFriendCodeSeed();
         info.macAddress = System::GetMacAddress();
         info.serialNumber = System::GetSerialNumber();
-        info.checkDigit =  System::GetCheckDigit(info.serialNumber);
+        info.checkDigit = (info.serialNumber != nullptr) ? System::GetCheckDigit(info.serialNumber) : 0;
         info.soapId = System::GetSoapId();
         return info;
     }
