@@ -49,6 +49,7 @@ namespace Wifi {
             return "unknown";
         }
 
+        if (static_cast<size_t>(mode) >= 8) return "unknown";
         return securityMode[mode];
     }
 }

@@ -23,7 +23,8 @@ namespace System {
             Log::Error("%s failed: 0x%x\n", __func__, ret);
             return "unknown";
         }
-        
+
+        if (model >= 6) return "unknown";
         return models[model];
     }
 
@@ -38,13 +39,14 @@ namespace System {
             "KOR",
             "TWN"
         };
-        
+
         u8 region = 0;
         if (R_FAILED(ret = CFGU_SecureInfoGetRegion(std::addressof(region)))) {
             Log::Error("%s failed: 0x%x\n", __func__, ret);
             return "unknown";
         }
 
+        if (region >= 7) return "unknown";
         return regions[region];
     }
 
@@ -66,6 +68,7 @@ namespace System {
             return "unknown";
         }
 
+        if (region >= 7) return "unknown";
         return regions[region];
     }
 
@@ -104,6 +107,7 @@ namespace System {
             return "unknown";
         }
 
+        if (language >= 12) return "unknown";
         return languages[language];
     }
 
@@ -128,7 +132,9 @@ namespace System {
             "snake KMC debugger"
         };
 
-        return runningHW[OS_SharedConfig->running_hw];
+        u8 hw = OS_SharedConfig->running_hw;
+        if (hw >= 10) return "unknown";
+        return runningHW[hw];
     }
 
     const char *IsDebugUnit(void) {
