@@ -137,9 +137,6 @@ namespace System {
         return runningHW[hw];
     }
 
-    const char *IsDebugUnit(void) {
-        return OS_KernelConfig->unit_info? "" : "(Debug Unit)";
-    }
 
     u64 GetLocalFriendCodeSeed(void) {
         Result ret = 0;
