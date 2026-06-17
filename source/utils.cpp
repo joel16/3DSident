@@ -19,12 +19,12 @@ namespace Utils {
         int i = 0;
         const char *units[] = { "B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
         
-        while (double_size >= 1024.0f) {
-            double_size /= 1024.0f;
+        while (double_size >= 1024.0 && i < 8) {
+            double_size /= 1024.0;
             i++;
         }
-        
-        std::sprintf(string, "%.*f %s", (i == 0) ? 0 : 2, double_size, units[i]);
+
+        std::snprintf(string, 16, "%.*f %s", (i == 0) ? 0 : 2, double_size, units[i]);
     }
     
     std::string GetSubstring(const std::string& str, const std::string& str1, const std::string& str2) {
