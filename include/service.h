@@ -95,7 +95,6 @@ typedef struct {
 } SystemStateInfo;
 
 namespace ACI {
-    Result GetSSID(char *ssid);
     Result GetSecurityMode(acSecurityMode *mode);
     Result GetPassphrase(char *passphrase);
 }
