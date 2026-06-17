@@ -29,7 +29,7 @@ typedef struct {
     u32 persistentID;
     u64 transferableIdBase;
     const char *accountId;
-    const char * countryName;
+    const char *countryName;
     u32 principalID;
     const char *status;
 } NNIDInfo;

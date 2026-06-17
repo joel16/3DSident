@@ -8,7 +8,7 @@
 #include "utils.h"
 
 namespace Kernel {
-    const char *GetInitalVersion(void) {
+    const char *GetInitialVersion(void) {
         Result ret = 0;
         
         FS_Archive archive;

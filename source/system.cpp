@@ -96,7 +96,7 @@ namespace System {
             "Simplified Chinese",
             "Korean",
             "Dutch",
-            "Portugese",
+            "Portuguese",
             "Russian",
             "Traditional Chinese"
         };
