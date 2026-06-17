@@ -115,12 +115,13 @@ namespace Hardware {
             "Stereo",
             "Surround"
         };
-        
+
         if (R_FAILED(ret = CFGU_GetConfigInfoBlk2(sizeof(data), 0x00070001, std::addressof(data)))) {
             Log::Error("%s failed: 0x%x\n", __func__, ret);
             return "unknown";
         }
 
+        if (data >= 3) return "unknown";
         return mode[data];
     }
 
