@@ -49,6 +49,8 @@ namespace Misc {
         u64 size = 0;
         if (R_FAILED(ret = FSFILE_GetSize(handle, std::addressof(size)))) {
             Log::Error("%s(FSFILE_GetSize) failed: 0x%x\n", __func__, ret);
+            FSFILE_Close(handle);
+            FS::CloseArchive(archive);
             return "unknown";
         }
 
@@ -70,6 +72,7 @@ namespace Misc {
         if (R_FAILED(ret = FSFILE_Close(handle))) {
             Log::Error("%s(FSFILE_Close) failed: 0x%x\n", __func__, ret);
             delete[] buf;
+            FS::CloseArchive(archive);
             return "unknown";
         }
 
