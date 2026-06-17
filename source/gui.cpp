@@ -68,6 +68,7 @@ namespace GUI {
         ptmuInit();
         cfguInit();
         dspInit();
+        gspInit();
         socBuffer = static_cast<u32 *>(memalign(0x1000, 0x10000));
         socInit(socBuffer, 0x10000);
     }
@@ -76,6 +77,7 @@ namespace GUI {
         socExit();
         free(socBuffer);
         socBuffer = nullptr;
+        gspExit();
         dspExit();
         cfguExit();
         ptmuExit();
@@ -188,34 +190,28 @@ namespace GUI {
     }
 
     static void BatteryInfoPage(const SystemStateInfo &info) {
-        mcuHwcInit();
         Result ret = 0;
-        u8 percentage = 0, status = 0, voltage = 0, fwVerHigh = 0, fwVerLow = 0, temp = 0;
+        u8 percentage = 0, status = 0, voltage = 0, temp = 0;
         bool connected = false;
 
         ret = MCUHWC_GetBatteryLevel(std::addressof(percentage));
         Result chargeResult = PTMU_GetBatteryChargeState(std::addressof(status));
-        GUI::DrawItemf(1, "Battery percentage:", "%3d%% (%s)", R_FAILED(ret)? 0 : (percentage),
-            R_FAILED(chargeResult)? "unknown" : (status? "charging" : "not charging"));
+        GUI::DrawItemf(1, "Battery percentage:", "%3d%% (%s)", R_FAILED(ret) ? 0 : percentage,
+            R_FAILED(chargeResult) ? "unknown" : (status ? "charging" : "not charging"));
 
         ret = MCUHWC_GetBatteryVoltage(std::addressof(voltage));
         GUI::DrawItemf(2, "Battery voltage:", "%d (%.1f V)", voltage, 5.f * (static_cast<float>(voltage) / 256.f));
 
         ret = MCUHWC::GetBatteryTemperature(std::addressof(temp));
-        GUI::DrawItemf(3, "Battery temperature:", "%d °C (%d °F)", 
-            R_FAILED(ret)? 0 : (temp), R_FAILED(ret)? 0 : static_cast<u8>((temp * 9) / 5 + 32));
+        GUI::DrawItemf(3, "Battery temperature:", "%d °C (%d °F)",
+            R_FAILED(ret) ? 0 : temp, R_FAILED(ret) ? 0 : static_cast<u8>((temp * 9) / 5 + 32));
 
         ret = PTMU_GetAdapterState(std::addressof(connected));
-        GUI::DrawItemf(4, "Adapter state:", R_FAILED(ret)? "unknown" : (connected? "connected" : "disconnected"));
+        GUI::DrawItemf(4, "Adapter state:", R_FAILED(ret) ? "unknown" : (connected ? "connected" : "disconnected"));
 
-        MCUHWC_GetFwVerHigh(std::addressof(fwVerHigh));
-        MCUHWC_GetFwVerLow(std::addressof(fwVerLow));
-        GUI::DrawItemf(5, "MCU firmware:", "%u.%u", (fwVerHigh - 0x10), fwVerLow);
-
+        GUI::DrawItemf(5, "MCU firmware:", "%u.%u", (info.mcuFwVerHigh - 0x10), info.mcuFwVerLow);
         GUI::DrawItemf(6, "PMIC vendor code:", "%x", info.pmicVendorCode);
-
         GUI::DrawItemf(7, "Battery vendor code:", "%x", info.batteryVendorCode);
-        mcuHwcExit();
     }
 
     static void NNIDInfoPage(const NNIDInfo &info, bool &displayInfo) {
@@ -245,8 +241,8 @@ namespace GUI {
         GUI::DrawItem(6, "Sound output:", info.soundOutputMode);
         
         if (isNew3DS) {
-            GUI::DrawItemf(7, "Brightness level:", "%lu (auto-brightness mode: %s)", Hardware::GetBrightness(GSPLCD_SCREEN_TOP), 
-                Hardware::GetAutoBrightnessStatus());
+            GUI::DrawItemf(7, "Brightness level:", "%lu (auto-brightness mode: %s)", Hardware::GetBrightness(GSPLCD_SCREEN_TOP),
+                info.autoBrightnessStatus);
         }
         else {
             GUI::DrawItemf(7, "Brightness level:", "%lu", Hardware::GetBrightness(GSPLCD_SCREEN_TOP));
@@ -336,11 +332,14 @@ namespace GUI {
         touchPosition touch;
         u16 touchX = 0, touchY = 0;
         u8 volume = 0;
-        
+
         const u32 guiButtonTesterText = C2D_Color32(77, 76, 74, 255);
         const u32 guiButtonTesterSliderBorder = C2D_Color32(219, 219, 219, 255);
         const u32 guiButtonTesterSlider = C2D_Color32(241, 122, 74, 255);
-        
+
+        SystemStateInfo sysState = {};
+        int frameCount = 0;
+
         while (enabled) {
             hidScanInput();
             
@@ -387,8 +386,10 @@ namespace GUI {
             
             GUI::DrawText(90, 138, 0.45f, guiButtonTesterText, "Press L + R to return.");
 
-            SystemStateInfo info = Service::GetSystemStateInfo();
-            ((info.rawButtonState >> 1) & 1) == 0? GUI::DrawImageBlend(btnHome, 180, 215, guiSelectorColour): GUI::DrawImage(btnHome, 180, 215);
+            if ((frameCount % 4) == 0)
+                sysState = Service::GetSystemStateInfo();
+            frameCount++;
+            ((sysState.rawButtonState >> 1) & 1) == 0 ? GUI::DrawImageBlend(btnHome, 180, 215, guiSelectorColour) : GUI::DrawImage(btnHome, 180, 215);
 
             kHeld & KEY_L? GUI::DrawImageBlend(btnL, 0, 0, guiSelectorColour) : GUI::DrawImage(btnL, 0, 0);
             kHeld & KEY_R? GUI::DrawImageBlend(btnR, 345, 0, guiSelectorColour) : GUI::DrawImage(btnR, 345, 0);
@@ -418,7 +419,7 @@ namespace GUI {
     }
 
     void MainMenu(void) {
-        int selection = 0;
+        int selection = 0, prevSelection = -1;
         bool isNew3DS = Utils::IsNew3DS(), displayInfo = true, buttonTestEnabled = false;
 
         const char *items[] = {
@@ -455,6 +456,12 @@ namespace GUI {
             C2D_DrawRectSolid(0, 0, guiTexSize, 400, 20, guiStatusBarColour);
             GUI::DrawTextf(5, (20 - titleHeight) / 2, guiTexSize, guiTitleColour, "3DSident v%d.%d.%d", VERSION_MAJOR, VERSION_MINOR, VERSION_MICRO);
             GUI::DrawImage(banner, (400 - banner.subtex->width) / 2, ((82 - banner.subtex->height) / 2) + 20);
+
+            if (selection != prevSelection) {
+                if (prevSelection == BATTERY_INFO_PAGE) mcuHwcExit();
+                if (selection == BATTERY_INFO_PAGE) mcuHwcInit();
+                prevSelection = selection;
+            }
 
             switch (selection) {
                 case KERNEL_INFO_PAGE:
@@ -544,6 +551,7 @@ namespace GUI {
             }
 
             if ((kDown & KEY_START) || ((kDown & KEY_A) && (selection == EXIT_PAGE))) {
+                if (selection == BATTERY_INFO_PAGE) mcuHwcExit();
                 break;
             }
         }

@@ -47,6 +47,7 @@ typedef struct {
     const char *screenUpper;
     const char *screenLower;
     const char *soundOutputMode;
+    const char *autoBrightnessStatus;
 } HardwareInfo;
 
 typedef struct {
@@ -92,6 +93,8 @@ typedef struct {
     u8 unk4;
     u8 wifiLedBrightness;
     u8 rawButtonState;
+    u8 mcuFwVerHigh;
+    u8 mcuFwVerLow;
 } SystemStateInfo;
 
 namespace ACI {
