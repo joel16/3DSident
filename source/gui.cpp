@@ -71,6 +71,7 @@ namespace GUI {
         gspInit();
         socBuffer = static_cast<u32 *>(memalign(0x1000, 0x10000));
         socInit(socBuffer, 0x10000);
+        aptSetSleepAllowed(true);
     }
 
     void Exit(void) {
@@ -353,9 +354,10 @@ namespace GUI {
             
             if (((kHeld & KEY_L) && (kDown & KEY_R)) || ((kHeld & KEY_R) && (kDown & KEY_L))) {
                 aptSetHomeAllowed(true);
+                aptSetSleepAllowed(true);
                 enabled = false;
             }
-            
+
             if (kHeld & KEY_TOUCH)  {
                 hidTouchRead(&touch);
                 touchX = touch.px;
@@ -547,6 +549,7 @@ namespace GUI {
 
             if (((kHeld & KEY_L) && (kDown & KEY_R)) || ((kHeld & KEY_R) && (kDown & KEY_L))) {
                 aptSetHomeAllowed(false);
+                aptSetSleepAllowed(false);
                 buttonTestEnabled = true;
             }
 
