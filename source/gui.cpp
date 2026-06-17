@@ -35,6 +35,7 @@ namespace GUI {
 
     static C3D_RenderTarget *c3dRenderTarget[TARGET_MAX];
     static C2D_TextBuf guiStaticBuf, guiDynamicBuf, guiSizeBuf;
+    static u32 *socBuffer = nullptr;
 
     static const u32 guiBgcolour = C2D_Color32(62, 62, 62, 255);
     static const u32 guiStatusBarColour = C2D_Color32(44, 44, 44, 255);
@@ -68,11 +69,14 @@ namespace GUI {
         ptmuInit();
         cfguInit();
         dspInit();
-        socInit(static_cast<u32 *>(memalign(0x1000, 0x10000)), 0x10000);
+        socBuffer = static_cast<u32 *>(memalign(0x1000, 0x10000));
+        socInit(socBuffer, 0x10000);
     }
 
     void Exit(void) {
         socExit();
+        free(socBuffer);
+        socBuffer = nullptr;
         dspExit();
         cfguExit();
         ptmuExit();
