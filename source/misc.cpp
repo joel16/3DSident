@@ -64,7 +64,8 @@ namespace Misc {
         buf[size] = '\0';
         
         static char date[11];
-        std::strcpy(date, Utils::GetSubstring(buf, "CommentUpdated=", "\n").c_str());
+        std::string d = Utils::GetSubstring(buf, "CommentUpdated=", "\n");
+        std::snprintf(date, sizeof(date), "%s", d.c_str());
 
         if (R_FAILED(ret = FSFILE_Close(handle))) {
             Log::Error("%s(FSFILE_Close) failed: 0x%x\n", __func__, ret);
