@@ -34,4 +34,12 @@ namespace Storage {
         FS_ArchiveResource resource = Storage::GetResource(SYSTEM_MEDIATYPE_SD);
         return static_cast<u64>(resource.clusterSize);
     }
+
+    void GetStorageForMedia(FS_SystemMediaType mediaType, u64 &freeOut, u64 &usedOut, u64 &totalOut) {
+        FS_ArchiveResource resource = Storage::GetResource(mediaType);
+        u64 clusterSize = static_cast<u64>(resource.clusterSize);
+        totalOut = static_cast<u64>(resource.totalClusters) * clusterSize;
+        freeOut  = static_cast<u64>(resource.freeClusters)  * clusterSize;
+        usedOut  = totalOut - freeOut;
+    }
 }

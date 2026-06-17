@@ -174,13 +174,15 @@ namespace Service {
 
     StorageInfo GetStorageInfo(void) {
         StorageInfo info = { 0 };
-        
+
         for (int i = 0; i < 4; i++) {
-            info.usedSize[i] = Storage::GetUsedStorage(static_cast<FS_SystemMediaType>(i));
-            info.totalSize[i] = Storage::GetTotalStorage(static_cast<FS_SystemMediaType>(i));
-            Utils::GetSizeString(info.freeSizeString[i], Storage::GetFreeStorage(static_cast<FS_SystemMediaType>(i)));
-            Utils::GetSizeString(info.usedSizeString[i], Storage::GetUsedStorage(static_cast<FS_SystemMediaType>(i)));
-            Utils::GetSizeString(info.totalSizeString[i], Storage::GetTotalStorage(static_cast<FS_SystemMediaType>(i)));
+            u64 free = 0, used = 0, total = 0;
+            Storage::GetStorageForMedia(static_cast<FS_SystemMediaType>(i), free, used, total);
+            info.usedSize[i]  = used;
+            info.totalSize[i] = total;
+            Utils::GetSizeString(info.freeSizeString[i],  free);
+            Utils::GetSizeString(info.usedSizeString[i],  used);
+            Utils::GetSizeString(info.totalSizeString[i], total);
         }
 
         Utils::GetSizeString(info.clusterSizeString, Storage::GetClusterSize());
