@@ -80,7 +80,7 @@ namespace Service {
         info.kernelVersion = Kernel::GetVersion(VERSION_INFO_KERNEL);
         info.firmVersion = Kernel::GetVersion(VERSION_INFO_FIRM);
         info.systemVersion = Kernel::GetVersion(VERSION_INFO_SYSTEM);
-        info.initialVersion = Kernel::GetInitalVersion();
+        info.initialVersion = Kernel::GetInitialVersion();
         info.sdmcCid = Kernel::GetSdmcCid();
         info.nandCid = Kernel::GetNandCid();
         info.deviceId = Kernel::GetDeviceId();

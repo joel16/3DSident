@@ -263,7 +263,7 @@ namespace GUI {
             if (info.slot[i]) {
                 C2D_DrawRectSolid(15, 27 + (i * slotDistance), guiTexSize, 370, 70, guiTitleColour);
                 C2D_DrawRectSolid(16, 28 + (i * slotDistance), guiTexSize, 368, 68, guiStatusBarColour);
-                GUI::DrawTextf(20, 30 + (i * slotDistance), guiTexSize, guiTitleColour, "WiFi Slot %d:", i + 1);
+                GUI::DrawTextf(20, 30 + (i * slotDistance), guiTexSize, guiTitleColour, "Wi-Fi Slot %d:", i + 1);
                 GUI::DrawTextf(20, 46 + (i * slotDistance), guiTexSize, guiTitleColour, "SSID: %s", info.ssid[i]);
                 GUI::DrawTextf(20, 62 + (i * slotDistance), guiTexSize, guiTitleColour, "Pass: %s (%s)",
                     displayInfo? info.passphrase[i] : "", info.securityMode[i]);
@@ -326,7 +326,7 @@ namespace GUI {
         GUI::DrawItemf(3, "Installed tickets:", "%lu", info.ticketCount);
 
         u8 wifiStrength = osGetWifiStrength();
-        GUI::DrawItemf(4, "WiFi signal strength:", "%d (%.0lf%%)", wifiStrength, static_cast<float>(wifiStrength * 33.33));
+        GUI::DrawItemf(4, "Wi-Fi signal strength:", "%d (%.0lf%%)", wifiStrength, static_cast<float>(wifiStrength * 33.33));
         
         char hostname[128];
         gethostname(hostname, sizeof(hostname));
