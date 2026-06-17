@@ -41,13 +41,14 @@ namespace Utils {
         return "";
     }
     
-    void UTF16ToUTF8(u8 *buf, const u16 *data, size_t length) {
-        ssize_t units = utf16_to_utf8(buf, data, length);
+    void UTF16ToUTF8(u8 *buf, const u16 *data, size_t bufSize) {
+        if (bufSize == 0) return;
+        ssize_t units = utf16_to_utf8(buf, data, bufSize - 1);
 
-        if (units < 0) {
+        if (units < 0 || static_cast<size_t>(units) >= bufSize) {
             units = 0;
         }
-        
+
         buf[units] = 0;
     }
 }
