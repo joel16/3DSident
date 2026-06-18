@@ -7,7 +7,7 @@ typedef enum {
 } VersionInfo;
 
 namespace Kernel {
-    const char *GetInitalVersion(void);
+    const char *GetInitialVersion(void);
     const char *GetVersion(VersionInfo info);
     const char *GetSdmcCid(void);
     const char *GetNandCid(void);

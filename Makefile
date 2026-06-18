@@ -64,17 +64,31 @@ ICON_FLAGS	:=	nosavebackups,visible
 #---------------------------------------------------------------------------------
 ARCH	:=	-march=armv6k -mtune=mpcore -mfloat-abi=hard -mtp=soft
 
+ifdef BUILD_DEBUG
 CFLAGS	:=	-g -Wall -O2 -mword-relocations \
-			-ffunction-sections \
+			-ffunction-sections -fdata-sections \
+			-DBUILD_DEBUG \
 			-DVERSION_MAJOR=$(VERSION_MAJOR) -DVERSION_MINOR=$(VERSION_MINOR) -DVERSION_MICRO=$(VERSION_MICRO) \
 			$(ARCH)
+else
+CFLAGS	:=	-Wall -O3 -mword-relocations \
+			-ffunction-sections -fdata-sections \
+			-DNDEBUG \
+			-DVERSION_MAJOR=$(VERSION_MAJOR) -DVERSION_MINOR=$(VERSION_MINOR) -DVERSION_MICRO=$(VERSION_MICRO) \
+			$(ARCH)
+endif
 
 CFLAGS	+=	$(INCLUDE) -D__3DS__
 
 CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions -std=gnu++20
 
+ifdef BUILD_DEBUG
 ASFLAGS	:=	-g $(ARCH)
-LDFLAGS	=	-specs=3dsx.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
+LDFLAGS	=	-specs=3dsx.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map) -Wl,--gc-sections
+else
+ASFLAGS	:=	$(ARCH)
+LDFLAGS	=	-specs=3dsx.specs $(ARCH) -Wl,-Map,$(notdir $*.map) -Wl,--gc-sections,--strip-debug
+endif
 
 LIBS	:= -lcitro2d -lcitro3d -lctru -lm
 

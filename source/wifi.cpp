@@ -10,7 +10,9 @@ namespace Wifi {
         static char ssid[32];
         
         if (R_FAILED(ret = ACI_GetNetworkWirelessEssidSecuritySsid(ssid))) {
+#ifdef BUILD_DEBUG
             Log::Error("%s failed: 0x%x\n", __func__, ret);
+#endif
             return "unknown";
         }
         
@@ -22,7 +24,9 @@ namespace Wifi {
         static char passphrase[64];
         
         if (R_FAILED(ret = ACI::GetPassphrase(passphrase))) {
+#ifdef BUILD_DEBUG
             Log::Error("%s failed: 0x%x\n", __func__, ret);
+#endif
             return "unknown";
         }
         
@@ -45,10 +49,13 @@ namespace Wifi {
         };
 
         if (R_FAILED(ret = ACI::GetSecurityMode(std::addressof(mode)))) {
+#ifdef BUILD_DEBUG
             Log::Error("%s failed: 0x%x\n", __func__, ret);
+#endif
             return "unknown";
         }
 
+        if (static_cast<size_t>(mode) >= 8) return "unknown";
         return securityMode[mode];
     }
 }
