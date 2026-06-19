@@ -19,12 +19,12 @@ namespace Utils {
         int i = 0;
         const char *units[] = { "B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
         
-        while (double_size >= 1024.0f) {
-            double_size /= 1024.0f;
+        while (double_size >= 1024.0 && i < 8) {
+            double_size /= 1024.0;
             i++;
         }
-        
-        std::sprintf(string, "%.*f %s", (i == 0) ? 0 : 2, double_size, units[i]);
+
+        std::snprintf(string, 16, "%.*f %s", (i == 0) ? 0 : 2, double_size, units[i]);
     }
     
     std::string GetSubstring(const std::string& str, const std::string& str1, const std::string& str2) {
@@ -41,13 +41,16 @@ namespace Utils {
         return "";
     }
     
-    void UTF16ToUTF8(u8 *buf, const u16 *data, size_t length) {
-        ssize_t units = utf16_to_utf8(buf, data, length);
+    void UTF16ToUTF8(u8 *buf, const u16 *data, size_t bufSize) {
+        if (bufSize == 0) {
+            return;
+        }
+        ssize_t units = utf16_to_utf8(buf, data, bufSize - 1);
 
-        if (units < 0) {
+        if (units < 0 || static_cast<size_t>(units) >= bufSize) {
             units = 0;
         }
-        
+
         buf[units] = 0;
     }
 }

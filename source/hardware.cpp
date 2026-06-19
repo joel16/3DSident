@@ -23,12 +23,16 @@ namespace Hardware {
         }
 
         if (R_FAILED(ret = gspLcdInit())) {
+#ifdef BUILD_DEBUG
             Log::Error("%s(gspLcdInit) failed: 0x%x\n", __func__, ret);
+#endif
             return ret;
         }
 
         if (R_FAILED(ret = GSPLCD_GetVendors(&vendors))) {
+#ifdef BUILD_DEBUG
             Log::Error("%s(GSPLCD_GetVendors) failed: 0x%x\n", __func__, ret);
+#endif
             return ret;
         }
 
@@ -115,30 +119,29 @@ namespace Hardware {
             "Stereo",
             "Surround"
         };
-        
+
         if (R_FAILED(ret = CFGU_GetConfigInfoBlk2(sizeof(data), 0x00070001, std::addressof(data)))) {
+#ifdef BUILD_DEBUG
             Log::Error("%s failed: 0x%x\n", __func__, ret);
+#endif
             return "unknown";
         }
 
+        if (data >= 3) {
+            return "unknown";
+        }
         return mode[data];
     }
 
     u32 GetBrightness(u32 screen) {
         Result ret = 0;
         u32 brightness = 0;
-        u32 addr = (screen == GSPLCD_SCREEN_TOP? REG_LCD_TOP_SCREEN : REG_LCD_BOTTOM_SCREEN) + 0x40;
-
-        if (R_FAILED(ret = gspInit())) {
-            return ret;
-        }
+        u32 addr = (screen == GSPLCD_SCREEN_TOP ? REG_LCD_TOP_SCREEN : REG_LCD_BOTTOM_SCREEN) + 0x40;
 
         if (R_FAILED(ret = GSPGPU_ReadHWRegs(addr, std::addressof(brightness), 4))) {
-            gspExit();
-            return ret;
+            return 0;
         }
 
-        gspExit();
         return brightness;
     }
     

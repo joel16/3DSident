@@ -8,7 +8,6 @@ namespace System {
     const char *GetLanguage(void);
     const char *GetMacAddress(void);
     const char *GetRunningHW(void);
-    const char *IsDebugUnit(void);
     u64 GetLocalFriendCodeSeed(void);
     const char *GetNandLocalFriendCodeSeed(void);
     u8 *GetSerialNumber(void);

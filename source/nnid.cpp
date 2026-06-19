@@ -9,7 +9,9 @@ namespace NNID {
         u32 persistentId;
 
         if (R_FAILED(ret = ACT_GetAccountInfo(std::addressof(persistentId), sizeof(u32), ACT_DEFAULT_ACCOUNT, INFO_TYPE_PERSISTENT_ID))) {
+#ifdef BUILD_DEBUG
             Log::Error("%s failed: 0x%x\n", __func__, ret);
+#endif
             return ret;
         }
 
@@ -21,7 +23,9 @@ namespace NNID {
         u64 transferableIdBase;
 
         if (R_FAILED(ret = ACT_GetAccountInfo(std::addressof(transferableIdBase), sizeof(u64), ACT_DEFAULT_ACCOUNT, INFO_TYPE_COMMON_TRANSFERABLE_ID_BASE))) {
+#ifdef BUILD_DEBUG
             Log::Error("%s failed: 0x%x\n", __func__, ret);
+#endif
             return ret;
         }
 
@@ -33,7 +37,9 @@ namespace NNID {
         static char accountId[0x11];
 
         if (R_FAILED(ret = ACT_GetAccountInfo(accountId, sizeof(accountId), ACT_DEFAULT_ACCOUNT, INFO_TYPE_ACCOUNT_ID))) {
+#ifdef BUILD_DEBUG
             Log::Error("%s failed: 0x%x\n", __func__, ret);
+#endif
             return "unknown";
         }
 
@@ -45,7 +51,9 @@ namespace NNID {
         static char countryName[0x3];
 
         if (R_FAILED(ret = ACT_GetAccountInfo(countryName, sizeof(countryName), ACT_DEFAULT_ACCOUNT, INFO_TYPE_COUNTRY_NAME))) {
+#ifdef BUILD_DEBUG
             Log::Error("%s failed: 0x%x\n", __func__, ret);
+#endif
             return "unknown";
         }
 
@@ -57,7 +65,9 @@ namespace NNID {
         u32 principalId;
 
         if (R_FAILED(ret = ACT_GetAccountInfo(std::addressof(principalId), sizeof(u32), ACT_DEFAULT_ACCOUNT, INFO_TYPE_PRINCIPAL_ID))) {
+#ifdef BUILD_DEBUG
             Log::Error("%s failed: 0x%x\n", __func__, ret);
+#endif
             return ret;
         }
 
@@ -69,7 +79,9 @@ namespace NNID {
         u8 accountDeleted;
 
         if (R_FAILED(ret = ACT_GetAccountInfo(std::addressof(accountDeleted), sizeof(u8), ACT_DEFAULT_ACCOUNT, INFO_TYPE_IS_SERVER_ACCOUNT_DELETED))) {
+#ifdef BUILD_DEBUG
             Log::Error("%s failed: 0x%x\n", __func__, ret);
+#endif
             return "unknown";
         }
 
